@@ -18,16 +18,111 @@
         .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
         .stat-number { font-size: 2rem; font-weight: bold; color: #3498db; margin-bottom: 0.5rem; }
         .stat-label { color: #666; font-size: 0.9rem; }
-        .profile-section { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .profile-section { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
         .profile-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
         .info-item { padding: 1rem; background: #f8f9fa; border-radius: 5px; }
         .info-label { font-weight: bold; color: #2c3e50; margin-bottom: 0.5rem; }
         .info-value { color: #555; }
-        .btn { padding: 0.7rem 1.5rem; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 1rem; margin-top: 1rem; }
+        .btn { padding: 0.7rem 1.5rem; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-right: 1rem; margin-top: 1rem; transition: background 0.3s; }
         .btn:hover { background: #2980b9; }
         .btn-secondary { background: #95a5a6; }
         .btn-secondary:hover { background: #7f8c8d; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        
+        /* Subscription Section Styles */
+        .subscription-section { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 2rem; 
+        }
+        
+        .plan-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .plan-basic { background: #95a5a6; color: white; }
+        .plan-standard { background: #3498db; color: white; }
+        .plan-premium { background: #e74c3c; color: white; }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .current-benefits {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .upgrade-benefits {
+            padding: 1rem;
+            background: #e8f4fd;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .upgrade-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        
+        .quick-upgrade-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quick-upgrade-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+        
+        .upgrade-highlight {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upgrade-savings {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
         footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; }
+        
+        @media (max-width: 768px) {
+            .dashboard-container { padding: 0 1rem; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .upgrade-actions { flex-direction: column; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .navbar { flex-direction: column; gap: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -37,6 +132,7 @@
             <div class="nav-links" id="nav-links">
                 <a href="/">Home</a>
                 <a href="/services/">Find Companies</a>
+                <a href="/plans/">Plans</a>
                 <a href="/dashboard/">Dashboard</a>
                 <a href="#" onclick="logout()">Logout</a>
             </div>
@@ -45,11 +141,13 @@
 
     <main style="background: #f8f9fa; min-height: calc(100vh - 140px);">
         <div class="dashboard-container">
+            <!-- Welcome Section -->
             <div class="welcome-section">
                 <h1 id="welcome-message" style="color: #2c3e50; margin-bottom: 1rem;">Welcome to your Dashboard</h1>
                 <p style="color: #666;">Manage your Flowlyne account and explore business opportunities.</p>
             </div>
 
+            <!-- Platform Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number" id="total-companies">0</div>
@@ -69,10 +167,66 @@
                 </div>
             </div>
 
+            <!-- Subscription Section -->
+            <div class="subscription-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="color: #2c3e50;">Your Subscription</h2>
+                    <span id="current-plan-badge" class="plan-badge plan-basic">Basic Plan (Free)</span>
+                </div>
+
+                <div class="benefits-grid">
+                    <!-- Current Plan Benefits -->
+                    <div class="current-benefits">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 0.5rem;">✅ Current Plan Benefits</div>
+                        <ul id="current-benefits-list" style="color: #666; padding-left: 1.5rem; line-height: 1.8;">
+                            <li>Standard listing in search results</li>
+                            <li>Basic company profile</li>
+                            <li>Standard email support</li>
+                            <li>5 project uploads during signup</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Upgrade Benefits -->
+                    <div class="upgrade-benefits">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 0.5rem;">🚀 Upgrade to Get More</div>
+                        <ul style="color: #666; padding-left: 1.5rem; line-height: 1.8;">
+                            <li><strong>Higher search ranking</strong> - Get found by more clients</li>
+                            <li><strong>Portfolio showcase</strong> - Display your best work</li>
+                            <li><strong>Advanced analytics</strong> - Track your performance</li>
+                            <li><strong>Priority support</strong> - Get help when you need it</li>
+                            <li><strong>Reduced commissions</strong> - Keep more of what you earn</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Upgrade Promotion -->
+                <div id="upgrade-promotion" class="quick-upgrade-card">
+                    <div class="upgrade-highlight">🎯 Most Popular: Standard Plan</div>
+                    <p style="margin: 0.5rem 0;">Get higher search ranking, portfolio showcase, and priority support</p>
+                    <div class="upgrade-savings">Save 2% on commissions - Pay only 8% instead of 10%</div>
+                    <div style="margin-top: 1rem;">
+                        <button onclick="quickUpgrade('standard')" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: none; padding: 0.7rem 1.5rem; border-radius: 5px; font-weight: bold; cursor: pointer; margin-right: 1rem;">
+                            Upgrade Now - EGP 200/mo
+                        </button>
+                        <button onclick="quickUpgrade('premium')" style="background: transparent; color: white; border: 2px solid white; padding: 0.7rem 1.5rem; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                            Go Premium - EGP 500/mo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="upgrade-actions">
+                    <a href="/plans/" class="btn">View All Plans & Features</a>
+                    <button onclick="showSubscriptionHistory()" class="btn btn-secondary">Subscription History</button>
+                    <button onclick="manageBilling()" class="btn btn-secondary">Payment Methods</button>
+                </div>
+            </div>
+
+            <!-- Company Profile Section -->
             <div class="profile-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                     <h2 style="color: #2c3e50;">Your Company Profile</h2>
-                    <span id="company-type-badge" style="padding: 0.5rem 1rem; background: #3498db; color: white; border-radius: 20px; font-size: 0.8rem;"></span>
+                    <span id="company-type-badge" class="plan-badge plan-basic">Company</span>
                 </div>
 
                 <div class="profile-info" id="profile-info">
@@ -83,20 +237,108 @@
                     <a href="/services/" class="btn">Browse Companies</a>
                     <button onclick="showDemoMessage()" class="btn btn-secondary">Edit Profile</button>
                     <button onclick="showDemoMessage()" class="btn btn-secondary">View Messages</button>
+                    <button onclick="showDemoMessage()" class="btn btn-secondary">Analytics</button>
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses.</p>
+        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses for mutual growth.</p>
     </footer>
 
     <script>
+        // Demo message for features not implemented
         function showDemoMessage() {
             alert('This is a demo feature. In a full application, this would provide complete functionality.');
         }
         
+        function manageBilling() {
+            alert('💳 Billing Management\n\nIn a full application, this would allow you to:\n• View payment history\n• Update payment methods\n• Download invoices\n• Manage automatic renewals');
+        }
+        
+        function showSubscriptionHistory() {
+            alert('📊 Subscription History\n\nIn a full application, this would show:\n• Past subscription changes\n• Payment history\n• Usage statistics\n• Renewal dates');
+        }
+        
+        // Quick upgrade functionality
+        function quickUpgrade(planType) {
+            const planNames = {
+                'standard': 'Standard Plan (EGP 200/month)',
+                'premium': 'Premium Plan (EGP 500/month)'
+            };
+            
+            const planBenefits = {
+                'standard': [
+                    'Higher ranking in search results',
+                    'Full portfolio display',
+                    'Upload 5 new projects/month',
+                    'View & respond to comments',
+                    '8% commission (2% discount)',
+                    'Engagement analytics',
+                    'Priority support'
+                ],
+                'premium': [
+                    'Top-tier placement + Featured on Homepage',
+                    'Advanced portfolio with priority exposure', 
+                    'Upload 10 new projects/month',
+                    'Highlight top reviews + Reply to comments',
+                    '5% commission (5% discount)',
+                    'Full analytics with client trends',
+                    'Dedicated account manager'
+                ]
+            };
+            
+            const benefits = planBenefits[planType].map(benefit => `• ${benefit}`).join('\n');
+            const confirmMessage = `🚀 Upgrade to ${planNames[planType]}?\n\nYou'll get:\n${benefits}\n\nProceed with upgrade?`;
+            
+            if (confirm(confirmMessage)) {
+                // Simulate payment processing
+                alert('💳 Processing payment...\n\nRedirecting to secure payment gateway...');
+                
+                setTimeout(() => {
+                    // Simulate successful upgrade
+                    alert(`🎉 Upgrade successful!\n\nWelcome to ${planNames[planType]}!\n\nYour new features are now active:\n${benefits.replace(/•/g, '✅')}`);
+                    
+                    // Update UI to reflect new plan
+                    updateSubscriptionUI(planType, planBenefits[planType]);
+                    
+                    // Update local storage
+                    const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+                    if (currentUser) {
+                        currentUser.current_plan = planType;
+                        localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
+                    }
+                }, 1500);
+            }
+        }
+        
+        // Update subscription UI after upgrade
+        function updateSubscriptionUI(planType, benefits) {
+            const planNames = {
+                'standard': 'Standard Plan (EGP 200/mo)',
+                'premium': 'Premium Plan (EGP 500/mo)'
+            };
+            
+            // Update plan badge
+            const badge = document.getElementById('current-plan-badge');
+            badge.textContent = planNames[planType];
+            badge.className = `plan-badge plan-${planType}`;
+            
+            // Update benefits list
+            const benefitsList = document.getElementById('current-benefits-list');
+            benefitsList.innerHTML = benefits.map(benefit => `<li>${benefit}</li>`).join('');
+            
+            // Hide upgrade promotion
+            const promotion = document.getElementById('upgrade-promotion');
+            promotion.style.display = 'none';
+            
+            // Update current benefits title
+            const benefitsTitle = benefitsList.parentElement.querySelector('div');
+            benefitsTitle.textContent = `✅ Your ${planNames[planType]} Benefits`;
+        }
+        
+        // Main dashboard loading function
         async function loadDashboard() {
             const currentCompany = JSON.parse(localStorage.getItem('flowlyne_current_company'));
             
@@ -112,7 +354,7 @@
                 const stats = await response.json();
                 
                 // Update welcome message
-                document.getElementById('welcome-message').textContent = `Welcome back, ${currentCompany.company_name}!`;
+                document.getElementById('welcome-message').textContent = `Welcome back, ${currentCompany.company_name}! 👋`;
                 
                 // Update stats
                 document.getElementById('total-companies').textContent = stats.total_companies;
@@ -124,9 +366,9 @@
                 document.getElementById('member-since').textContent = memberDate.toLocaleDateString();
                 
                 // Update company type badge
-                const badge = document.getElementById('company-type-badge');
-                badge.textContent = currentCompany.is_verified ? 'Verified Company' : 'Company';
-                badge.style.background = currentCompany.is_verified ? '#27ae60' : '#3498db';
+                const companyBadge = document.getElementById('company-type-badge');
+                companyBadge.textContent = currentCompany.is_verified ? 'Verified Company ✓' : 'Company';
+                companyBadge.className = currentCompany.is_verified ? 'plan-badge plan-premium' : 'plan-badge plan-basic';
                 
                 // Populate profile information
                 document.getElementById('profile-info').innerHTML = `
@@ -156,12 +398,80 @@
                     </div>
                 `;
                 
+                // Update subscription section based on current plan
+                updateSubscriptionSection();
+                
             } catch (error) {
                 console.error('Dashboard error:', error);
                 alert('Error loading dashboard data');
             }
         }
         
+        // Update subscription section based on user's current plan
+        function updateSubscriptionSection() {
+            const currentCompany = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+            
+            if (currentCompany && currentCompany.current_plan) {
+                const plan = currentCompany.current_plan;
+                const badge = document.getElementById('current-plan-badge');
+                const promotion = document.getElementById('upgrade-promotion');
+                
+                const planBenefits = {
+                    'standard': [
+                        'Higher ranking in search results',
+                        'Full portfolio display',
+                        'Upload 5 new projects/month',
+                        'View & respond to comments',
+                        '8% commission (2% discount)',
+                        'Engagement analytics',
+                        'Priority support'
+                    ],
+                    'premium': [
+                        'Top-tier placement + Featured on Homepage',
+                        'Advanced portfolio with priority exposure', 
+                        'Upload 10 new projects/month',
+                        'Highlight top reviews + Reply to comments',
+                        '5% commission (5% discount)',
+                        'Full analytics with client trends',
+                        'Dedicated account manager'
+                    ]
+                };
+                
+                if (plan === 'standard') {
+                    badge.textContent = 'Standard Plan (EGP 200/mo)';
+                    badge.className = 'plan-badge plan-standard';
+                    
+                    // Update benefits
+                    const benefitsList = document.getElementById('current-benefits-list');
+                    benefitsList.innerHTML = planBenefits.standard.map(benefit => `<li>${benefit}</li>`).join('');
+                    
+                    // Update promotion to premium
+                    promotion.innerHTML = `
+                        <div class="upgrade-highlight">🌟 Upgrade to Premium</div>
+                        <p style="margin: 0.5rem 0;">Get featured placement, advanced analytics, and dedicated support</p>
+                        <div class="upgrade-savings">Save 3% more on commissions - Pay only 5% instead of 8%</div>
+                        <div style="margin-top: 1rem;">
+                            <button onclick="quickUpgrade('premium')" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: none; padding: 0.7rem 1.5rem; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                                Upgrade to Premium - EGP 500/mo
+                            </button>
+                        </div>
+                    `;
+                    
+                } else if (plan === 'premium') {
+                    badge.textContent = 'Premium Plan (EGP 500/mo)';  
+                    badge.className = 'plan-badge plan-premium';
+                    
+                    // Update benefits
+                    const benefitsList = document.getElementById('current-benefits-list');
+                    benefitsList.innerHTML = planBenefits.premium.map(benefit => `<li>${benefit}</li>`).join('');
+                    
+                    // Hide promotion for premium users
+                    promotion.style.display = 'none';
+                }
+            }
+        }
+        
+        // Logout functionality
         function logout() {
             localStorage.removeItem('flowlyne_token');
             localStorage.removeItem('flowlyne_current_company');
@@ -169,8 +479,10 @@
             window.location.href = '/';
         }
         
-        // Load dashboard when page loads
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans - Flowlyne</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand h1 { color: #3498db; font-size: 1.8rem; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+        .nav-links a:hover { background: #34495e; }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-section p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        .plans-container {
+            max-width: 1200px;
+            margin: -3rem auto 4rem;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .plan-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+        }
+        
+        .plan-card.featured {
+            border: 3px solid #e74c3c;
+            transform: scale(1.05);
+        }
+        
+        .plan-header {
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+        
+        .plan-card.featured .plan-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-card.featured .plan-price {
+            color: white;
+        }
+        
+        .plan-period {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .plan-card.featured .plan-period {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e74c3c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .plan-features {
+            padding: 2rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+        
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-available {
+            color: #27ae60;
+        }
+        
+        .feature-unavailable {
+            color: #e74c3c;
+        }
+        
+        .feature-text {
+            font-size: 0.95rem;
+        }
+        
+        .plan-button {
+            margin: 0 2rem 2rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .btn-free {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-free:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-standard {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-standard:hover {
+            background: #2980b9;
+        }
+        
+        .btn-premium {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-premium:hover {
+            background: #c0392b;
+        }
+        
+        .current-plan {
+            background: #27ae60;
+            color: white;
+            cursor: default;
+        }
+        
+        .faq-section {
+            background: #f8f9fa;
+            padding: 4rem 2rem;
+        }
+        
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .faq-question {
+            padding: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .faq-answer {
+            padding: 1.5rem;
+            color: #666;
+            display: none;
+        }
+        
+        footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; }
+        
+        @media (max-width: 768px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .plan-card.featured {
+                transform: none;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand"><h1>Flowlyne</h1></div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/services/">Find Companies</a>
+                <a href="/plans/">Plans</a>
+                <a href="/login/">Login</a>
+                <a href="/register/">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <h1>Choose Your Business Growth Plan</h1>
+        <p>Unlock more opportunities and grow your business with our flexible subscription plans designed for Egyptian companies.</p>
+    </section>
+
+    <div class="plans-container">
+        <div class="plans-grid">
+            <!-- Basic Plan (Free) -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <div class="plan-name">Basic Plan</div>
+                    <div class="plan-price">EGP 0</div>
+                    <div class="plan-period">Forever Free</div>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Standard listing in search results</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-unavailable">✗</div>
+                        <div class="feature-text">Portfolio view not available</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Upload 5 projects while signing up</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-unavailable">✗</div>
+                        <div class="feature-text">Comments view not available</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-unavailable">✗</div>
+                        <div class="feature-text">No commission discount (10% commission)</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Basic stats (No profile visits only)</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Standard support (Email/chat)</div>
+                    </div>
+                </div>
+                <button onclick="selectPlan('basic')" class="plan-button btn-free">Get Started Free</button>
+            </div>
+
+            <!-- Standard Plan -->
+            <div class="plan-card featured">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-header">
+                    <div class="plan-name">Standard Plan</div>
+                    <div class="plan-price">EGP 200</div>
+                    <div class="plan-period">per month</div>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Higher ranking in search results</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Full portfolio display (Showcase past projects)</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Upload 5 new projects/month</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">View & respond to comments</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">8% commission (2% discount) for contracts up to 11,000 EGP</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Engagement analytics (Click-through rates, inquiries)</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Priority support (Faster response time)</div>
+                    </div>
+                </div>
+                <button onclick="selectPlan('standard')" class="plan-button btn-standard">Choose Standard</button>
+            </div>
+
+            <!-- Premium Plan -->
+            <div class="plan-card">
+                <div class="plan-header">
+                    <div class="plan-name">Premium Plan</div>
+                    <div class="plan-price">EGP 500</div>
+                    <div class="plan-period">per month</div>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Top-tier placement + Featured on Homepage</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Advanced portfolio with priority exposure</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Upload 10 new projects/month</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Highlight top reviews + Reply to comments</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">5% commission (5% discount) for contracts up to 11,000 EGP</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Full analytics (Client trends, conversion tracking)</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon feature-available">✓</div>
+                        <div class="feature-text">Dedicated account manager (One-on-one support)</div>
+                    </div>
+                </div>
+                <button onclick="selectPlan('premium')" class="plan-button btn-premium">Go Premium</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="faq-section">
+        <div class="faq-container">
+            <h2 style="text-align: center; margin-bottom: 3rem; color: #2c3e50;">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">Can I change my plan anytime?</div>
+                <div class="faq-answer">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and billing adjustments are made accordingly.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">What payment methods do you accept?</div>
+                <div class="faq-answer">We accept major credit cards, bank transfers, and mobile payment solutions popular in Egypt including Vodafone Cash and Orange Money.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">Is there a contract or commitment period?</div>
+                <div class="faq-answer">No long-term contracts required. All plans are month-to-month and you can cancel anytime. Your current plan remains active until the end of your billing period.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">What happens if I cancel my subscription?</div>
+                <div class="faq-answer">You'll automatically be moved to the Basic (Free) plan. Your account and data remain intact, but premium features will no longer be accessible.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Flowlyne. Empowering Egyptian businesses to grow together.</p>
+    </footer>
+
+    <script>
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const isOpen = answer.style.display === 'block';
+            
+            // Close all FAQ answers
+            document.querySelectorAll('.faq-answer').forEach(ans => {
+                ans.style.display = 'none';
+            });
+            
+            // Open clicked answer if it was closed
+            if (!isOpen) {
+                answer.style.display = 'block';
+            }
+        }
+
+        function selectPlan(planType) {
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+            
+            if (!currentUser) {
+                alert('Please login to select a subscription plan');
+                window.location.href = '/login/';
+                return;
+            }
+            
+            if (planType === 'basic') {
+                alert('You are selecting the Basic (Free) plan. This plan is automatically assigned to all new accounts.');
+                return;
+            }
+            
+            // For demo purposes - in a real app, this would integrate with payment processing
+            const planNames = {
+                'standard': 'Standard Plan (EGP 200/month)',
+                'premium': 'Premium Plan (EGP 500/month)'
+            };
+            
+            const confirmMessage = `You are about to upgrade to ${planNames[planType]}.\n\nIn a full application, you would be redirected to a secure payment page.\n\nProceed with demo upgrade?`;
+            
+            if (confirm(confirmMessage)) {
+                // Simulate successful upgrade
+                alert(`Congratulations! You have successfully upgraded to ${planNames[planType]}.\n\nYour new features are now active!`);
+                
+                // Update local storage to reflect new plan
+                currentUser.subscription_plan = planType;
+                localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
+                
+                // Redirect to dashboard
+                window.location.href = '/dashboard/';
+            }
+        }
+
+        // Check current user's plan and update buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+            
+            if (currentUser && currentUser.subscription_plan) {
+                const currentPlan = currentUser.subscription_plan;
+                const buttons = document.querySelectorAll('.plan-button');
+                
+                buttons.forEach(button => {
+                    const planType = button.getAttribute('onclick').match(/'(\w+)'/)[1];
+                    if (planType === currentPlan) {
+                        button.textContent = 'Current Plan';
+                        button.className = 'plan-button current-plan';
+                        button.setAttribute('onclick', '');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

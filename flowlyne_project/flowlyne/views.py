@@ -58,7 +58,8 @@ def api_register(request):
             description=data.get('description', ''),
             website=data.get('website', ''),
             city=data.get('city', 'Cairo'),
-            country=data.get('country', 'Egypt')
+            country=data.get('country', 'Egypt'),
+            current_plan='basic'  # Add this line - all new users start with basic plan
         )
         
         # Handle file uploads if present
@@ -309,6 +310,83 @@ def api_send_message(request):
             'message': 'Message sent successfully',
             'id': 'demo-message-id'
         }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+def plans(request):
+    return render(request, 'plans.html')
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_subscription_plans(request):
+    """Get all available subscription plans"""
+    try:
+        # For demo purposes, return static data
+        # In a real app, this would query the SubscriptionPlan model
+        plans = [
+            {
+                'id': 1,
+                'name': 'basic',
+                'display_name': 'Basic Plan (Free)',
+                'price_egp': 0,
+                'features': [
+                    'Standard listing',
+                    'Basic profile',
+                    'Email support',
+                    '5 project uploads'
+                ]
+            },
+            {
+                'id': 2,
+                'name': 'standard',
+                'display_name': 'Standard Plan',
+                'price_egp': 200,
+                'features': [
+                    'Higher search ranking',
+                    'Portfolio showcase',
+                    'Priority support',
+                    'Analytics dashboard'
+                ]
+            },
+            {
+                'id': 3,
+                'name': 'premium',
+                'display_name': 'Premium Plan',
+                'price_egp': 500,
+                'features': [
+                    'Top placement',
+                    'Featured on homepage',
+                    'Advanced analytics',
+                    'Dedicated support'
+                ]
+            }
+        ]
+        return Response(plans)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_upgrade_subscription(request):
+    """Upgrade user's subscription plan"""
+    try:
+        plan_type = request.data.get('plan_type')
+        if not plan_type:
+            return Response({'error': 'Plan type required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # In a real app, this would:
+        # 1. Process payment
+        # 2. Update user's subscription in database
+        # 3. Send confirmation email
+        
+        # For demo purposes, just return success
+        return Response({
+            'message': f'Successfully upgraded to {plan_type} plan',
+            'plan_type': plan_type,
+            'status': 'active'
+        })
         
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

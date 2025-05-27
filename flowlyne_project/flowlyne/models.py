@@ -57,10 +57,25 @@ class Company(AbstractUser):
     
     # Verification status
     is_verified = models.BooleanField(default=False)
+
+    # Company Subscription Plan
+    current_plan = models.CharField(max_length=20, default='basic', choices=[('basic', 'Basic'), ('standard', 'Standard'), ('premium', 'Premium')])
     
     # Location
     city = models.CharField(max_length=100, default="Cairo")
     country = models.CharField(max_length=100, default="Egypt")
+
+    # Subscription Plan - ADD THIS LINE
+    current_plan = models.CharField(
+        max_length=20, 
+        default='basic', 
+        choices=[
+            ('basic', 'Basic Plan (Free)'),
+            ('standard', 'Standard Plan'),
+            ('premium', 'Premium Plan')
+        ],
+        help_text="Current subscription plan"
+    )
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -105,3 +120,71 @@ class CompanyDepartment(models.Model):
     
     def __str__(self):
         return f"{self.company.company_name} - {self.department.name}"
+    
+class SubscriptionPlan(models.Model):
+    """Subscription plans available on the platform"""
+    PLAN_CHOICES = [
+        ('basic', 'Basic Plan (Free)'),
+        ('standard', 'Standard Plan'),
+        ('premium', 'Premium Plan'),
+    ]
+    
+    name = models.CharField(max_length=20, choices=PLAN_CHOICES, unique=True)
+    display_name = models.CharField(max_length=100)
+    price_egp = models.DecimalField(max_digits=10, decimal_places=2)
+    price_period = models.CharField(max_length=20, default='month')
+    
+    # Features
+    search_ranking = models.CharField(max_length=200)
+    portfolio_view = models.CharField(max_length=200)
+    portfolio_uploads_per_month = models.IntegerField()
+    comments_view = models.CharField(max_length=200)
+    commission_discount = models.CharField(max_length=200)
+    business_insights = models.CharField(max_length=200)
+    support_level = models.CharField(max_length=200)
+    
+    # Additional benefits
+    featured_on_homepage = models.BooleanField(default=False)
+    priority_support = models.BooleanField(default=False)
+    advanced_analytics = models.BooleanField(default=False)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['price_egp']
+    
+    def __str__(self):
+        return f"{self.display_name} - EGP {self.price_egp}/{self.price_period}"
+
+class CompanySubscription(models.Model):
+    """Company's current subscription"""
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='subscription')
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE)
+    
+    # Subscription details
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    auto_renewal = models.BooleanField(default=True)
+    
+    # Payment tracking
+    last_payment_date = models.DateTimeField(null=True, blank=True)
+    next_payment_date = models.DateTimeField(null=True, blank=True)
+    payment_method = models.CharField(max_length=50, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.company.company_name} - {self.plan.display_name}"
+    
+    @property
+    def is_expired(self):
+        if not self.end_date:
+            return False
+        from django.utils import timezone
+        return timezone.now() > self.end_date
