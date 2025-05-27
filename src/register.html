@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Flowlyne</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>Flowlyne</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="services.html">Find Services</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding: 2rem; background: #f8f9fa; min-height: calc(100vh - 140px);">
+        <div class="form-container">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">Join Flowlyne</h2>
+            
+            <form onsubmit="handleRegistration(event)">
+                <div class="form-group">
+                    <label for="userType">I am a:</label>
+                    <select id="userType" name="userType" onchange="toggleUserTypeFields()" required>
+                        <option value="">Select your role</option>
+                        <option value="company">Company looking for services</option>
+                        <option value="provider">Service provider</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company Name</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div id="provider-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="services">Services You Offer *</label>
+                        <select id="services" name="services">
+                            <option value="">Select your main service</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile App Development">Mobile App Development</option>
+                            <option value="Digital Marketing">Digital Marketing</option>
+                            <option value="Graphic Design">Graphic Design</option>
+                            <option value="Content Writing">Content Writing</option>
+                            <option value="Accounting">Accounting & Finance</option>
+                            <option value="Business Consulting">Business Consulting</option>
+                            <option value="Legal Services">Legal Services</option>
+                            <option value="Translation">Translation Services</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Describe Your Services</label>
+                        <textarea id="description" name="description" rows="4" 
+                            placeholder="Tell potential clients about your expertise, experience, and what makes you unique..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    Create Account
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 1.5rem;">
+                Already have an account? <a href="login.html" style="color: #3498db;">Login here</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Flowlyne. Connecting businesses across Egypt.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

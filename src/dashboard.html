@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Flowlyne</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .welcome-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .profile-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-value {
+            color: #555;
+        }
+        
+        .action-buttons {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>Flowlyne</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="services.html">Find Services</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main style="background: #f8f9fa; min-height: calc(100vh - 140px);">
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1 id="welcome-message" style="color: #2c3e50; margin-bottom: 1rem;">Welcome to your Dashboard</h1>
+                <p style="color: #666;">Manage your Flowlyne account and track your activity.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-users">0</div>
+                    <div class="stat-label">Total Platform Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="service-providers">0</div>
+                    <div class="stat-label">Service Providers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="companies">0</div>
+                    <div class="stat-label">Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="member-since">-</div>
+                    <div class="stat-label">Member Since</div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-header">
+                    <h2 style="color: #2c3e50;">Your Profile Information</h2>
+                    <span id="user-type-badge" style="padding: 0.5rem 1rem; background: #3498db; color: white; border-radius: 20px; font-size: 0.8rem;"></span>
+                </div>
+
+                <div class="profile-info" id="profile-info">
+                    <!-- Profile information will be populated by JavaScript -->
+                </div>
+
+                <div class="action-buttons">
+                    <a href="services.html" class="btn btn-primary">Browse Services</a>
+                    <button onclick="showDemoMessage()" class="btn btn-secondary">Edit Profile</button>
+                    <button onclick="showDemoMessage()" class="btn btn-secondary">View Messages</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Flowlyne. Connecting businesses across Egypt.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function showDemoMessage() {
+            alert('This is a demo feature. In a full application, this would provide complete functionality.');
+        }
+        
+        function loadDashboard() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_user'));
+            
+            if (!currentUser) {
+                alert('Please login to access your dashboard');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load users data
+            const users = JSON.parse(localStorage.getItem('flowlyne_users')) || [];
+            
+            // Update welcome message
+            document.getElementById('welcome-message').textContent = `Welcome back, ${currentUser.name}!`;
+            
+            // Update stats
+            document.getElementById('total-users').textContent = users.length;
+            document.getElementById('service-providers').textContent = users.filter(u => u.type === 'provider').length;
+            document.getElementById('companies').textContent = users.filter(u => u.type === 'company').length;
+            
+            // Format member since date
+            const memberDate = new Date(currentUser.createdAt);
+            document.getElementById('member-since').textContent = memberDate.toLocaleDateString();
+            
+            // Update user type badge
+            const badge = document.getElementById('user-type-badge');
+            badge.textContent = currentUser.type === 'provider' ? 'Service Provider' : 'Company';
+            badge.style.background = currentUser.type === 'provider' ? '#e74c3c' : '#3498db';
+            
+            // Populate profile information
+            const profileInfo = document.getElementById('profile-info');
+            profileInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">${currentUser.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">${currentUser.email}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Company</div>
+                    <div class="info-value">${currentUser.company || 'Not specified'}</div>
+                </div>
+                ${currentUser.type === 'provider' ? `
+                <div class="info-item">
+                    <div class="info-label">Services Offered</div>
+                    <div class="info-value">${currentUser.services || 'Not specified'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Description</div>
+                    <div class="info-value">${currentUser.description || 'No description provided'}</div>
+                </div>
+                ` : ''}
+            `;
+        }
+        
+        // Load dashboard when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>
