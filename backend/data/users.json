@@ -1,0 +1,44 @@
+[
+  {
+    "id": "b1fc5964-7f77-4585-9ebe-ecbb79dcf52a",
+    "name": "Demo Company",
+    "email": "company@demo.com",
+    "password": "$2a$10$QZHwpNyL3GDi27GANxc7Le/xKn/zeJSN6quCcBOiQsOcqe16YGXJG",
+    "type": "company",
+    "company": "Demo Corp",
+    "createdAt": "2025-05-27T15:09:18.382Z"
+  },
+  {
+    "id": "58d30e9a-5a72-4220-8060-8545d9af2998",
+    "name": "Demo Provider",
+    "email": "provider@demo.com",
+    "password": "$2a$10$bo7WxRA3RusYJimNbvDrb..mT3iwGpOo3lCvtcKXAlhdn18Pz2dYC",
+    "type": "provider",
+    "company": "Web Solutions Pro",
+    "services": "Web Development",
+    "description": "Professional web development services with 5+ years experience in React, Node.js, and modern web technologies.",
+    "createdAt": "2025-05-27T15:09:18.444Z"
+  },
+  {
+    "id": "407a0a3a-549c-4d6f-8ea8-c9eb7b65aebf",
+    "name": "Ahmed Hassan",
+    "email": "ahmed@webdev.com",
+    "password": "$2a$10$ch5rlbnWDGPSL/iEUUM5fe6u2CTfX7Lu3PO3GK6dgqSebgnBNZu76",
+    "type": "provider",
+    "company": "Hassan Digital",
+    "services": "Digital Marketing",
+    "description": "Expert in social media marketing, SEO, and Google Ads with 3+ years helping Egyptian businesses grow online.",
+    "createdAt": "2025-05-27T15:09:18.506Z"
+  },
+  {
+    "id": "2b859cea-a617-49f6-88cc-35b06a5a207f",
+    "name": "Fatma Ali",
+    "email": "fatma@designs.com",
+    "password": "$2a$10$s63ZGL6WvGmchrOZKa8pNel.ztNWrVXkPIgqFxXokzFMjE26/95fO",
+    "type": "provider",
+    "company": "Creative Designs Co",
+    "services": "Graphic Design",
+    "description": "Professional graphic designer specializing in branding, logos, and marketing materials for startups and small businesses.",
+    "createdAt": "2025-05-27T15:09:18.567Z"
+  }
+]
