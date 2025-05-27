@@ -290,26 +290,14 @@
             };
             
             const benefits = planBenefits[planType].map(benefit => `• ${benefit}`).join('\n');
-            const confirmMessage = `🚀 Upgrade to ${planNames[planType]}?\n\nYou'll get:\n${benefits}\n\nProceed with upgrade?`;
+            const confirmMessage = `🚀 Upgrade to ${planNames[planType]}?\n\nYou'll be redirected to our secure payment page.\n\nProceed?`;
             
             if (confirm(confirmMessage)) {
-                // Simulate payment processing
-                alert('💳 Processing payment...\n\nRedirecting to secure payment gateway...');
+                // Show loading message
+                alert('🔄 Redirecting to secure payment page...');
                 
-                setTimeout(() => {
-                    // Simulate successful upgrade
-                    alert(`🎉 Upgrade successful!\n\nWelcome to ${planNames[planType]}!\n\nYour new features are now active:\n${benefits.replace(/•/g, '✅')}`);
-                    
-                    // Update UI to reflect new plan
-                    updateSubscriptionUI(planType, planBenefits[planType]);
-                    
-                    // Update local storage
-                    const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
-                    if (currentUser) {
-                        currentUser.current_plan = planType;
-                        localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
-                    }
-                }, 1500);
+                // Redirect to payment page with selected plan
+                window.location.href = `/payment/?plan=${planType}`;
             }
         }
         

@@ -390,3 +390,7 @@ def api_upgrade_subscription(request):
         
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+def payment(request):
+    """Payment page for subscription upgrades"""
+    return render(request, 'payment.html')

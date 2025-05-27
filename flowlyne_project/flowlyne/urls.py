@@ -7,7 +7,8 @@ urlpatterns = [
     # Frontend views
     path('', views.index, name='index'),
     path('services/', views.services, name='services'),
-    path('plans/', views.plans, name='plans'),  # Add this line
+    path('plans/', views.plans, name='plans'),
+    path('payment/', views.payment, name='payment'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),

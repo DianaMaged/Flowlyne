@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - Flowlyne</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f8f9fa; }
+        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand h1 { color: #3498db; font-size: 1.8rem; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+        .nav-links a:hover { background: #34495e; }
+        
+        .payment-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+        
+        .payment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .order-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e8f4fd;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .card-input {
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Crect x='1' y='4' width='22' height='16' rx='2' ry='2'/%3E%3Cline x1='1' y1='10' x2='23' y2='10'/%3E%3C/svg%3E") no-repeat right 12px center;
+            background-size: 20px;
+            padding-right: 45px;
+        }
+        
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-method {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: #3498db;
+        }
+        
+        .payment-method.active {
+            border-color: #3498db;
+            background: #e8f4fd;
+        }
+        
+        .payment-method img {
+            width: 40px;
+            height: 25px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .egyptian-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .mobile-payment {
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mobile-payment:hover {
+            border-color: #e74c3c;
+        }
+        
+        .mobile-payment.active {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        
+        .pay-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .pay-button:hover {
+            background: linear-gradient(135deg, #229954, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .pay-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .plan-highlight {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .price-breakdown {
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-row.total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-top: 1px solid #ddd;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .savings-highlight {
+            background: #d5f4e6;
+            color: #27ae60;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .security-features {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .security-features div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .back-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .payment-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                flex-direction: column;
+            }
+            
+            .egyptian-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand"><h1>Flowlyne</h1></div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/services/">Find Companies</a>
+                <a href="/plans/">Plans</a>
+                <a href="/dashboard/">Dashboard</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="payment-container">
+            <!-- Payment Form -->
+            <div class="payment-form">
+                <a href="/plans/" class="back-link">
+                    ← Back to Plans
+                </a>
+                
+                <div class="security-badge">
+                    <span style="font-size: 1.2rem;">🔒</span>
+                    <div>
+                        <strong>Secure Payment</strong><br>
+                        <small>256-bit SSL encryption protects your data</small>
+                    </div>
+                </div>
+
+                <form id="payment-form" onsubmit="processPayment(event)">
+                    <!-- Payment Method Selection -->
+                    <div class="form-section">
+                        <h3>💳 Payment Method</h3>
+                        <div class="payment-methods">
+                            <div class="payment-method active" onclick="selectPaymentMethod('card')" data-method="card">
+                                <div style="font-size: 1.5rem;">💳</div>
+                                <div>Credit Card</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPaymentMethod('bank')" data-method="bank">
+                                <div style="font-size: 1.5rem;">🏦</div>
+                                <div>Bank Transfer</div>
+                            </div>
+                        </div>
+                        
+                        <div class="egyptian-methods">
+                            <div class="mobile-payment" onclick="selectPaymentMethod('vodafone')" data-method="vodafone">
+                                <div style="color: #e60000; font-weight: bold;">📱 Vodafone Cash</div>
+                            </div>
+                            <div class="mobile-payment" onclick="selectPaymentMethod('orange')" data-method="orange">
+                                <div style="color: #ff6600; font-weight: bold;">📱 Orange Money</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Credit Card Details -->
+                    <div id="card-details" class="form-section">
+                        <h3>💳 Card Details</h3>
+                        <div class="form-group">
+                            <label for="card_number">Card Number</label>
+                            <input type="text" id="card_number" name="card_number" class="card-input" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiry_date">Expiry Date</label>
+                                <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="card_name">Cardholder Name</label>
+                            <input type="text" id="card_name" name="card_name" placeholder="Name as it appears on card">
+                        </div>
+                    </div>
+
+                    <!-- Mobile Payment Details -->
+                    <div id="mobile-details" class="form-section" style="display: none;">
+                        <h3>📱 Mobile Payment Details</h3>
+                        <div class="form-group">
+                            <label for="mobile_number">Mobile Number</label>
+                            <input type="tel" id="mobile_number" name="mobile_number" placeholder="+20 100 123 4567">
+                        </div>
+                        <div style="padding: 1rem; background: #fff3cd; border-radius: 6px; color: #856404;">
+                            <strong>Instructions:</strong><br>
+                            You will receive an SMS with payment instructions after confirming this order.
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer Details -->
+                    <div id="bank-details" class="form-section" style="display: none;">
+                        <h3>🏦 Bank Transfer Details</h3>
+                        <div style="padding: 1rem; background: #e8f4fd; border-radius: 6px; color: #2c3e50;">
+                            <strong>Bank Details will be provided after confirmation:</strong><br>
+                            • Account Name: Flowlyne Egypt Ltd.<br>
+                            • Bank: National Bank of Egypt<br>
+                            • Payment reference will be generated
+                        </div>
+                    </div>
+
+                    <!-- Billing Address -->
+                    <div class="form-section">
+                        <h3>📍 Billing Address</h3>
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="billing_address">Address</label>
+                            <input type="text" id="billing_address" name="billing_address" placeholder="Street address" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city" value="Cairo" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <select id="country" name="country" required>
+                                    <option value="Egypt">Egypt</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="UAE">UAE</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="pay-button" id="pay-btn">
+                        <span id="pay-btn-text">🔒 Complete Secure Payment</span>
+                        <div id="pay-btn-loading" style="display: none;">Processing... ⏳</div>
+                    </button>
+                </form>
+
+                <div class="security-features">
+                    <div><span>🔒</span> 256-bit SSL Encryption</div>
+                    <div><span>🛡️</span> PCI DSS Compliant</div>
+                    <div><span>✅</span> Secure Payment Processing</div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="plan-highlight">
+                    <div class="plan-name" id="selected-plan-name">Standard Plan</div>
+                    <div>Monthly Subscription</div>
+                    <div class="plan-price" id="selected-plan-price">EGP 200</div>
+                </div>
+
+                <div id="plan-benefits">
+                    <h4 style="margin-bottom: 1rem; color: #2c3e50;">✨ What You Get:</h4>
+                    <ul style="color: #666; line-height: 1.8;" id="benefits-list">
+                        <li>Higher ranking in search results</li>
+                        <li>Full portfolio display</li>
+                        <li>Upload 5 new projects/month</li>
+                        <li>View & respond to comments</li>
+                        <li>8% commission (2% discount)</li>
+                        <li>Engagement analytics</li>
+                        <li>Priority support</li>
+                    </ul>
+                </div>
+
+                <div class="savings-highlight" id="savings-info">
+                    💰 You save 2% on all commissions!<br>
+                    <small>Pay only 8% instead of 10%</small>
+                </div>
+
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>Subscription Fee:</span>
+                        <span id="plan-cost">EGP 200.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span>VAT (14%):</span>
+                        <span id="vat-amount">EGP 28.00</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total Monthly:</span>
+                        <span id="total-amount">EGP 228.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 6px; font-size: 0.9rem; color: #666;">
+                    <strong>💡 Note:</strong> You can cancel anytime. No long-term commitment required. Your subscription will auto-renew monthly unless cancelled.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Get plan details from URL parameters or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const planType = urlParams.get('plan') || 'standard';
+        
+        const planDetails = {
+            'standard': {
+                name: 'Standard Plan',
+                price: 200,
+                benefits: [
+                    'Higher ranking in search results',
+                    'Full portfolio display',
+                    'Upload 5 new projects/month',
+                    'View & respond to comments',
+                    '8% commission (2% discount)',
+                    'Engagement analytics',
+                    'Priority support'
+                ],
+                savings: '💰 You save 2% on all commissions!<br><small>Pay only 8% instead of 10%</small>'
+            },
+            'premium': {
+                name: 'Premium Plan',
+                price: 500,
+                benefits: [
+                    'Top-tier placement + Featured on Homepage',
+                    'Advanced portfolio with priority exposure',
+                    'Upload 10 new projects/month',
+                    'Highlight top reviews + Reply to comments',
+                    '5% commission (5% discount)',
+                    'Full analytics with client trends',
+                    'Dedicated account manager'
+                ],
+                savings: '💰 You save 5% on all commissions!<br><small>Pay only 5% instead of 10%</small>'
+            }
+        };
+        
+        // Initialize page with selected plan
+        function initializePage() {
+            const plan = planDetails[planType];
+            const vat = plan.price * 0.14;
+            const total = plan.price + vat;
+            
+            document.getElementById('selected-plan-name').textContent = plan.name;
+            document.getElementById('selected-plan-price').textContent = `EGP ${plan.price}`;
+            document.getElementById('plan-cost').textContent = `EGP ${plan.price.toFixed(2)}`;
+            document.getElementById('vat-amount').textContent = `EGP ${vat.toFixed(2)}`;
+            document.getElementById('total-amount').textContent = `EGP ${total.toFixed(2)}`;
+            
+            const benefitsList = document.getElementById('benefits-list');
+            benefitsList.innerHTML = plan.benefits.map(benefit => `<li>${benefit}</li>`).join('');
+            
+            document.getElementById('savings-info').innerHTML = plan.savings;
+            
+            // Pre-fill company name if available
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || '{}');
+            if (currentUser.company_name) {
+                document.getElementById('company_name').value = currentUser.company_name;
+            }
+        }
+        
+        // Payment method selection
+        function selectPaymentMethod(method) {
+            // Remove active class from all methods
+            document.querySelectorAll('.payment-method, .mobile-payment').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Add active class to selected method
+            document.querySelector(`[data-method="${method}"]`).classList.add('active');
+            
+            // Show/hide relevant form sections
+            document.getElementById('card-details').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('mobile-details').style.display = ['vodafone', 'orange'].includes(method) ? 'block' : 'none';
+            document.getElementById('bank-details').style.display = method === 'bank' ? 'block' : 'none';
+            
+            // Update pay button text
+            const payBtn = document.getElementById('pay-btn-text');
+            const methodNames = {
+                'card': '🔒 Complete Card Payment',
+                'bank': '🏦 Confirm Bank Transfer',
+                'vodafone': '📱 Pay with Vodafone Cash',
+                'orange': '📱 Pay with Orange Money'
+            };
+            payBtn.textContent = methodNames[method];
+        }
+        
+        // Format card number input
+        document.getElementById('card_number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedInputValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedInputValue;
+        });
+        
+        // Format expiry date
+        document.getElementById('expiry_date').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+        
+        // Process payment (demo)
+        async function processPayment(event) {
+            event.preventDefault();
+            
+            const payBtn = document.getElementById('pay-btn');
+            const payBtnText = document.getElementById('pay-btn-text');
+            const payBtnLoading = document.getElementById('pay-btn-loading');
+            
+            // Show loading state
+            payBtn.disabled = true;
+            payBtnText.style.display = 'none';
+            payBtnLoading.style.display = 'block';
+            
+            // Simulate payment processing
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // Simulate successful payment
+            const plan = planDetails[planType];
+            
+            alert(`🎉 Payment Successful!\n\nYou have successfully upgraded to ${plan.name}!\n\n✅ Your subscription is now active\n✅ New features unlocked\n✅ Confirmation email sent\n\nRedirecting to your dashboard...`);
+            
+            // Update user's plan in localStorage
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || '{}');
+            currentUser.current_plan = planType;
+            localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
+            
+            // Redirect to dashboard
+            window.location.href = '/dashboard/';
+        }
+        
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

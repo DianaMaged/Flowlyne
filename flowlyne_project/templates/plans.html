@@ -443,25 +443,8 @@
                 return;
             }
             
-            // For demo purposes - in a real app, this would integrate with payment processing
-            const planNames = {
-                'standard': 'Standard Plan (EGP 200/month)',
-                'premium': 'Premium Plan (EGP 500/month)'
-            };
-            
-            const confirmMessage = `You are about to upgrade to ${planNames[planType]}.\n\nIn a full application, you would be redirected to a secure payment page.\n\nProceed with demo upgrade?`;
-            
-            if (confirm(confirmMessage)) {
-                // Simulate successful upgrade
-                alert(`Congratulations! You have successfully upgraded to ${planNames[planType]}.\n\nYour new features are now active!`);
-                
-                // Update local storage to reflect new plan
-                currentUser.subscription_plan = planType;
-                localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
-                
-                // Redirect to dashboard
-                window.location.href = '/dashboard/';
-            }
+            // Redirect to payment page with selected plan
+            window.location.href = `/payment/?plan=${planType}`;
         }
 
         // Check current user's plan and update buttons
