@@ -188,19 +188,40 @@ async function displayServiceProviders() {
             <div class="provider-card">
                 <div class="provider-header">
                     <div class="provider-info">
-                        <h3>${provider.name}</h3>
+                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
                         <div class="provider-meta">
-                            <span>${provider.services || 'General Services'}</span>
-                            <span>${provider.company || 'Independent'}</span>
+                            <span class="service-tag">${provider.services || 'General Services'}</span>
+                            <span class="company-tag">${provider.company || 'Independent'}</span>
+                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
                         </div>
+                        <div class="provider-stats">
+                            <div class="rating">
+                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
+                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
+                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
+                            </div>
+                            <div class="experience">
+                                <strong>${provider.experience_years || 0}+ years</strong> • 
+                                <strong>${provider.completed_projects || 0} projects</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-pricing">
+                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
+                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
                     </div>
                 </div>
                 <div class="provider-description">
                     ${provider.description || 'Professional service provider ready to help your business grow.'}
                 </div>
-                <button onclick="contactProvider('${provider.email}')" class="contact-btn">
-                    Contact Provider
-                </button>
+                <div class="provider-actions">
+                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
+                        💬 Contact Provider
+                    </button>
+                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
+                        👤 View Profile
+                    </button>
+                </div>
             </div>
         `).join('');
         
@@ -208,6 +229,95 @@ async function displayServiceProviders() {
         console.error('Error loading providers:', error);
         container.innerHTML = '<div class="no-results"><h3>Error loading providers</h3><p>Please try again later.</p></div>';
     }
+}
+
+// Filter providers by category
+async function filterByCategory(category) {
+    const container = document.getElementById('providers-container');
+    
+    if (!container) return;
+    
+    // Update active button
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    event.target.classList.add('active');
+    
+    try {
+        // Show loading state
+        container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Loading providers...</p></div>';
+        
+        let providers;
+        if (category) {
+            providers = await apiRequest(`/providers/search?q=${encodeURIComponent(category)}`);
+        } else {
+            providers = await apiRequest('/providers');
+        }
+        
+        if (providers.length === 0) {
+            container.innerHTML = `
+                <div class="no-results">
+                    <h3>No providers found</h3>
+                    <p>No providers available for ${category || 'this category'}.</p>
+                    <button onclick="displayServiceProviders()" class="btn btn-secondary" style="margin-top: 1rem;">
+                        Show All Providers
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = providers.map(provider => `
+            <div class="provider-card">
+                <div class="provider-header">
+                    <div class="provider-info">
+                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
+                        <div class="provider-meta">
+                            <span class="service-tag">${provider.services || 'General Services'}</span>
+                            <span class="company-tag">${provider.company || 'Independent'}</span>
+                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
+                        </div>
+                        <div class="provider-stats">
+                            <div class="rating">
+                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
+                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
+                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
+                            </div>
+                            <div class="experience">
+                                <strong>${provider.experience_years || 0}+ years</strong> • 
+                                <strong>${provider.completed_projects || 0} projects</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-pricing">
+                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
+                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
+                    </div>
+                </div>
+                <div class="provider-description">
+                    ${provider.description || 'Professional service provider ready to help your business grow.'}
+                </div>
+                <div class="provider-actions">
+                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
+                        💬 Contact Provider
+                    </button>
+                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
+                        👤 View Profile  
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Category filter error:', error);
+        container.innerHTML = '<div class="no-results"><h3>Error loading providers</h3><p>Please try again.</p></div>';
+    }
+}
+
+// View provider profile (demo function)
+function viewProfile(providerId) {
+    alert('View Profile feature coming soon! This would show detailed provider information, portfolio, reviews, and past work.');
 }
 
 // Contact provider function
@@ -274,19 +384,40 @@ async function searchProviders() {
             <div class="provider-card">
                 <div class="provider-header">
                     <div class="provider-info">
-                        <h3>${provider.name}</h3>
+                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
                         <div class="provider-meta">
-                            <span>${provider.services || 'General Services'}</span>
-                            <span>${provider.company || 'Independent'}</span>
+                            <span class="service-tag">${provider.services || 'General Services'}</span>
+                            <span class="company-tag">${provider.company || 'Independent'}</span>
+                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
                         </div>
+                        <div class="provider-stats">
+                            <div class="rating">
+                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
+                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
+                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
+                            </div>
+                            <div class="experience">
+                                <strong>${provider.experience_years || 0}+ years</strong> • 
+                                <strong>${provider.completed_projects || 0} projects</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="provider-pricing">
+                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
+                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
                     </div>
                 </div>
                 <div class="provider-description">
                     ${provider.description || 'Professional service provider ready to help your business grow.'}
                 </div>
-                <button onclick="contactProvider('${provider.email}')" class="contact-btn">
-                    Contact Provider
-                </button>
+                <div class="provider-actions">
+                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
+                        💬 Contact Provider
+                    </button>
+                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
+                        👤 View Profile
+                    </button>
+                </div>
             </div>
         `).join('');
         

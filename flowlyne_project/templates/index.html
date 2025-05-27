@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowlyne - B2B Business Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand h1 {
+            color: #3498db;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #34495e;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #2c3e50;
+        }
+        
+        .features {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        
+        .features h2 {
+            margin-bottom: 3rem;
+            font-size: 2rem;
+            color: #2c3e50;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>Flowlyne</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/services/">Find Companies</a>
+                <a href="/login/">Login</a>
+                <a href="/register/">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Connect Your Business with Trusted Partners</h1>
+                <p>Flowlyne is the B2B platform that connects Egyptian companies for outsourcing, partnerships, and business growth opportunities.</p>
+                <div class="hero-buttons">
+                    <a href="/register/" class="btn btn-primary">Join as Company</a>
+                    <a href="/services/" class="btn btn-secondary">Find Partners</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose Flowlyne?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🏢 B2B Focused</h3>
+                    <p>Connect with verified companies and professional teams, not individual freelancers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Verified Partners</h3>
+                    <p>All companies are verified with business licenses and professional certifications.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🇪🇬 Egyptian Market</h3>
+                    <p>Focused on the Egyptian business ecosystem with local expertise and understanding.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🤝 Dual Role System</h3>
+                    <p>Your company can both offer services and seek outsourcing partners on the same platform.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses for mutual growth.</p>
+    </footer>
+</body>
+</html>
