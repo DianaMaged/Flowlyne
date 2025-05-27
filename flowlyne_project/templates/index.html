@@ -3,210 +3,653 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowlyne - B2B Business Network</title>
+    <title>Flowlyne - The Future of B2B</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* Logo-inspired color palette */
+            --primary-teal: #4ECDC4;
+            --primary-blue: #45B7D1;
+            --accent-purple: #6C5CE7;
+            --dark-grey: #2D3436;
+            --medium-grey: #636E72;
+            --light-grey: #DDD6FE;
+            --white: #FFFFFF;
+            --off-white: #FAFBFC;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
+
+        html {
+            scroll-behavior: smooth;
         }
-        
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-grey);
+            background: var(--off-white);
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Navigation */
         .navbar {
-            background: #2c3e50;
-            color: white;
-            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .nav-brand h1 {
-            color: #3498db;
-            font-size: 1.8rem;
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
+
+        .nav-brand h1 {
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
         .nav-links {
             display: flex;
             gap: 2rem;
+            align-items: center;
         }
-        
+
         .nav-links a {
-            color: white;
+            color: var(--dark-grey);
             text-decoration: none;
+            font-weight: 500;
             padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background 0.3s;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
-        
+
         .nav-links a:hover {
-            background: #34495e;
+            background: var(--glass-bg);
+            transform: translateY(-1px);
         }
-        
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        /* Hero Section - Apple Style */
         .hero {
-            background: linear-gradient(135deg, #3498db, #2c3e50);
-            color: white;
-            padding: 4rem 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, -20px) rotate(5deg); }
+        }
+
+        .hero-content {
             text-align: center;
+            max-width: 800px;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
         }
-        
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--dark-grey) 0%, var(--medium-grey) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
         }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--medium-grey);
+            margin-bottom: 3rem;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .hero-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 4rem;
         }
-        
+
         .btn {
             padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: transform 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
+
         .btn-primary {
-            background: #e74c3c;
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
             color: white;
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
         }
-        
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.4);
+        }
+
         .btn-secondary {
-            background: white;
-            color: #2c3e50;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-grey);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
         }
-        
-        .features {
-            padding: 4rem 2rem;
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
             text-align: center;
-            background: #f8f9fa;
         }
-        
-        .features h2 {
-            margin-bottom: 3rem;
-            font-size: 2rem;
-            color: #2c3e50;
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+
+        .stat-label {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 8rem 2rem;
+            background: var(--white);
+        }
+
+        .section-container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
         }
-        
-        .feature-card h3 {
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
             margin-bottom: 1rem;
-            color: #2c3e50;
-            font-size: 1.3rem;
+            color: var(--dark-grey);
+            letter-spacing: -0.02em;
         }
-        
-        footer {
-            background: #2c3e50;
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-grey);
+        }
+
+        .feature-description {
+            color: var(--medium-grey);
+            line-height: 1.7;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
             color: white;
             text-align: center;
-            padding: 2rem;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="grad"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23grad)"/><circle cx="800" cy="300" r="150" fill="url(%23grad)"/><circle cx="400" cy="700" r="120" fill="url(%23grad)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            backdrop-filter: blur(10px);
+            font-size: 1.2rem;
+            padding: 1.25rem 3rem;
+        }
+
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-grey);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-text {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .navbar {
+            .nav-container {
+                padding: 0 1rem;
                 flex-direction: column;
                 gap: 1rem;
             }
-            
-            .hero h1 {
-                font-size: 2rem;
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
             }
-            
+
             .hero-buttons {
                 flex-direction: column;
                 align-items: center;
             }
+
+            .hero-stats {
+                gap: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Smooth animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--off-white);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
             <div class="nav-brand">
                 <h1>Flowlyne</h1>
             </div>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/services/">Find Companies</a>
+                <a href="/services/">Companies</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
-                <a href="/register/">Register</a>
+                <a href="/register/" class="nav-cta">Get Started</a>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Connect Your Business with Trusted Partners</h1>
-                <p>Flowlyne is the B2B platform that connects Egyptian companies for outsourcing, partnerships, and business growth opportunities.</p>
-                <div class="hero-buttons">
-                    <a href="/register/" class="btn btn-primary">Join as Company</a>
-                    <a href="/services/" class="btn btn-secondary">Find Partners</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in">
+            <h1>The Future of B2B Networking</h1>
+            <p class="hero-subtitle">Connect, collaborate, and grow with Egypt's most trusted business network. Where companies find their perfect partners.</p>
+            
+            <div class="hero-buttons">
+                <a href="/register/" class="btn btn-primary">
+                    <span>Start Your Journey</span>
+                    <span>→</span>
+                </a>
+                <a href="/services/" class="btn btn-secondary">
+                    <span>Explore Partners</span>
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Verified Companies</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Industries</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Successful Partnerships</div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="features">
-            <h2>Why Choose Flowlyne?</h2>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <h2 class="section-title">Built for Egyptian Businesses</h2>
+                <p class="section-subtitle">Everything you need to connect, collaborate, and grow your business network in one powerful platform.</p>
+            </div>
+
             <div class="features-grid">
-                <div class="feature-card">
-                    <h3>🏢 B2B Focused</h3>
-                    <p>Connect with verified companies and professional teams, not individual freelancers.</p>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🏢</span>
+                    <h3 class="feature-title">B2B Excellence</h3>
+                    <p class="feature-description">Connect with verified companies and professional teams. No individual freelancers - just serious business partnerships.</p>
                 </div>
-                <div class="feature-card">
-                    <h3>✅ Verified Partners</h3>
-                    <p>All companies are verified with business licenses and professional certifications.</p>
+
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">✅</span>
+                    <h3 class="feature-title">Verified Network</h3>
+                    <p class="feature-description">Every company is verified with business licenses and professional certifications. Trust built into every connection.</p>
                 </div>
-                <div class="feature-card">
-                    <h3>🇪🇬 Egyptian Market</h3>
-                    <p>Focused on the Egyptian business ecosystem with local expertise and understanding.</p>
+
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🇪🇬</span>
+                    <h3 class="feature-title">Egyptian Focus</h3>
+                    <p class="feature-description">Designed specifically for the Egyptian market with local payment methods, regulations, and business culture understanding.</p>
                 </div>
-                <div class="feature-card">
-                    <h3>🤝 Dual Role System</h3>
-                    <p>Your company can both offer services and seek outsourcing partners on the same platform.</p>
+
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🤝</span>
+                    <h3 class="feature-title">Dual Opportunities</h3>
+                    <p class="feature-description">Your company can both offer services and seek partners. Maximum flexibility for your business growth strategy.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">📊</span>
+                    <h3 class="feature-title">Smart Analytics</h3>
+                    <p class="feature-description">Track your performance, understand market trends, and optimize your business development with powerful insights.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">💳</span>
+                    <h3 class="feature-title">Local Payments</h3>
+                    <p class="feature-description">Vodafone Cash, Orange Money, bank transfers, and cards. Pay the Egyptian way with methods you already use.</p>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer>
-        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses for mutual growth.</p>
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="section-container">
+            <div class="cta-content fade-in">
+                <h2 class="cta-title">Ready to Transform Your Business?</h2>
+                <p class="cta-subtitle">Join thousands of Egyptian companies already growing their networks on Flowlyne.</p>
+                <a href="/register/" class="btn cta-button">
+                    <span>Start Free Today</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">Flowlyne</div>
+            <p class="footer-text">&copy; 2025 Flowlyne. Empowering Egyptian businesses to connect, collaborate, and grow together.</p>
+        </div>
     </footer>
+
+    <script>
+        // Smooth scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = `${Math.random() * 0.3}s`;
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements that should fade in
+        document.querySelectorAll('.feature-card, .section-header, .cta-content').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.8)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+
+        // Add some micro-interactions
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+            
+            btn.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
 </body>
 </html>

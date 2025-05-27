@@ -3,100 +3,664 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Registration - Flowlyne</title>
+    <title>Join Flowlyne - Create Your Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand h1 { color: #3498db; font-size: 1.8rem; }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
-        .nav-links a:hover { background: #34495e; }
-        .form-container { max-width: 600px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2c3e50; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem; border: 2px solid #ddd; border-radius: 4px; font-size: 1rem; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3498db; outline: none; }
-        .btn { padding: 1rem 2rem; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%; }
-        .btn:hover { background: #2980b9; }
-        footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; }
+        :root {
+            --primary-teal: #4ECDC4;
+            --primary-blue: #45B7D1;
+            --accent-purple: #6C5CE7;
+            --dark-grey: #2D3436;
+            --medium-grey: #636E72;
+            --light-grey: #DDD6FE;
+            --white: #FFFFFF;
+            --off-white: #FAFBFC;
+            --success: #00D4AA;
+            --error: #FF6B6B;
+            --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--dark-grey);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-grey);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.08) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .main-content::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-15px, -15px) rotate(3deg); }
+        }
+
+        .register-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .register-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .register-subtitle {
+            color: var(--medium-grey);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .benefit-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(78, 205, 196, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(78, 205, 196, 0.1);
+        }
+
+        .benefit-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-textarea {
+            padding: 1rem;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--medium-grey);
+            font-size: 1.25rem;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
+        }
+
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.4);
+        }
+
+        .register-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .login-link a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--gradient-primary);
+            transform: scale(1.2);
+        }
+
+        .security-info {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--medium-grey);
+        }
+
+        .security-title {
+            font-weight: 600;
+            color: var(--dark-grey);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-grey);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .footer-text {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .register-container {
+                padding: 2rem;
+                border-radius: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .register-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .register-container {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-brand"><h1>Flowlyne</h1></div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>Flowlyne</h1>
+            </div>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/services/">Find Companies</a>
+                <a href="/services/">Companies</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
-                <a href="/register/">Register</a>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
-    <main style="padding: 2rem; background: #f8f9fa; min-height: calc(100vh - 140px);">
-        <div class="form-container">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">Join Flowlyne B2B Platform</h2>
-            <p style="text-align: center; color: #666; margin-bottom: 2rem;">Connect your company with other businesses</p>
-            
-            <form onsubmit="handleRegistration(event)">
-                <div class="form-group">
-                    <label for="company_name">Company Name *</label>
-                    <input type="text" id="company_name" name="company_name" required>
-                </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="register-container">
+            <div class="register-header">
+                <h1 class="register-title">Join Flowlyne</h1>
+                <p class="register-subtitle">Connect your business with Egypt's largest B2B network</p>
                 
-                <div class="form-group">
-                    <label for="email">Business Email *</label>
-                    <input type="email" id="email" name="email" required>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🏢</div>
+                        <div class="benefit-text">B2B Focus</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">✅</div>
+                        <div class="benefit-text">Verified Partners</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🇪🇬</div>
+                        <div class="benefit-text">Egyptian Market</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🚀</div>
+                        <div class="benefit-text">Free to Start</div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Password *</label>
-                    <input type="password" id="password" name="password" required minlength="6">
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+            <div class="success-message" id="success-message"></div>
+
+            <form onsubmit="handleRegistration(event)" id="register-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="company_name">Company Name *</label>
+                        <div class="input-container">
+                            <div class="input-icon">🏢</div>
+                            <input type="text" id="company_name" name="company_name" class="form-input" required 
+                                   placeholder="Your company name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Business Email *</label>
+                        <div class="input-container">
+                            <div class="input-icon">📧</div>
+                            <input type="email" id="email" name="email" class="form-input" required 
+                                   placeholder="company@domain.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <div class="input-container">
+                            <div class="input-icon">🔒</div>
+                            <input type="password" id="password" name="password" class="form-input" required minlength="6"
+                                   placeholder="Create a strong password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <div class="input-container">
+                            <div class="input-icon">📱</div>
+                            <input type="tel" id="phone_number" name="phone_number" class="form-input" 
+                                   placeholder="+20-XXX-XXX-XXXX">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <div class="input-container">
+                            <div class="input-icon">📍</div>
+                            <input type="text" id="city" name="city" class="form-input" value="Cairo" 
+                                   placeholder="Your city">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Website (Optional)</label>
+                        <div class="input-container">
+                            <div class="input-icon">🌐</div>
+                            <input type="url" id="website" name="website" class="form-input" 
+                                   placeholder="https://yourcompany.com">
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group full-width">
                     <label for="company_address">Company Address</label>
-                    <textarea id="company_address" name="company_address" rows="3" placeholder="Full company address including city and country"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone_number">Phone Number</label>
-                    <input type="tel" id="phone_number" name="phone_number" placeholder="+20-XXX-XXX-XXXX">
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Company Description *</label>
-                    <textarea id="description" name="description" rows="4" required 
-                        placeholder="Describe your company, services, and expertise..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="website">Website (Optional)</label>
-                    <input type="url" id="website" name="website" placeholder="https://www.yourcompany.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" id="city" name="city" value="Cairo">
+                    <div class="input-container">
+                        <div class="input-icon">🏠</div>
+                        <textarea id="company_address" name="company_address" class="form-input form-textarea" 
+                                  placeholder="Full company address including street, city, and country"></textarea>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn">Create Company Account</button>
+                <div class="form-group full-width">
+                    <label for="description">Company Description *</label>
+                    <div class="input-container">
+                        <div class="input-icon">📝</div>
+                        <textarea id="description" name="description" class="form-input form-textarea" required
+                                  placeholder="Describe your company, services, and what makes you unique..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="register-button" id="register-btn">
+                    <span id="register-text">Create Your Account</span>
+                </button>
             </form>
 
-            <p style="text-align: center; margin-top: 1.5rem;">
-                Already have an account? <a href="/login/" style="color: #3498db;">Login here</a>
-            </p>
+            <div class="security-info">
+                <div class="security-title">
+                    <span>🔒</span>
+                    <span>Your Data is Secure</span>
+                </div>
+                <p>We use industry-standard encryption to protect your information. Your business details are kept confidential and will only be visible to verified partners you choose to connect with.</p>
+            </div>
+
+            <div class="login-link">
+                <p>Already have an account? <a href="/login/">Sign in here</a></p>
+            </div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses.</p>
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">&copy; 2025 Flowlyne. Empowering Egyptian businesses to grow together.</p>
     </footer>
 
     <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Update progress as user fills form
+        function updateProgress() {
+            const formInputs = document.querySelectorAll('.form-input[required]');
+            let filledInputs = 0;
+            
+            formInputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    filledInputs++;
+                }
+            });
+            
+            const progress = (filledInputs / formInputs.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            // Update step indicator
+            const stepDots = document.querySelectorAll('.step-dot');
+            const currentStepIndex = Math.floor(progress / 33.33);
+            
+            stepDots.forEach((dot, index) => {
+                if (index <= currentStepIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Add event listeners to form inputs
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', updateProgress);
+            input.addEventListener('focus', (e) => {
+                e.target.parentElement.style.transform = 'scale(1.02)';
+            });
+            input.addEventListener('blur', (e) => {
+                e.target.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Show messages
+        function showMessage(message, type = 'error') {
+            const errorMsg = document.getElementById('error-message');
+            const successMsg = document.getElementById('success-message');
+            
+            // Hide both messages first
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            // Show appropriate message
+            if (type === 'error') {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+                successMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle registration
         async function handleRegistration(event) {
             event.preventDefault();
             
@@ -112,10 +676,22 @@
                 city: formData.get('city') || 'Cairo'
             };
             
+            const registerBtn = document.getElementById('register-btn');
+            const registerText = document.getElementById('register-text');
+            
             try {
-                const submitBtn = event.target.querySelector('button[type="submit"]');
-                submitBtn.textContent = 'Creating Account...';
-                submitBtn.disabled = true;
+                // Validate required fields
+                if (!companyData.company_name || !companyData.email || !companyData.password || !companyData.description) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                if (companyData.password.length < 6) {
+                    throw new Error('Password must be at least 6 characters long');
+                }
+                
+                // Show loading state
+                registerBtn.disabled = true;
+                registerText.innerHTML = '<div class="loading-spinner"></div>Creating your account...';
                 
                 const response = await fetch('/api/register/', {
                     method: 'POST',
@@ -128,22 +704,48 @@
                 const data = await response.json();
                 
                 if (response.ok) {
+                    // Store user data
                     localStorage.setItem('flowlyne_token', data.token);
                     localStorage.setItem('flowlyne_current_company', JSON.stringify(data.company));
-                    alert('Registration successful!');
-                    window.location.href = '/services/';
+                    
+                    // Update progress to 100%
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.querySelectorAll('.step-dot').forEach(dot => dot.classList.add('active'));
+                    
+                    // Show success message
+                    showMessage('🎉 Account created successfully! Redirecting to explore companies...', 'success');
+                    
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = '/services/';
+                    }, 2000);
                 } else {
-                    alert(`Registration failed: ${data.error}`);
+                    throw new Error(data.error || 'Registration failed');
                 }
                 
             } catch (error) {
-                alert(`Registration failed: ${error.message}`);
-            } finally {
-                const submitBtn = event.target.querySelector('button[type="submit"]');
-                submitBtn.textContent = 'Create Company Account';
-                submitBtn.disabled = false;
+                showMessage(error.message);
+                
+                // Reset button
+                registerBtn.disabled = false;
+                registerText.textContent = 'Create Your Account';
             }
         }
+
+        // Add entrance animation
+        window.addEventListener('load', () => {
+            document.querySelector('.register-container').style.opacity = '0';
+            document.querySelector('.register-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.register-container').style.transition = 'all 0.8s ease';
+                document.querySelector('.register-container').style.opacity = '1';
+                document.querySelector('.register-container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Initialize progress
+        updateProgress();
     </script>
 </body>
 </html>
