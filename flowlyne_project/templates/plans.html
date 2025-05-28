@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Your Plan - Flowlyne</title>
+    <title>Choose Your Plan - Flowlyne | Smooth and Fine, That's Flowlyne</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,11 +43,12 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -58,12 +60,58 @@
             align-items: center;
         }
 
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
         .nav-brand h1 {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-size: 1.75rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -78,14 +126,29 @@
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(78, 205, 196, 0.1);
-            color: var(--primary-teal);
+        .nav-links a:hover {
+            background: var(--glass-bg);
+            transform: translateY(-1px);
         }
 
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+        
         /* Hero Section */
         .hero-section {
             padding: 8rem 2rem 4rem;
@@ -142,20 +205,29 @@
         .hero-subtitle {
             font-size: 1.25rem;
             color: var(--medium-grey);
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
 
+        .hero-tagline {
+            font-size: 1rem;
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
+            margin-bottom: 3rem;
+        }
+
         .pricing-toggle {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             border-radius: 16px;
             padding: 0.5rem;
             display: inline-flex;
             border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .toggle-btn {
@@ -167,12 +239,28 @@
             cursor: pointer;
             transition: all 0.3s ease;
             color: var(--medium-grey);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .toggle-btn.active {
             background: var(--gradient-primary);
             color: white;
             box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .savings-badge {
+            background: var(--success);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         /* Plans Section */
@@ -285,6 +373,21 @@
             color: var(--medium-grey);
             font-size: 0.85rem;
             margin-bottom: 2rem;
+            min-height: 1.2rem;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--medium-grey);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+
+        .savings-note {
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .plan-features {
@@ -399,64 +502,163 @@
             transform: none;
         }
 
-        /* Comparison Table */
+        /* Modern Comparison Table */
         .comparison-section {
             background: var(--white);
             border-radius: 24px;
-            padding: 3rem 2rem;
+            padding: 4rem 3rem;
             margin: 4rem 0;
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .comparison-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             color: var(--dark-grey);
+            background: var(--gradient-dark);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .comparison-container {
+            overflow-x: auto;
+            border-radius: 20px;
+            background: var(--off-white);
+            padding: 1rem;
         }
 
         .comparison-table {
-            overflow-x: auto;
-        }
-
-        .table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             border-radius: 16px;
             overflow: hidden;
+            background: var(--white);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem 1rem;
+            text-align: center;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
         }
 
-        .table th {
-            background: var(--off-white);
-            font-weight: 600;
+        .comparison-table th {
+            background: linear-gradient(135deg, var(--off-white), #f8f9fa);
+            font-weight: 700;
             color: var(--dark-grey);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .table td {
-            background: var(--white);
+        .comparison-table th:first-child {
+            text-align: left;
+            background: var(--gradient-primary);
+            color: white;
         }
 
-        .table tbody tr:hover {
+        .comparison-table th.featured {
+            background: var(--gradient-primary);
+            color: white;
+            position: relative;
+        }
+
+        .comparison-table th.featured::after {
+            content: "Most Popular";
+            position: absolute;
+            top: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .comparison-table tbody tr:hover {
             background: rgba(78, 205, 196, 0.02);
         }
 
-        .check-mark {
-            color: var(--success);
+        .comparison-table tbody tr:hover td {
+            background: transparent;
+        }
+
+        .feature-name {
+            font-weight: 600;
+            color: var(--dark-grey);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-category {
+            background: var(--gradient-primary);
+            color: white;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+        }
+
+        .feature-category td {
+            padding: 1rem;
+        }
+
+        .feature-value {
+            font-weight: 500;
+            color: var(--dark-grey);
+        }
+
+        .check-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.8rem;
         }
 
         .x-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(149, 165, 166, 0.2);
             color: var(--medium-grey);
+            border-radius: 50%;
             font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(69, 183, 209, 0.05));
+            position: relative;
+        }
+
+        .feature-highlight::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gradient-primary);
         }
 
         /* FAQ Section */
@@ -476,6 +678,9 @@
             text-align: center;
             margin-bottom: 3rem;
             color: var(--dark-grey);
+            background: var(--gradient-dark);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .faq-item {
@@ -485,6 +690,11 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .faq-question {
@@ -510,6 +720,7 @@
         .faq-arrow {
             transition: transform 0.3s ease;
             font-size: 1.2rem;
+            color: var(--primary-teal);
         }
 
         .faq-question.active .faq-arrow {
@@ -546,10 +757,17 @@
         .footer-brand {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .footer-tagline {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-bottom: 1rem;
         }
 
         .footer-text {
@@ -595,10 +813,14 @@
                 padding: 2rem 1rem;
             }
 
-            .table th,
-            .table td {
+            .comparison-table th,
+            .comparison-table td {
                 padding: 0.75rem 0.5rem;
                 font-size: 0.9rem;
+            }
+
+            .comparison-container {
+                padding: 0.5rem;
             }
         }
 
@@ -621,14 +843,21 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1>Flowlyne</h1>
-            </div>
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                    <div class="nav-tagline">Smooth and Fine</div>
+                </div>
+            </a>
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/services/">Companies</a>
                 <a href="/plans/" class="active">Plans</a>
                 <a href="/login/">Login</a>
+                <a href="/about/">About</a>
                 <a href="/register/">Register</a>
             </div>
         </div>
@@ -639,10 +868,14 @@
         <div class="hero-content">
             <h1 class="hero-title">Choose Your Growth Plan</h1>
             <p class="hero-subtitle">Unlock powerful features and accelerate your business growth with our flexible subscription plans designed for Egyptian companies.</p>
+            <p class="hero-tagline">"Smooth and Fine, That's Flowlyne"</p>
             
             <div class="pricing-toggle">
-                <button class="toggle-btn active">Monthly</button>
-                <button class="toggle-btn">Yearly <span style="color: var(--success); font-size: 0.8rem; margin-left: 0.5rem;">Save 20%</span></button>
+                <button class="toggle-btn active" data-period="monthly">Monthly</button>
+                <button class="toggle-btn" data-period="yearly">
+                    Yearly 
+                    <span class="savings-badge">Save 20%</span>
+                </button>
             </div>
         </div>
     </section>
@@ -657,10 +890,10 @@
                     <p class="plan-description">Perfect for companies just getting started</p>
                     <div class="plan-price">
                         <span class="price-currency">EGP</span>
-                        <span class="price-amount">0</span>
-                        <span class="price-period">/month</span>
+                        <span class="price-amount" id="basic-price">0</span>
+                        <span class="price-period" id="basic-period">/month</span>
                     </div>
-                    <p class="price-note">Forever Free</p>
+                    <p class="price-note" id="basic-note">Forever Free</p>
                 </div>
                 
                 <div class="plan-features">
@@ -708,11 +941,13 @@
                     <h3 class="plan-name">Standard Plan</h3>
                     <p class="plan-description">Ideal for growing businesses seeking visibility</p>
                     <div class="plan-price">
+                        <span class="original-price" id="standard-original" style="display: none;">EGP 2400</span>
                         <span class="price-currency">EGP</span>
-                        <span class="price-amount">200</span>
-                        <span class="price-period">/month</span>
+                        <span class="price-amount" id="standard-price">200</span>
+                        <span class="price-period" id="standard-period">/month</span>
                     </div>
-                    <p class="price-note">Billed monthly • Cancel anytime</p>
+                    <p class="price-note" id="standard-note">Billed monthly • Cancel anytime</p>
+                    <p class="savings-note" id="standard-savings" style="display: none;">Save EGP 480 per year!</p>
                 </div>
                 
                 <div class="plan-features">
@@ -759,11 +994,13 @@
                     <h3 class="plan-name">Premium Plan</h3>
                     <p class="plan-description">Maximum visibility and features for enterprises</p>
                     <div class="plan-price">
+                        <span class="original-price" id="premium-original" style="display: none;">EGP 6000</span>
                         <span class="price-currency">EGP</span>
-                        <span class="price-amount">500</span>
-                        <span class="price-period">/month</span>
+                        <span class="price-amount" id="premium-price">500</span>
+                        <span class="price-period" id="premium-period">/month</span>
                     </div>
-                    <p class="price-note">All features included</p>
+                    <p class="price-note" id="premium-note">All features included</p>
+                    <p class="savings-note" id="premium-savings" style="display: none;">Save EGP 1200 per year!</p>
                 </div>
                 
                 <div class="plan-features">
@@ -805,61 +1042,119 @@
             </div>
         </div>
 
-        <!-- Comparison Table -->
+        <!-- Modern Comparison Table -->
         <div class="comparison-section fade-in">
             <h2 class="comparison-title">Feature Comparison</h2>
-            <div class="comparison-table">
-                <table class="table">
+            <div class="comparison-container">
+                <table class="comparison-table">
                     <thead>
                         <tr>
                             <th>Features</th>
                             <th>Basic</th>
-                            <th>Standard</th>
+                            <th class="featured">Standard</th>
                             <th>Premium</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Search Ranking</td>
-                            <td>Standard</td>
-                            <td>Higher</td>
-                            <td>Top Placement</td>
+                        <tr class="feature-category">
+                            <td colspan="4">🔍 Search & Visibility</td>
+                        </tr>
+                        <tr class="feature-highlight">
+                            <td class="feature-name">
+                                <span>🎯</span>
+                                Search Ranking Priority
+                            </td>
+                            <td class="feature-value">Standard</td>
+                            <td class="feature-value">Higher Priority</td>
+                            <td class="feature-value">Top Placement</td>
                         </tr>
                         <tr>
-                            <td>Portfolio Display</td>
+                            <td class="feature-name">
+                                <span>🏠</span>
+                                Homepage Featured
+                            </td>
+                            <td><span class="x-mark">×</span></td>
+                            <td><span class="x-mark">×</span></td>
+                            <td><span class="check-mark">✓</span></td>
+                        </tr>
+                        
+                        <tr class="feature-category">
+                            <td colspan="4">📁 Portfolio & Content</td>
+                        </tr>
+                        <tr class="feature-highlight">
+                            <td class="feature-name">
+                                <span>📂</span>
+                                Portfolio Display
+                            </td>
+                            <td class="feature-value">Basic Profile</td>
+                            <td class="feature-value">Full Portfolio</td>
+                            <td class="feature-value">Advanced Portfolio</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span>📤</span>
+                                Monthly Project Uploads
+                            </td>
+                            <td class="feature-value">0 (5 at signup only)</td>
+                            <td class="feature-value">5 per month</td>
+                            <td class="feature-value">10 per month</td>
+                        </tr>
+                        
+                        <tr class="feature-category">
+                            <td colspan="4">💰 Financial Benefits</td>
+                        </tr>
+                        <tr class="feature-highlight">
+                            <td class="feature-name">
+                                <span>💳</span>
+                                Commission Rate
+                            </td>
+                            <td class="feature-value">10%</td>
+                            <td class="feature-value">8% (2% discount)</td>
+                            <td class="feature-value">5% (5% discount)</td>
+                        </tr>
+                        
+                        <tr class="feature-category">
+                            <td colspan="4">📊 Analytics & Insights</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span>📈</span>
+                                Business Analytics
+                            </td>
+                            <td class="feature-value">Basic stats</td>
+                            <td class="feature-value">Engagement analytics</td>
+                            <td class="feature-value">Full analytics + trends</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">
+                                <span>👥</span>
+                                Client Behavior Insights
+                            </td>
                             <td><span class="x-mark">×</span></td>
                             <td><span class="check-mark">✓</span></td>
                             <td><span class="check-mark">✓ Advanced</span></td>
                         </tr>
-                        <tr>
-                            <td>Monthly Project Uploads</td>
-                            <td>5 (signup only)</td>
-                            <td>5 per month</td>
-                            <td>10 per month</td>
+                        
+                        <tr class="feature-category">
+                            <td colspan="4">🎧 Support & Service</td>
+                        </tr>
+                        <tr class="feature-highlight">
+                            <td class="feature-name">
+                                <span>💬</span>
+                                Support Level
+                            </td>
+                            <td class="feature-value">Email only</td>
+                            <td class="feature-value">Priority support</td>
+                            <td class="feature-value">Dedicated manager</td>
                         </tr>
                         <tr>
-                            <td>Commission Rate</td>
-                            <td>10%</td>
-                            <td>8%</td>
-                            <td>5%</td>
-                        </tr>
-                        <tr>
-                            <td>Analytics</td>
-                            <td>Basic stats</td>
-                            <td>Engagement analytics</td>
-                            <td>Full analytics + trends</td>
-                        </tr>
-                        <tr>
-                            <td>Support Level</td>
-                            <td>Email</td>
-                            <td>Priority</td>
-                            <td>Dedicated manager</td>
-                        </tr>
-                        <tr>
-                            <td>Homepage Featured</td>
-                            <td><span class="x-mark">×</span></td>
-                            <td><span class="x-mark">×</span></td>
-                            <td><span class="check-mark">✓</span></td>
+                            <td class="feature-name">
+                                <span>⚡</span>
+                                Response Time
+                            </td>
+                            <td class="feature-value">48 hours</td>
+                            <td class="feature-value">24 hours</td>
+                            <td class="feature-value">4 hours</td>
                         </tr>
                     </tbody>
                 </table>
@@ -894,21 +1189,21 @@
             
             <div class="faq-item fade-in">
                 <div class="faq-question" onclick="toggleFAQ(this)">
-                    Is there a long-term contract requirement?
+                    How much can I save with yearly billing?
                     <span class="faq-arrow">↓</span>
                 </div>
                 <div class="faq-answer">
-                    No long-term contracts required. All plans are month-to-month, and you can cancel anytime. Your current plan remains active until the end of your billing period.
+                    With yearly billing, you save 20% on all plans! Standard plan saves you EGP 480 per year, and Premium saves EGP 1,200 per year. That's like getting 2.4 months free!
                 </div>
             </div>
             
             <div class="faq-item fade-in">
                 <div class="faq-question" onclick="toggleFAQ(this)">
-                    What happens to my data if I cancel?
+                    Is there a long-term contract requirement?
                     <span class="faq-arrow">↓</span>
                 </div>
                 <div class="faq-answer">
-                    Your account and data remain intact when you cancel. You'll automatically move to the Basic (Free) plan, but premium features will no longer be accessible. You can reactivate anytime.
+                    No long-term contracts required. All plans are flexible - monthly or yearly as you prefer. You can cancel anytime, and your current plan remains active until the end of your billing period.
                 </div>
             </div>
             
@@ -928,26 +1223,100 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">Flowlyne</div>
+            <div class="footer-tagline">Smooth and Fine, That's Flowlyne</div>
             <p class="footer-text">&copy; 2025 Flowlyne. Empowering Egyptian businesses to connect and grow together.</p>
         </div>
     </footer>
 
     <script>
-        // FAQ Toggle functionality
-        function toggleFAQ(element) {
-            const answer = element.nextElementSibling;
-            const isActive = element.classList.contains('active');
-            
-            // Close all FAQ items
-            document.querySelectorAll('.faq-question').forEach(q => {
-                q.classList.remove('active');
-                q.nextElementSibling.classList.remove('active');
+        let currentPeriod = 'monthly';
+        
+        // Pricing data
+        const pricingData = {
+            monthly: {
+                basic: { price: 0, original: 0, note: 'Forever Free' },
+                standard: { price: 200, original: 200, note: 'Billed monthly • Cancel anytime' },
+                premium: { price: 500, original: 500, note: 'All features included' }
+            },
+            yearly: {
+                basic: { price: 0, original: 0, note: 'Forever Free' },
+                standard: { price: 160, original: 200, note: 'Billed yearly • Save EGP 480!' },
+                premium: { price: 400, original: 500, note: 'Billed yearly • Save EGP 1200!' }
+            }
+        };
+
+        // Initialize pricing toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            setupPricingToggle();
+            updatePlanButtons();
+        });
+
+        // Setup pricing toggle functionality
+        function setupPricingToggle() {
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentPeriod = this.dataset.period;
+                    updatePricing();
+                });
             });
+        }
+
+        // Update pricing display
+        function updatePricing() {
+            const data = pricingData[currentPeriod];
             
-            // Open clicked item if it wasn't active
-            if (!isActive) {
-                element.classList.add('active');
-                answer.classList.add('active');
+            // Update Basic Plan
+            document.getElementById('basic-price').textContent = data.basic.price;
+            document.getElementById('basic-period').textContent = currentPeriod === 'monthly' ? '/month' : '/year';
+            document.getElementById('basic-note').textContent = data.basic.note;
+            
+            // Update Standard Plan
+            const standardOriginal = document.getElementById('standard-original');
+            const standardPrice = document.getElementById('standard-price');
+            const standardPeriod = document.getElementById('standard-period');
+            const standardNote = document.getElementById('standard-note');
+            const standardSavings = document.getElementById('standard-savings');
+            
+            if (currentPeriod === 'yearly') {
+                standardOriginal.style.display = 'inline';
+                standardOriginal.textContent = `EGP ${data.standard.original * 12}`;
+                standardPrice.textContent = data.standard.price * 12;
+                standardPeriod.textContent = '/year';
+                standardNote.textContent = 'Billed yearly • Cancel anytime';
+                standardSavings.style.display = 'block';
+                standardSavings.textContent = `Save EGP ${(data.standard.original - data.standard.price) * 12} per year!`;
+            } else {
+                standardOriginal.style.display = 'none';
+                standardPrice.textContent = data.standard.price;
+                standardPeriod.textContent = '/month';
+                standardNote.textContent = data.standard.note;
+                standardSavings.style.display = 'none';
+            }
+            
+            // Update Premium Plan
+            const premiumOriginal = document.getElementById('premium-original');
+            const premiumPrice = document.getElementById('premium-price');
+            const premiumPeriod = document.getElementById('premium-period');
+            const premiumNote = document.getElementById('premium-note');
+            const premiumSavings = document.getElementById('premium-savings');
+            
+            if (currentPeriod === 'yearly') {
+                premiumOriginal.style.display = 'inline';
+                premiumOriginal.textContent = `EGP ${data.premium.original * 12}`;
+                premiumPrice.textContent = data.premium.price * 12;
+                premiumPeriod.textContent = '/year';
+                premiumNote.textContent = 'Billed yearly • All features included';
+                premiumSavings.style.display = 'block';
+                premiumSavings.textContent = `Save EGP ${(data.premium.original - data.premium.price) * 12} per year!`;
+            } else {
+                premiumOriginal.style.display = 'none';
+                premiumPrice.textContent = data.premium.price;
+                premiumPeriod.textContent = '/month';
+                premiumNote.textContent = data.premium.note;
+                premiumSavings.style.display = 'none';
             }
         }
 
@@ -973,8 +1342,11 @@
                 return;
             }
             
-            // Redirect to payment page
-            window.location.href = `/payment/?plan=${planType}`;
+            // Add period to plan selection
+            const planWithPeriod = `${planType}_${currentPeriod}`;
+            
+            // Redirect to payment page with period
+            window.location.href = `/payment/?plan=${planType}&period=${currentPeriod}`;
         }
 
         // Update plan buttons based on current user
@@ -996,22 +1368,23 @@
             }
         }
 
-        // Pricing toggle functionality
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // In a real app, this would update pricing
-                if (this.textContent.includes('Yearly')) {
-                    // Show yearly pricing with discount
-                    console.log('Switch to yearly pricing');
-                } else {
-                    // Show monthly pricing
-                    console.log('Switch to monthly pricing');
-                }
+        // FAQ Toggle functionality
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const isActive = element.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.classList.remove('active');
+                q.nextElementSibling.classList.remove('active');
             });
-        });
+            
+            // Open clicked item if it wasn't active
+            if (!isActive) {
+                element.classList.add('active');
+                answer.classList.add('active');
+            }
+        }
 
         // Scroll animations
         const observerOptions = {
@@ -1035,8 +1408,6 @@
             document.querySelectorAll('.plan-card, .comparison-section, .faq-item').forEach(el => {
                 observer.observe(el);
             });
-            
-            updatePlanButtons();
         });
 
         // Navbar scroll effect

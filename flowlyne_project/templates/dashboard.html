@@ -43,10 +43,12 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -58,12 +60,58 @@
             align-items: center;
         }
 
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
         .nav-brand h1 {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-size: 1.75rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -78,12 +126,27 @@
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(78, 205, 196, 0.1);
-            color: var(--primary-teal);
+        .nav-links a:hover {
+            background: var(--glass-bg);
+            transform: translateY(-1px);
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
 
         .user-menu {
@@ -114,6 +177,7 @@
             font-weight: 600;
             font-size: 0.875rem;
         }
+        
 
         /* Dashboard Content */
         .dashboard {
@@ -681,6 +745,7 @@
                 <a href="/">Home</a>
                 <a href="/services/">Companies</a>
                 <a href="/plans/">Plans</a>
+                <a href="/about/">About</a>
                 <a href="/dashboard/" class="active">Dashboard</a>
             </div>
             <div class="user-menu" onclick="showUserMenu()">

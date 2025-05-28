@@ -1,565 +1,117 @@
-// Backend API configuration
+// Global config
 const API_BASE_URL = 'http://localhost:3000/api';
 
-// Get auth token from localStorage
-function getAuthToken() {
-    return localStorage.getItem('flowlyne_token');
-}
-
-// Set auth token
+// Token helpers
 function setAuthToken(token) {
-    localStorage.setItem('flowlyne_token', token);
+    localStorage.setItem('flowlyne_access', token);
 }
 
-// Remove auth token
-function removeAuthToken() {
-    localStorage.removeItem('flowlyne_token');
-    localStorage.removeItem('flowlyne_current_user');
+function getAuthToken() {
+    return localStorage.getItem('flowlyne_access');
 }
 
-// Get current user from localStorage
-function getCurrentUser() {
-    return JSON.parse(localStorage.getItem('flowlyne_current_user'));
+function clearAuthToken() {
+    localStorage.removeItem('flowlyne_access');
+    localStorage.removeItem('flowlyne_refresh');
 }
 
-// Set current user
-function setCurrentUser(user) {
-    localStorage.setItem('flowlyne_current_user', JSON.stringify(user));
-}
-
-// Make API request with authentication
+// Generic API call
 async function apiRequest(endpoint, options = {}) {
     const token = getAuthToken();
-    const defaultHeaders = {
-        'Content-Type': 'application/json',
-    };
-    
-    if (token) {
-        defaultHeaders['Authorization'] = `Bearer ${token}`;
-    }
-    
-    const config = {
-        headers: defaultHeaders,
+    const headers = options.headers || { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
-        headers: {
-            ...defaultHeaders,
-            ...options.headers
-        }
+        headers
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'API error');
+    }
+
+    return await response.json();
+}
+
+// Login
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const loginData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
     };
-    
+
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'API request failed');
-        }
-        
-        return data;
+        const response = await apiRequest('/token/', {
+            method: 'POST',
+            body: JSON.stringify(loginData)
+        });
+
+        localStorage.setItem('flowlyne_access', response.access);
+        localStorage.setItem('flowlyne_refresh', response.refresh);
+        window.location.href = 'dashboard.html';
     } catch (error) {
-        console.error('API Error:', error);
-        throw error;
+        alert('Login failed. Please check your credentials.');
     }
 }
 
-// Check if user is logged in and update nav
+// Register
+async function handleRegister(event) {
+    event.preventDefault();
+
+    const registerData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        confirm_password: document.getElementById('confirm_password').value
+    };
+
+    try {
+        const response = await apiRequest('/register/', {
+            method: 'POST',
+            body: JSON.stringify(registerData)
+        });
+
+        setAuthToken(response.token);
+        window.location.href = 'dashboard.html';
+    } catch (error) {
+        alert('Registration failed. Please check your data.');
+    }
+}
+
+// Logout
+function logout() {
+    clearAuthToken();
+    window.location.href = 'index.html';
+}
+
+// Navbar update
 function updateNavigation() {
-    const currentUser = getCurrentUser();
     const navLinks = document.querySelector('.nav-links');
-    
-    if (currentUser && navLinks) {
+    const token = getAuthToken();
+
+    if (!navLinks) return;
+
+    if (token) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'User' };
         navLinks.innerHTML = `
             <a href="index.html">Home</a>
+            <a href="about.html">About</a>
             <a href="services.html">Find Services</a>
             <a href="dashboard.html">Dashboard</a>
             <a href="#" onclick="logout()">Logout (${currentUser.name})</a>
         `;
+    } else {
+        navLinks.innerHTML = `
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Find Services</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        `;
     }
 }
 
-// Logout function
-function logout() {
-    removeAuthToken();
-    alert('Logged out successfully');
-    window.location.href = 'index.html';
-}
-
-// Registration form handler
-async function handleRegistration(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const userData = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        password: formData.get('password'),
-        type: formData.get('userType'),
-        company: formData.get('company') || '',
-        services: formData.get('services') || '',
-        description: formData.get('description') || ''
-    };
-    
-    try {
-        // Show loading state
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Creating Account...';
-        submitBtn.disabled = true;
-        
-        const response = await apiRequest('/register', {
-            method: 'POST',
-            body: JSON.stringify(userData)
-        });
-        
-        // Store token and user data
-        setAuthToken(response.token);
-        setCurrentUser(response.user);
-        
-        alert('Registration successful!');
-        window.location.href = 'dashboard.html';
-        
-    } catch (error) {
-        alert(`Registration failed: ${error.message}`);
-        
-        // Reset button
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        submitBtn.textContent = 'Create Account';
-        submitBtn.disabled = false;
-    }
-}
-
-// Login form handler
-async function handleLogin(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const loginData = {
-        email: formData.get('email'),
-        password: formData.get('password')
-    };
-    
-    try {
-        // Show loading state
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Logging in...';
-        submitBtn.disabled = true;
-        
-        const response = await apiRequest('/login', {
-            method: 'POST',
-            body: JSON.stringify(loginData)
-        });
-        
-        // Store token and user data
-        setAuthToken(response.token);
-        setCurrentUser(response.user);
-        
-        alert('Login successful!');
-        window.location.href = 'dashboard.html';
-        
-    } catch (error) {
-        alert(`Login failed: ${error.message}`);
-        
-        // Reset button
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        submitBtn.textContent = 'Login';
-        submitBtn.disabled = false;
-    }
-}
-
-// Display service providers
-async function displayServiceProviders() {
-    const container = document.getElementById('providers-container');
-    
-    if (!container) return;
-    
-    try {
-        // Show loading state
-        container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Loading service providers...</p></div>';
-        
-        const providers = await apiRequest('/providers');
-        
-        if (providers.length === 0) {
-            container.innerHTML = '<div class="no-results"><h3>No service providers available</h3><p>Be the first to join as a service provider!</p></div>';
-            return;
-        }
-        
-        container.innerHTML = providers.map(provider => `
-            <div class="provider-card">
-                <div class="provider-header">
-                    <div class="provider-info">
-                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
-                        <div class="provider-meta">
-                            <span class="service-tag">${provider.services || 'General Services'}</span>
-                            <span class="company-tag">${provider.company || 'Independent'}</span>
-                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
-                        </div>
-                        <div class="provider-stats">
-                            <div class="rating">
-                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
-                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
-                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
-                            </div>
-                            <div class="experience">
-                                <strong>${provider.experience_years || 0}+ years</strong> • 
-                                <strong>${provider.completed_projects || 0} projects</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="provider-pricing">
-                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
-                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
-                    </div>
-                </div>
-                <div class="provider-description">
-                    ${provider.description || 'Professional service provider ready to help your business grow.'}
-                </div>
-                <div class="provider-actions">
-                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
-                        💬 Contact Provider
-                    </button>
-                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
-                        👤 View Profile
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        console.error('Error loading providers:', error);
-        container.innerHTML = '<div class="no-results"><h3>Error loading providers</h3><p>Please try again later.</p></div>';
-    }
-}
-
-// Filter providers by category
-async function filterByCategory(category) {
-    const container = document.getElementById('providers-container');
-    
-    if (!container) return;
-    
-    // Update active button
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    event.target.classList.add('active');
-    
-    try {
-        // Show loading state
-        container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Loading providers...</p></div>';
-        
-        let providers;
-        if (category) {
-            providers = await apiRequest(`/providers/search?q=${encodeURIComponent(category)}`);
-        } else {
-            providers = await apiRequest('/providers');
-        }
-        
-        if (providers.length === 0) {
-            container.innerHTML = `
-                <div class="no-results">
-                    <h3>No providers found</h3>
-                    <p>No providers available for ${category || 'this category'}.</p>
-                    <button onclick="displayServiceProviders()" class="btn btn-secondary" style="margin-top: 1rem;">
-                        Show All Providers
-                    </button>
-                </div>
-            `;
-            return;
-        }
-        
-        container.innerHTML = providers.map(provider => `
-            <div class="provider-card">
-                <div class="provider-header">
-                    <div class="provider-info">
-                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
-                        <div class="provider-meta">
-                            <span class="service-tag">${provider.services || 'General Services'}</span>
-                            <span class="company-tag">${provider.company || 'Independent'}</span>
-                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
-                        </div>
-                        <div class="provider-stats">
-                            <div class="rating">
-                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
-                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
-                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
-                            </div>
-                            <div class="experience">
-                                <strong>${provider.experience_years || 0}+ years</strong> • 
-                                <strong>${provider.completed_projects || 0} projects</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="provider-pricing">
-                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
-                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
-                    </div>
-                </div>
-                <div class="provider-description">
-                    ${provider.description || 'Professional service provider ready to help your business grow.'}
-                </div>
-                <div class="provider-actions">
-                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
-                        💬 Contact Provider
-                    </button>
-                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
-                        👤 View Profile  
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        console.error('Category filter error:', error);
-        container.innerHTML = '<div class="no-results"><h3>Error loading providers</h3><p>Please try again.</p></div>';
-    }
-}
-
-// View provider profile (demo function)
-function viewProfile(providerId) {
-    alert('View Profile feature coming soon! This would show detailed provider information, portfolio, reviews, and past work.');
-}
-
-// Contact provider function
-async function contactProvider(email) {
-    const currentUser = getCurrentUser();
-    
-    if (!currentUser) {
-        alert('Please login to contact service providers');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    const message = prompt('Enter your message:');
-    if (!message) return;
-    
-    try {
-        await apiRequest('/messages', {
-            method: 'POST',
-            body: JSON.stringify({
-                receiverEmail: email,
-                message: message
-            })
-        });
-        
-        alert('Message sent successfully! The service provider will get back to you soon.');
-        
-    } catch (error) {
-        alert(`Failed to send message: ${error.message}`);
-    }
-}
-
-// Search functionality
-async function searchProviders() {
-    const searchTerm = document.getElementById('search-input').value.trim();
-    const container = document.getElementById('providers-container');
-    
-    if (!container) return;
-    
-    if (!searchTerm) {
-        displayServiceProviders();
-        return;
-    }
-    
-    try {
-        // Show loading state
-        container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Searching...</p></div>';
-        
-        const providers = await apiRequest(`/providers/search?q=${encodeURIComponent(searchTerm)}`);
-        
-        if (providers.length === 0) {
-            container.innerHTML = `
-                <div class="no-results">
-                    <h3>No providers found</h3>
-                    <p>No providers match "${searchTerm}". Try a different search term.</p>
-                    <button onclick="displayServiceProviders()" class="btn btn-secondary" style="margin-top: 1rem;">
-                        Show All Providers
-                    </button>
-                </div>
-            `;
-            return;
-        }
-        
-        container.innerHTML = providers.map(provider => `
-            <div class="provider-card">
-                <div class="provider-header">
-                    <div class="provider-info">
-                        <h3>${provider.name} ${provider.is_verified ? '<span class="verified-badge">✓</span>' : ''}</h3>
-                        <div class="provider-meta">
-                            <span class="service-tag">${provider.services || 'General Services'}</span>
-                            <span class="company-tag">${provider.company || 'Independent'}</span>
-                            <span class="location-tag">📍 ${provider.location || 'Egypt'}</span>
-                        </div>
-                        <div class="provider-stats">
-                            <div class="rating">
-                                ${'⭐'.repeat(Math.floor(provider.rating || 0))} 
-                                <span class="rating-number">${(provider.rating || 0).toFixed(1)}</span>
-                                <span class="review-count">(${provider.total_reviews || 0} reviews)</span>
-                            </div>
-                            <div class="experience">
-                                <strong>${provider.experience_years || 0}+ years</strong> • 
-                                <strong>${provider.completed_projects || 0} projects</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="provider-pricing">
-                        <div class="hourly-rate">${(provider.hourly_rate || 0).toFixed(0)}/hr</div>
-                        <div class="availability ${(provider.availability || 'available').toLowerCase()}">${provider.availability || 'Available'}</div>
-                    </div>
-                </div>
-                <div class="provider-description">
-                    ${provider.description || 'Professional service provider ready to help your business grow.'}
-                </div>
-                <div class="provider-actions">
-                    <button onclick="contactProvider('${provider.email}')" class="contact-btn">
-                        💬 Contact Provider
-                    </button>
-                    <button onclick="viewProfile('${provider.id}')" class="profile-btn">
-                        👤 View Profile
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        console.error('Search error:', error);
-        container.innerHTML = '<div class="no-results"><h3>Search failed</h3><p>Please try again.</p></div>';
-    }
-}
-
-// Load dashboard data
-async function loadDashboard() {
-    const currentUser = getCurrentUser();
-    
-    if (!currentUser) {
-        alert('Please login to access your dashboard');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    try {
-        // Load platform statistics
-        const stats = await apiRequest('/stats');
-        
-        // Update welcome message
-        const welcomeElement = document.getElementById('welcome-message');
-        if (welcomeElement) {
-            welcomeElement.textContent = `Welcome back, ${currentUser.name}!`;
-        }
-        
-        // Update stats
-        const elements = {
-            'total-users': stats.totalUsers,
-            'service-providers': stats.serviceProviders,
-            'companies': stats.companies
-        };
-        
-        Object.entries(elements).forEach(([id, value]) => {
-            const element = document.getElementById(id);
-            if (element) element.textContent = value;
-        });
-        
-        // Format member since date
-        const memberDate = new Date(currentUser.createdAt);
-        const memberSinceElement = document.getElementById('member-since');
-        if (memberSinceElement) {
-            memberSinceElement.textContent = memberDate.toLocaleDateString();
-        }
-        
-        // Update user type badge
-        const badge = document.getElementById('user-type-badge');
-        if (badge) {
-            badge.textContent = currentUser.type === 'provider' ? 'Service Provider' : 'Company';
-            badge.style.background = currentUser.type === 'provider' ? '#e74c3c' : '#3498db';
-        }
-        
-        // Populate profile information
-        const profileInfo = document.getElementById('profile-info');
-        if (profileInfo) {
-            profileInfo.innerHTML = `
-                <div class="info-item">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value">${currentUser.name}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Email Address</div>
-                    <div class="info-value">${currentUser.email}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Company</div>
-                    <div class="info-value">${currentUser.company || 'Not specified'}</div>
-                </div>
-                ${currentUser.type === 'provider' ? `
-                <div class="info-item">
-                    <div class="info-label">Services Offered</div>
-                    <div class="info-value">${currentUser.services || 'Not specified'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Description</div>
-                    <div class="info-value">${currentUser.description || 'No description provided'}</div>
-                </div>
-                ` : ''}
-            `;
-        }
-        
-    } catch (error) {
-        console.error('Dashboard error:', error);
-        alert('Error loading dashboard data');
-    }
-}
-
-// Toggle form fields based on user type
-function toggleUserTypeFields() {
-    const userType = document.getElementById('userType')?.value;
-    const providerFields = document.getElementById('provider-fields');
-    
-    if (providerFields) {
-        if (userType === 'provider') {
-            providerFields.style.display = 'block';
-        } else {
-            providerFields.style.display = 'none';
-        }
-    }
-}
-
-// Demo message for unimplemented features
-function showDemoMessage() {
-    alert('This is a demo feature. In a full application, this would provide complete functionality.');
-}
-
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    updateNavigation();
-    
-    // Set user type from URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const userType = urlParams.get('type');
-    if (userType) {
-        const userTypeSelect = document.getElementById('userType');
-        if (userTypeSelect) {
-            userTypeSelect.value = userType;
-            toggleUserTypeFields();
-        }
-    }
-    
-    // Initialize page-specific functionality
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    if (currentPage === 'services.html') {
-        displayServiceProviders();
-        
-        // Enable search on Enter key
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchProviders();
-                }
-            });
-        }
-    }
-    
-    if (currentPage === 'dashboard.html') {
-        loadDashboard();
-    }
-});
+document.addEventListener('DOMContentLoaded', updateNavigation);

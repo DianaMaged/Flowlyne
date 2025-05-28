@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('about/', views.about, name='about'),
     
     # API endpoints
     path('api/register/', views.api_register, name='api_register'),

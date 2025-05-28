@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discover Companies - Flowlyne</title>
+    <title>Discover Companies - Flowlyne | Smooth and Fine, That's Flowlyne</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -41,11 +42,12 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -57,12 +59,58 @@
             align-items: center;
         }
 
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
         .nav-brand h1 {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-size: 1.75rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -77,13 +125,29 @@
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(78, 205, 196, 0.1);
-            color: var(--primary-teal);
+        .nav-links a:hover {
+            background: var(--glass-bg);
+            transform: translateY(-1px);
         }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
 
         /* Search Section */
         .search-hero {
@@ -130,6 +194,14 @@
         .search-subtitle {
             font-size: 1.25rem;
             color: var(--medium-grey);
+            margin-bottom: 1rem;
+        }
+
+        .search-tagline {
+            font-size: 1rem;
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
             margin-bottom: 3rem;
         }
 
@@ -421,6 +493,7 @@
         .loading-state {
             text-align: center;
             padding: 4rem 2rem;
+            grid-column: 1 / -1;
         }
 
         .loading-spinner {
@@ -440,6 +513,7 @@
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
+            grid-column: 1 / -1;
         }
 
         .empty-icon {
@@ -481,6 +555,31 @@
             color: white;
             text-align: center;
             padding: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-tagline {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            opacity: 0.8;
         }
 
         /* Mobile Responsive */
@@ -535,14 +634,21 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1>Flowlyne</h1>
-            </div>
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                    <div class="nav-tagline">Smooth and Fine</div>
+                </div>
+            </a>
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/services/" class="active">Companies</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
+                <a href="/about/">About</a>
                 <a href="/register/">Register</a>
             </div>
         </div>
@@ -553,6 +659,7 @@
         <div class="search-content">
             <h1 class="search-title">Discover Your Perfect Business Partner</h1>
             <p class="search-subtitle">Connect with verified Egyptian companies across all industries</p>
+            <p class="search-tagline">"Smooth and Fine, That's Flowlyne"</p>
             
             <div class="search-container">
                 <div class="search-box">
@@ -601,12 +708,17 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 Flowlyne. Connecting Egyptian businesses for mutual growth.</p>
+        <div class="footer-content">
+            <div class="footer-brand">Flowlyne</div>
+            <div class="footer-tagline">Smooth and Fine, That's Flowlyne</div>
+            <p class="footer-text">&copy; 2025 Flowlyne. Connecting Egyptian businesses for mutual growth.</p>
+        </div>
     </footer>
 
     <script>
         let allCompanies = [];
         let filteredCompanies = [];
+        let currentFilter = '';
 
         // Load companies on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -622,11 +734,17 @@
 
         async function loadCompanies() {
             const container = document.getElementById('companies-container');
-            const loadingState = document.getElementById('loading-state');
             
             try {
+                console.log('Loading companies...');
                 const response = await fetch('/api/companies/');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const companies = await response.json();
+                console.log('Companies loaded:', companies);
                 
                 allCompanies = companies;
                 filteredCompanies = companies;
@@ -636,14 +754,58 @@
                 
             } catch (error) {
                 console.error('Error loading companies:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">😕</div>
-                        <h3 class="empty-title">Oops! Something went wrong</h3>
-                        <p class="empty-text">We're having trouble loading companies. Please try again.</p>
-                        <button class="empty-btn" onclick="loadCompanies()">Retry</button>
-                    </div>
-                `;
+                
+                // Show demo companies as fallback
+                const demoCompanies = [
+                    {
+                        id: '1',
+                        company_name: 'TechSolutions Egypt',
+                        description: 'Leading web development company in Egypt specializing in modern, scalable web applications.',
+                        city: 'Cairo',
+                        country: 'Egypt',
+                        website: 'https://techsolutions.eg',
+                        is_verified: true,
+                        primary_department: 'Web Development',
+                        rating: 4.8,
+                        review_count: 15,
+                        departments: [
+                            { name: 'Web Development', icon: '💻', is_primary: true }
+                        ]
+                    },
+                    {
+                        id: '2',
+                        company_name: 'Creative Studio Alexandria',
+                        description: 'Award-winning design agency providing comprehensive branding and visual identity solutions.',
+                        city: 'Alexandria',
+                        country: 'Egypt',
+                        is_verified: true,
+                        primary_department: 'Graphic Design',
+                        rating: 4.9,
+                        review_count: 22,
+                        departments: [
+                            { name: 'Graphic Design', icon: '🎨', is_primary: true }
+                        ]
+                    },
+                    {
+                        id: '3',
+                        company_name: 'Digital Marketing Agency Cairo',
+                        description: 'Full-service digital marketing agency helping Egyptian businesses grow online.',
+                        city: 'Cairo',
+                        country: 'Egypt',
+                        is_verified: true,
+                        primary_department: 'Digital Marketing',
+                        rating: 4.7,
+                        review_count: 18,
+                        departments: [
+                            { name: 'Digital Marketing', icon: '📈', is_primary: true }
+                        ]
+                    }
+                ];
+                
+                allCompanies = demoCompanies;
+                filteredCompanies = demoCompanies;
+                displayCompanies(demoCompanies);
+                updateResultsCount(demoCompanies.length);
             }
         }
 
@@ -707,6 +869,20 @@
                     </div>
                 </div>
             `).join('');
+
+            // Add entrance animations
+            setTimeout(() => {
+                document.querySelectorAll('.company-card').forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 100);
         }
 
         function updateResultsCount(count) {
@@ -719,38 +895,50 @@
             const container = document.getElementById('companies-container');
             
             if (!searchTerm) {
-                filteredCompanies = allCompanies;
+                filteredCompanies = allCompanies.filter(company => {
+                    if (!currentFilter) return true;
+                    return company.primary_department === currentFilter ||
+                           (company.departments && company.departments.some(dept => dept.name === currentFilter));
+                });
                 displayCompanies(filteredCompanies);
                 updateResultsCount(filteredCompanies.length);
                 return;
             }
             
+            // Show loading
+            container.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <h3>Searching for "${searchTerm}"...</h3>
+                </div>
+            `;
+            
             try {
-                // Show loading
-                container.innerHTML = `
-                    <div class="loading-state">
-                        <div class="loading-spinner"></div>
-                        <h3>Searching for "${searchTerm}"...</h3>
-                    </div>
-                `;
-                
                 const response = await fetch(`/api/companies/?search=${encodeURIComponent(searchTerm)}`);
-                const companies = await response.json();
                 
-                filteredCompanies = companies;
-                displayCompanies(companies);
-                updateResultsCount(companies.length);
+                if (response.ok) {
+                    const companies = await response.json();
+                    filteredCompanies = companies;
+                    displayCompanies(companies);
+                    updateResultsCount(companies.length);
+                } else {
+                    throw new Error('Search failed');
+                }
                 
             } catch (error) {
                 console.error('Search error:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">😕</div>
-                        <h3 class="empty-title">Search failed</h3>
-                        <p class="empty-text">Please try again or browse all companies.</p>
-                        <button class="empty-btn" onclick="clearFilters()">Show All Companies</button>
-                    </div>
-                `;
+                
+                // Fallback to client-side search
+                const searchResults = allCompanies.filter(company => 
+                    company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    company.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    company.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (company.primary_department && company.primary_department.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+                
+                filteredCompanies = searchResults;
+                displayCompanies(searchResults);
+                updateResultsCount(searchResults.length);
             }
         }
 
@@ -761,6 +949,7 @@
             });
             event.target.classList.add('active');
             
+            currentFilter = category;
             const container = document.getElementById('companies-container');
             
             // Show loading
@@ -788,6 +977,8 @@
 
         function clearFilters() {
             document.getElementById('search-input').value = '';
+            currentFilter = '';
+            
             document.querySelectorAll('.filter-pill').forEach(pill => {
                 pill.classList.remove('active');
             });
@@ -827,33 +1018,6 @@
                 navbar.style.boxShadow = 'none';
             }
         });
-
-        // Add entrance animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, index * 100);
-                }
-            });
-        }, observerOptions);
-
-        // Observe company cards when they're added
-        function observeCards() {
-            document.querySelectorAll('.company-card').forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.6s ease';
-                observer.observe(card);
-            });
-        }
     </script>
 </body>
 </html>

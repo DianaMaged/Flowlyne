@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowlyne - The Future of B2B</title>
+    <title>Flowlyne - The Future of B2B | Smooth and Fine, That's Flowlyne</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -65,7 +66,36 @@
         .nav-brand {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
         }
 
         .nav-brand h1 {
@@ -76,6 +106,15 @@
             font-size: 1.75rem;
             font-weight: 700;
             letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -100,7 +139,7 @@
         }
 
         .nav-cta {
-            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
             color: white !important;
             padding: 0.75rem 1.5rem !important;
             border-radius: 25px;
@@ -163,7 +202,7 @@
             font-size: clamp(3rem, 8vw, 5rem);
             font-weight: 700;
             line-height: 1.1;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             background: linear-gradient(135deg, var(--dark-grey) 0%, var(--medium-grey) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -175,10 +214,19 @@
             font-size: 1.5rem;
             font-weight: 400;
             color: var(--medium-grey);
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .hero-tagline {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-teal);
+            font-style: italic;
+            margin-bottom: 3rem;
+            text-shadow: 0 2px 4px rgba(78, 205, 196, 0.2);
         }
 
         .hero-buttons {
@@ -281,7 +329,14 @@
             font-size: 1.25rem;
             color: var(--medium-grey);
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto 1rem;
+        }
+
+        .section-tagline {
+            font-size: 1rem;
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
         }
 
         .features-grid {
@@ -375,8 +430,15 @@
 
         .cta-subtitle {
             font-size: 1.25rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             opacity: 0.9;
+        }
+
+        .cta-tagline {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            opacity: 0.8;
         }
 
         .cta-button {
@@ -409,11 +471,18 @@
         .footer-brand {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .footer-tagline {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-bottom: 1rem;
         }
 
         .footer-text {
@@ -433,6 +502,10 @@
                 gap: 1rem;
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .nav-tagline {
+                display: none;
             }
 
             .hero-buttons {
@@ -491,14 +564,21 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1>Flowlyne</h1>
-            </div>
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                    <div class="nav-tagline">Smooth and Fine</div>
+                </div>
+            </a>
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/services/">Companies</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
+                <a href="/about/">About</a>
                 <a href="/register/" class="nav-cta">Get Started</a>
             </div>
         </div>
@@ -509,6 +589,7 @@
         <div class="hero-content fade-in">
             <h1>The Future of B2B Networking</h1>
             <p class="hero-subtitle">Connect, collaborate, and grow with Egypt's most trusted business network. Where companies find their perfect partners.</p>
+            <p class="hero-tagline">"Smooth and Fine, That's Flowlyne"</p>
             
             <div class="hero-buttons">
                 <a href="/register/" class="btn btn-primary">
@@ -543,6 +624,7 @@
             <div class="section-header fade-in">
                 <h2 class="section-title">Built for Egyptian Businesses</h2>
                 <p class="section-subtitle">Everything you need to connect, collaborate, and grow your business network in one powerful platform.</p>
+                <p class="section-tagline">Smooth and Fine, That's Flowlyne</p>
             </div>
 
             <div class="features-grid">
@@ -591,6 +673,7 @@
             <div class="cta-content fade-in">
                 <h2 class="cta-title">Ready to Transform Your Business?</h2>
                 <p class="cta-subtitle">Join thousands of Egyptian companies already growing their networks on Flowlyne.</p>
+                <p class="cta-tagline">"Smooth and Fine, That's Flowlyne"</p>
                 <a href="/register/" class="btn cta-button">
                     <span>Start Free Today</span>
                     <span>→</span>
@@ -603,6 +686,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">Flowlyne</div>
+            <div class="footer-tagline">Smooth and Fine, That's Flowlyne</div>
             <p class="footer-text">&copy; 2025 Flowlyne. Empowering Egyptian businesses to connect, collaborate, and grow together.</p>
         </div>
     </footer>

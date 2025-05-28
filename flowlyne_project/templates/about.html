@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Flowlyne | Smooth and Fine, That's Flowlyne</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #4ECDC4;
+            --primary-blue: #45B7D1;
+            --accent-purple: #6C5CE7;
+            --dark-grey: #2D3436;
+            --medium-grey: #636E72;
+            --light-grey: #DDD6FE;
+            --white: #FFFFFF;
+            --off-white: #FAFBFC;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            --gradient-dark: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--off-white);
+            color: var(--dark-grey);
+            line-height: 1.6;
+        }
+
+        /* Navigation with Logo */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
+        .nav-brand h1 {
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-grey);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            background: var(--glass-bg);
+            transform: translateY(-1px);
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 8rem 2rem 4rem;
+            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.08) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, -15px) rotate(2deg); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient-dark);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            margin-bottom: 1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-tagline {
+            font-size: 1.1rem;
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
+            margin-bottom: 3rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .about-text {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Story Section */
+        .story-section {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .story-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .story-text {
+            color: var(--medium-grey);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .name-explanation {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .name-part {
+            margin-bottom: 1rem;
+        }
+
+        .name-part:last-child {
+            margin-bottom: 0;
+        }
+
+        .name-highlight {
+            font-weight: 700;
+            color: var(--primary-teal);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .logo-svg {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tagline {
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 10;
+            font-style: italic;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: var(--gradient-dark);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .mission-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .mission-card:nth-child(2)::before {
+            background: var(--gradient-accent);
+        }
+
+        .mission-card:nth-child(3)::before {
+            background: linear-gradient(135deg, var(--success), #00B894);
+        }
+
+        .mission-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .mission-card:nth-child(2) .mission-icon {
+            background: var(--gradient-accent);
+        }
+
+        .mission-card:nth-child(3) .mission-icon {
+            background: linear-gradient(135deg, var(--success), #00B894);
+        }
+
+        .mission-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-grey);
+        }
+
+        .mission-card p {
+            color: var(--medium-grey);
+            line-height: 1.7;
+        }
+
+        /* Vision Section */
+        .vision-section {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .vision-item {
+            text-align: center;
+        }
+
+        .vision-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0 auto 1.5rem;
+        }
+
+        .vision-item:nth-child(2) .vision-icon {
+            background: var(--gradient-accent);
+        }
+
+        .vision-item:nth-child(3) .vision-icon {
+            background: linear-gradient(135deg, var(--success), #00B894);
+        }
+
+        .vision-item h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-grey);
+        }
+
+        .vision-item p {
+            color: var(--medium-grey);
+            line-height: 1.6;
+        }
+
+        /* Team Section */
+        .team-section {
+            margin-bottom: 4rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .team-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 3px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .team-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-grey);
+        }
+
+        .team-role {
+            color: var(--medium-grey);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-grey);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-tagline {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            opacity: 0.8;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-tagline {
+                display: none;
+            }
+
+            .hero-section {
+                padding: 6rem 1rem 3rem;
+            }
+
+            .main-content {
+                padding: 0 1rem;
+            }
+
+            .about-section,
+            .story-section,
+            .vision-section {
+                padding: 2rem;
+            }
+
+            .story-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .mission-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                </div>
+                <span class="nav-tagline">Smooth and Fine</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/services/">Companies</a>
+                <a href="/plans/">Plans</a>
+                <a href="/about/" class="active">About</a>
+                <a href="/login/">Login</a>
+                <a href="/register/">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">About Flowlyne</h1>
+            <p class="hero-subtitle">Connecting Egyptian businesses through innovation, trust, and seamless collaboration</p>
+            <p class="hero-tagline">"Smooth and Fine, That's Flowlyne"</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- About Section -->
+        <section class="about-section fade-in">
+            <p class="about-text">
+                We are a B2B platform dedicated to connecting businesses with trusted service providers across key areas such as web development, marketing, accounting, auditing, and consulting. By acting as a direct bridge between companies and specialized teams, we simplify outsourcing through secure transactions, verified services, and efficient contract management. Our goal is to help businesses save time, reduce costs, and collaborate with confidence.
+            </p>
+        </section>
+
+        <!-- Story Behind the Name -->
+        <section class="story-section fade-in">
+            <div class="story-content">
+                <h2>Story Behind the Name</h2>
+                <p class="story-text">
+                    <strong>Flowlyne</strong> was born from our mission to create a smoother, smarter way for businesses to connect and collaborate.
+                </p>
+                
+                <div class="name-explanation">
+                    <div class="name-part">
+                        <span class="name-highlight">Flow</span>—a symbol of ease, efficiency, and movement. It reflects the seamless experience we want every business to have when navigating outsourcing smooth workflows, effortless connections, and productive results.
+                    </div>
+                    <div class="name-part">
+                        <span class="name-highlight">Lyne</span>—a word that represents connection and community. It embodies our commitment to building strong, lasting relationships with our clients.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="logo-container">
+                <div class="logo-svg">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main flowing design -->
+                        <path d="M200 80 C240 80, 280 120, 280 160 C280 200, 240 240, 200 240 C160 240, 120 200, 120 160 C120 180, 140 200, 160 200 C180 200, 200 180, 200 160" 
+                              fill="none" stroke="#4ECDC4" stroke-width="8" opacity="0.8"/>
+                        
+                        <path d="M200 160 C200 180, 180 200, 160 200 C140 200, 120 180, 120 160 C120 140, 140 120, 160 120 C180 120, 200 140, 200 160" 
+                              fill="#45B7D1" opacity="0.6"/>
+                        
+                        <path d="M200 240 C160 240, 120 280, 120 320 C120 360, 160 400, 200 400 C240 400, 280 360, 280 320 C280 300, 260 280, 240 280 C220 280, 200 300, 200 320" 
+                              fill="none" stroke="#6C5CE7" stroke-width="6" opacity="0.7"/>
+                        
+                        <!-- Connection nodes -->
+                        <circle cx="120" cy="100" r="12" fill="#B0BEC5"/>
+                        <circle cx="160" cy="80" r="8" fill="#90A4AE"/>
+                        <circle cx="320" cy="140" r="10" fill="#4ECDC4"/>
+                        <circle cx="340" cy="200" r="8" fill="#45B7D1"/>
+                        <circle cx="300" cy="360" r="12" fill="#6C5CE7"/>
+                        <circle cx="80" cy="300" r="10" fill="#B0BEC5"/>
+                        <circle cx="60" cy="180" r="8" fill="#90A4AE"/>
+                        <circle cx="380" cy="280" r="6" fill="#4ECDC4"/>
+                        
+                        <!-- Connection lines -->
+                        <line x1="120" y1="100" x2="160" y2="120" stroke="#E0E0E0" stroke-width="2"/>
+                        <line x1="320" y1="140" x2="280" y2="160" stroke="#E0E0E0" stroke-width="2"/>
+                        <line x1="300" y1="360" x2="260" y2="320" stroke="#E0E0E0" stroke-width="2"/>
+                        <line x1="80" y1="300" x2="120" y2="280" stroke="#E0E0E0" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="tagline">Smooth and Fine, That's Flowlyne</div>
+            </div>
+        </section>
+
+        <!-- Mission Section -->
+        <section class="mission-section">
+            <h2 class="section-title">Our Mission</h2>
+            <div class="mission-grid">
+                <div class="mission-card fade-in">
+                    <div class="mission-icon">⚡</div>
+                    <h3>Driving Efficiency</h3>
+                    <p>Our platform offers a seamless and secure space for collaboration, helping businesses cut operational costs, save valuable time, and access a comprehensive suite of essential services with ease.</p>
+                </div>
+                
+                <div class="mission-card fade-in">
+                    <div class="mission-icon">🤝</div>
+                    <h3>Empowering Connections</h3>
+                    <p>Our mission is to revolutionize outsourcing through a secure, user-friendly platform that connects businesses with trusted service providers. We simplify the search and expand opportunities across Egypt.</p>
+                </div>
+                
+                <div class="mission-card fade-in">
+                    <div class="mission-icon">🔍</div>
+                    <h3>Ensuring Transparency</h3>
+                    <p>We foster trust and clarity in every connection by showcasing verified portfolios and genuine client reviews. This enables businesses to evaluate service providers confidently and make informed, strategic decisions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vision Section -->
+        <section class="vision-section fade-in">
+            <h2 class="section-title">Our Vision</h2>
+            <div class="vision-grid">
+                <div class="vision-item">
+                    <div class="vision-icon">🎯</div>
+                    <h3>Best Strategy</h3>
+                    <p>To be the leading B2B outsourcing platform, making it easier for businesses to connect with trusted service providers across all departments.</p>
+                </div>
+                
+                <div class="vision-item">
+                    <div class="vision-icon">⭐</div>
+                    <h3>High-Quality Services</h3>
+                    <p>Our centralized hub ensures access to vetted experts, delivering consistent quality and driving better business outcomes.</p>
+                </div>
+                
+                <div class="vision-item">
+                    <div class="vision-icon">💬</div>
+                    <h3>Friendly Support</h3>
+                    <p>With responsive, people-first support, we help businesses grow through smarter tools, innovation, and global reach.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="team-section">
+            <h2 class="section-title">Our Team</h2>
+            <p style="text-align: center; color: var(--medium-grey); font-size: 1.1rem; margin-bottom: 3rem;">
+                Our team is a group of dedicated professionals who are passionate about helping businesses grow and succeed
+            </p>
+            <div class="team-grid">
+                <div class="team-card fade-in">
+                    <img src="/static/images/maria.jpg" alt="Maria Ihab" class="team-photo" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-primary); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">MI</div>
+                    <h3 class="team-name">Maria Ihab</h3>
+                    <p class="team-role">Founder, System Analyst</p>
+                </div>
+                
+                <div class="team-card fade-in">
+                    <img src="/static/images/diana.jpg" alt="Diana Maged" class="team-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-accent); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">DM</div>
+                    <h3 class="team-name">Diana Maged</h3>
+                    <p class="team-role">Founder, Business Analyst</p>
+                </div>
+                
+                <div class="team-card fade-in">
+                    <img src="/static/images/beshoy.jpg" alt="Beshoy Wahba" class="team-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--success), #00B894); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">BW</div>
+                    <h3 class="team-name">Beshoy Wahba</h3>
+                    <p class="team-role">Founder, Backend Developer</p>
+                </div>
+                
+                <div class="team-card fade-in">
+                    <img src="/static/images/salwa.jpg" alt="Salwa Magdy" class="team-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-primary); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">SM</div>
+                    <h3 class="team-name">Salwa Magdy</h3>
+                    <p class="team-role">Founder, Financial Analyst</p>
+                </div>
+                
+                <div class="team-card fade-in">
+                    <img src="/static/images/marvy.jpg" alt="Marvy Nady" class="team-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: var(--gradient-accent); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">MN</div>
+                    <h3 class="team-name">Marvy Nady</h3>
+                    <p class="team-role">Founder, Front-end Developer</p>
+                </div>
+                
+                <div class="team-card fade-in">
+                    <img src="/static/images/youssef.jpg" alt="Youssef Malak" class="team-photo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="team-avatar" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--success), #00B894); align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700; margin: 0 auto 1.5rem;">YM</div>
+                    <h3 class="team-name">Youssef Malak</h3>
+                    <p class="team-role">Founder, Front-end Developer</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">Flowlyne</div>
+            <div class="footer-tagline">Smooth and Fine, That's Flowlyne</div>
+            <p class="footer-text">&copy; 2025 Flowlyne. Empowering Egyptian businesses to connect and grow together.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.animationDelay = `${index * 0.1}s`;
+                        entry.target.classList.add('fade-in');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.about-section, .story-section, .mission-card, .vision-section, .team-card').forEach(el => {
+                observer.observe(el);
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.9)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

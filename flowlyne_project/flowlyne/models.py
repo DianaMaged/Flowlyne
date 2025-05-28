@@ -57,15 +57,12 @@ class Company(AbstractUser):
     
     # Verification status
     is_verified = models.BooleanField(default=False)
-
-    # Company Subscription Plan
-    current_plan = models.CharField(max_length=20, default='basic', choices=[('basic', 'Basic'), ('standard', 'Standard'), ('premium', 'Premium')])
     
     # Location
     city = models.CharField(max_length=100, default="Cairo")
     country = models.CharField(max_length=100, default="Egypt")
 
-    # Subscription Plan - ADD THIS LINE
+    # Subscription Plan (FIXED - removed duplicate)
     current_plan = models.CharField(
         max_length=20, 
         default='basic', 
@@ -95,7 +92,6 @@ class Company(AbstractUser):
     def __str__(self):
         return self.company_name
 
-# Keep the Department and CompanyDepartment models the same...
 class Department(models.Model):
     """Service departments/categories"""
     name = models.CharField(max_length=100, unique=True)
@@ -120,7 +116,7 @@ class CompanyDepartment(models.Model):
     
     def __str__(self):
         return f"{self.company.company_name} - {self.department.name}"
-    
+
 class SubscriptionPlan(models.Model):
     """Subscription plans available on the platform"""
     PLAN_CHOICES = [
@@ -188,3 +184,53 @@ class CompanySubscription(models.Model):
             return False
         from django.utils import timezone
         return timezone.now() > self.end_date
+
+# Add additional models for messaging system
+class Message(models.Model):
+    """Messages between companies"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='received_messages')
+    
+    subject = models.CharField(max_length=200)
+    content = models.TextField()
+    
+    is_read = models.BooleanField(default=False)
+    replied_to = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.sender.company_name} → {self.receiver.company_name}: {self.subject}"
+
+class CompanyReview(models.Model):
+    """Reviews for companies"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reviewer = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='given_reviews')
+    reviewed_company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='received_reviews')
+    
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    
+    # Project details
+    project_type = models.CharField(max_length=100, blank=True)
+    project_duration = models.CharField(max_length=50, blank=True)
+    project_budget_range = models.CharField(max_length=50, blank=True)
+    
+    would_recommend = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)  # For verified project reviews
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['reviewer', 'reviewed_company']  # One review per company pair
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.reviewer.company_name} → {self.reviewed_company.company_name} ({self.rating}★)"

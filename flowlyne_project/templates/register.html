@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Flowlyne - Create Your Account</title>
+    <title>Join Flowlyne - Create Your Account | Smooth and Fine, That's Flowlyne</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,10 +39,17 @@
 
         /* Navigation */
         .navbar {
-            background: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding: 1rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -53,12 +61,58 @@
             align-items: center;
         }
 
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
         .nav-brand h1 {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-size: 1.75rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -73,12 +127,29 @@
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
         .nav-links a:hover {
-            background: rgba(78, 205, 196, 0.1);
+            background: var(--glass-bg);
+            transform: translateY(-1px);
         }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+
 
         /* Main Content */
         .main-content {
@@ -126,7 +197,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             position: relative;
             z-index: 10;
         }
@@ -149,6 +220,13 @@
         .register-subtitle {
             color: var(--medium-grey);
             font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .register-tagline {
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
             margin-bottom: 2rem;
         }
 
@@ -240,6 +318,112 @@
             font-size: 1.25rem;
         }
 
+        /* Enhanced Multi-Select Departments */
+        .departments-section {
+            background: rgba(78, 205, 196, 0.03);
+            border: 1px solid rgba(78, 205, 196, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .departments-title {
+            font-weight: 600;
+            color: var(--dark-grey);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .department-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--white);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .department-option:hover {
+            border-color: var(--primary-teal);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
+        }
+
+        .department-option.selected {
+            border-color: var(--primary-teal);
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .department-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--medium-grey);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .department-option.selected .department-checkbox {
+            background: var(--primary-teal);
+            border-color: var(--primary-teal);
+            color: white;
+        }
+
+        .department-info {
+            flex: 1;
+        }
+
+        .department-name {
+            font-weight: 600;
+            color: var(--dark-grey);
+            font-size: 0.9rem;
+        }
+
+        .department-icon {
+            font-size: 1.5rem;
+            margin-left: auto;
+        }
+
+        .custom-department {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .custom-department.show {
+            display: block;
+        }
+
+        .custom-department input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .custom-department input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+        }
+
         .register-button {
             width: 100%;
             padding: 1.25rem;
@@ -283,62 +467,31 @@
             text-decoration: underline;
         }
 
-        .error-message {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            color: var(--error);
+        .error-message, .success-message, .debug-info {
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
             font-size: 0.875rem;
             display: none;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: var(--error);
         }
 
         .success-message {
             background: rgba(0, 212, 170, 0.1);
             border: 1px solid rgba(0, 212, 170, 0.3);
             color: var(--success);
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-            display: none;
         }
 
-        .progress-bar {
-            height: 4px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 2px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient-primary);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 2px;
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .step-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .step-dot.active {
-            background: var(--gradient-primary);
-            transform: scale(1.2);
+        .debug-info {
+            background: rgba(108, 92, 231, 0.1);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            color: var(--accent-purple);
+            font-family: 'Courier New', monospace;
         }
 
         .security-info {
@@ -405,6 +558,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .departments-grid {
+                grid-template-columns: 1fr;
+            }
+
             .register-title {
                 font-size: 2rem;
             }
@@ -440,14 +597,21 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1>Flowlyne</h1>
-            </div>
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                    <div class="nav-tagline">Smooth and Fine</div>
+                </div>
+            </a>
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/services/">Companies</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
+                <a href="/about/">About</a>
             </div>
         </div>
     </nav>
@@ -458,6 +622,7 @@
             <div class="register-header">
                 <h1 class="register-title">Join Flowlyne</h1>
                 <p class="register-subtitle">Connect your business with Egypt's largest B2B network</p>
+                <p class="register-tagline">"Smooth and Fine, That's Flowlyne"</p>
                 
                 <div class="benefits-grid">
                     <div class="benefit-item">
@@ -479,18 +644,9 @@
                 </div>
             </div>
 
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-
-            <div class="step-indicator">
-                <div class="step-dot active"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
-            </div>
-
             <div class="error-message" id="error-message"></div>
             <div class="success-message" id="success-message"></div>
+            <div class="debug-info" id="debug-info"></div>
 
             <form onsubmit="handleRegistration(event)" id="register-form">
                 <div class="form-grid">
@@ -549,6 +705,23 @@
                     </div>
                 </div>
 
+                <!-- Enhanced Departments Selection -->
+                <div class="departments-section">
+                    <div class="departments-title">
+                        <span>🎯</span>
+                        <span>Select Your Service Categories *</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--medium-grey); margin-bottom: 1rem;">Choose the services your company provides (select multiple)</p>
+                    
+                    <div class="departments-grid" id="departments-grid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <div class="custom-department" id="custom-department">
+                        <input type="text" id="custom-department-input" placeholder="Enter your custom service category...">
+                    </div>
+                </div>
+
                 <div class="form-group full-width">
                     <label for="company_address">Company Address</label>
                     <div class="input-container">
@@ -592,79 +765,156 @@
     </footer>
 
     <script>
-        let currentStep = 1;
-        const totalSteps = 3;
+        let selectedDepartments = [];
+        let availableDepartments = [];
 
-        // Update progress as user fills form
-        function updateProgress() {
-            const formInputs = document.querySelectorAll('.form-input[required]');
-            let filledInputs = 0;
-            
-            formInputs.forEach(input => {
-                if (input.value.trim() !== '') {
-                    filledInputs++;
-                }
-            });
-            
-            const progress = (filledInputs / formInputs.length) * 100;
-            document.getElementById('progress-fill').style.width = progress + '%';
-            
-            // Update step indicator
-            const stepDots = document.querySelectorAll('.step-dot');
-            const currentStepIndex = Math.floor(progress / 33.33);
-            
-            stepDots.forEach((dot, index) => {
-                if (index <= currentStepIndex) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-        }
-
-        // Add event listeners to form inputs
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('input', updateProgress);
-            input.addEventListener('focus', (e) => {
-                e.target.parentElement.style.transform = 'scale(1.02)';
-            });
-            input.addEventListener('blur', (e) => {
-                e.target.parentElement.style.transform = 'scale(1)';
-            });
+        // Load departments on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDepartments();
         });
 
-        // Show messages
+        // Load available departments
+        async function loadDepartments() {
+            try {
+                const response = await fetch('/api/departments/');
+                const data = await response.json();
+                availableDepartments = data;
+                renderDepartments();
+            } catch (error) {
+                console.error('Error loading departments:', error);
+                // Fallback departments
+                availableDepartments = [
+                    {id: 1, name: 'Web Development', icon: '💻'},
+                    {id: 2, name: 'Mobile App Development', icon: '📱'},
+                    {id: 3, name: 'Digital Marketing', icon: '📈'},
+                    {id: 4, name: 'Graphic Design', icon: '🎨'},
+                    {id: 5, name: 'Business Consulting', icon: '🎯'},
+                    {id: 6, name: 'Accounting & Finance', icon: '💰'},
+                ];
+                renderDepartments();
+            }
+        }
+
+        // Render departments grid
+        function renderDepartments() {
+            const grid = document.getElementById('departments-grid');
+            
+            const departmentsHTML = availableDepartments.map(dept => `
+                <div class="department-option" onclick="toggleDepartment('${dept.name}', this)">
+                    <div class="department-checkbox">
+                        <span style="display: none;">✓</span>
+                    </div>
+                    <div class="department-info">
+                        <div class="department-name">${dept.name}</div>
+                    </div>
+                    <div class="department-icon">${dept.icon}</div>
+                </div>
+            `).join('');
+
+            // Add "Other" option
+            const otherHTML = `
+                <div class="department-option" onclick="toggleDepartment('Other', this)">
+                    <div class="department-checkbox">
+                        <span style="display: none;">✓</span>
+                    </div>
+                    <div class="department-info">
+                        <div class="department-name">Other (Custom)</div>
+                    </div>
+                    <div class="department-icon">➕</div>
+                </div>
+            `;
+
+            grid.innerHTML = departmentsHTML + otherHTML;
+        }
+
+        // Toggle department selection
+        function toggleDepartment(deptName, element) {
+            const checkbox = element.querySelector('.department-checkbox span');
+            const customSection = document.getElementById('custom-department');
+            
+            if (element.classList.contains('selected')) {
+                // Deselect
+                element.classList.remove('selected');
+                checkbox.style.display = 'none';
+                selectedDepartments = selectedDepartments.filter(d => d !== deptName);
+                
+                // Hide custom input if "Other" is deselected
+                if (deptName === 'Other') {
+                    customSection.classList.remove('show');
+                    document.getElementById('custom-department-input').value = '';
+                }
+            } else {
+                // Select
+                element.classList.add('selected');
+                checkbox.style.display = 'block';
+                selectedDepartments.push(deptName);
+                
+                // Show custom input if "Other" is selected
+                if (deptName === 'Other') {
+                    customSection.classList.add('show');
+                    document.getElementById('custom-department-input').focus();
+                }
+            }
+        }
+
+        // Show messages with better debugging
         function showMessage(message, type = 'error') {
             const errorMsg = document.getElementById('error-message');
             const successMsg = document.getElementById('success-message');
+            const debugMsg = document.getElementById('debug-info');
             
-            // Hide both messages first
+            // Hide all messages first
             errorMsg.style.display = 'none';
             successMsg.style.display = 'none';
+            debugMsg.style.display = 'none';
             
             // Show appropriate message
             if (type === 'error') {
-                errorMsg.textContent = message;
+                errorMsg.innerHTML = message;
                 errorMsg.style.display = 'block';
                 errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                successMsg.textContent = message;
+            } else if (type === 'success') {
+                successMsg.innerHTML = message;
                 successMsg.style.display = 'block';
                 successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (type === 'debug') {
+                debugMsg.innerHTML = message;
+                debugMsg.style.display = 'block';
             }
             
-            // Auto-hide after 5 seconds
+            // Auto-hide after 8 seconds
             setTimeout(() => {
                 errorMsg.style.display = 'none';
                 successMsg.style.display = 'none';
-            }, 5000);
+                debugMsg.style.display = 'none';
+            }, 8000);
         }
 
-        // Handle registration
+        // Handle registration with departments
         async function handleRegistration(event) {
             event.preventDefault();
             
+            // Validate departments selection
+            if (selectedDepartments.length === 0) {
+                showMessage('Please select at least one service category for your company.', 'error');
+                return;
+            }
+
             const formData = new FormData(event.target);
+            
+            // Handle custom department
+            let finalDepartments = [...selectedDepartments];
+            if (selectedDepartments.includes('Other')) {
+                const customDept = document.getElementById('custom-department-input').value.trim();
+                if (!customDept) {
+                    showMessage('Please enter your custom service category or deselect "Other".', 'error');
+                    return;
+                }
+                // Replace "Other" with custom department name
+                finalDepartments = finalDepartments.filter(d => d !== 'Other');
+                finalDepartments.push(customDept);
+            }
+
             const companyData = {
                 company_name: formData.get('company_name'),
                 email: formData.get('email'),
@@ -673,16 +923,17 @@
                 phone_number: formData.get('phone_number') || '',
                 description: formData.get('description'),
                 website: formData.get('website') || '',
-                city: formData.get('city') || 'Cairo'
+                city: formData.get('city') || 'Cairo',
+                departments: finalDepartments
             };
             
             const registerBtn = document.getElementById('register-btn');
             const registerText = document.getElementById('register-text');
             
             try {
-                // Validate required fields
+                // Validate required fields client-side
                 if (!companyData.company_name || !companyData.email || !companyData.password || !companyData.description) {
-                    throw new Error('Please fill in all required fields');
+                    throw new Error('Please fill in all required fields (Company Name, Email, Password, Description)');
                 }
                 
                 if (companyData.password.length < 6) {
@@ -693,6 +944,8 @@
                 registerBtn.disabled = true;
                 registerText.innerHTML = '<div class="loading-spinner"></div>Creating your account...';
                 
+                console.log('Sending registration data:', companyData);
+                
                 const response = await fetch('/api/register/', {
                     method: 'POST',
                     headers: {
@@ -701,16 +954,15 @@
                     body: JSON.stringify(companyData)
                 });
                 
+                console.log('Response status:', response.status);
+                
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (response.ok) {
                     // Store user data
                     localStorage.setItem('flowlyne_token', data.token);
                     localStorage.setItem('flowlyne_current_company', JSON.stringify(data.company));
-                    
-                    // Update progress to 100%
-                    document.getElementById('progress-fill').style.width = '100%';
-                    document.querySelectorAll('.step-dot').forEach(dot => dot.classList.add('active'));
                     
                     // Show success message
                     showMessage('🎉 Account created successfully! Redirecting to explore companies...', 'success');
@@ -720,17 +972,44 @@
                         window.location.href = '/services/';
                     }, 2000);
                 } else {
-                    throw new Error(data.error || 'Registration failed');
+                    throw new Error(data.error || `Registration failed with status ${response.status}`);
                 }
                 
             } catch (error) {
-                showMessage(error.message);
+                console.error('Registration error:', error);
+                showMessage(error.message, 'error');
                 
                 // Reset button
                 registerBtn.disabled = false;
                 registerText.textContent = 'Create Your Account';
             }
         }
+
+        // Add form validation indicators
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                if (e.target.hasAttribute('required') && e.target.value.trim() === '') {
+                    e.target.style.borderColor = 'var(--error)';
+                } else {
+                    e.target.style.borderColor = 'var(--success)';
+                }
+            });
+            
+            input.addEventListener('focus', (e) => {
+                e.target.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', (e) => {
+                e.target.parentElement.style.transform = 'scale(1)';
+                
+                // Reset border color on blur if not focused
+                setTimeout(() => {
+                    if (document.activeElement !== e.target) {
+                        e.target.style.borderColor = '';
+                    }
+                }, 100);
+            });
+        });
 
         // Add entrance animation
         window.addEventListener('load', () => {
@@ -743,9 +1022,6 @@
                 document.querySelector('.register-container').style.transform = 'translateY(0)';
             }, 100);
         });
-
-        // Initialize progress
-        updateProgress();
     </script>
 </body>
 </html>
