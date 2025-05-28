@@ -20,62 +20,6 @@ from .models import Company, Department, CompanyDepartment
 logger = logging.getLogger(__name__)
 
 # ================================
-# TEST API ENDPOINTS (for debugging)
-# ================================
-
-@csrf_exempt
-def test_api(request):
-    """Simple test endpoint"""
-    if request.method == 'GET':
-        return JsonResponse({'status': 'API is working', 'method': 'GET'})
-    elif request.method == 'POST':
-        return JsonResponse({'status': 'API is working', 'method': 'POST', 'data_received': True})
-    else:
-        return JsonResponse({'status': 'API is working', 'method': request.method})
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def simple_login(request):
-    """Ultra-simple login endpoint for testing"""
-    try:
-        # Try to get data from both JSON and form
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST.dict()
-        
-        email = data.get('email', '')
-        password = data.get('password', '')
-        
-        print(f"Login attempt - Email: {email}, Password: {'*' * len(password)}")
-        
-        # For testing, accept specific demo credentials
-        if email == 'info@techsolutions.eg' and password == 'demo123456':
-            return JsonResponse({
-                'success': True,
-                'message': 'Login successful',
-                'token': 'demo-token-12345',
-                'company': {
-                    'id': '1',
-                    'company_name': 'TechSolutions Egypt',
-                    'email': email,
-                    'current_plan': 'basic'
-                }
-            })
-        else:
-            return JsonResponse({
-                'success': False,
-                'error': 'Invalid credentials. Try: info@techsolutions.eg / demo123456'
-            }, status=400)
-            
-    except Exception as e:
-        print(f"Login error: {str(e)}")
-        return JsonResponse({
-            'success': False,
-            'error': f'Server error: {str(e)}'
-        }, status=500)
-
-# ================================
 # FRONTEND VIEWS
 # ================================
 
@@ -104,87 +48,93 @@ def payment(request):
     return render(request, 'payment.html')
 
 # ================================
-# MAIN API VIEWS
+# API VIEWS - FIXED VERSIONS
 # ================================
 
 @csrf_exempt
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def api_login(request):
-    """FIXED Login company with CSRF exemption"""
+    """FIXED Login company"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
     try:
-        # Handle both JSON and form data
+        # Parse request data
         if request.content_type == 'application/json':
-            data = request.data
+            data = json.loads(request.body)
         else:
             data = request.POST
             
-        email = data.get('email')
-        password = data.get('password')
+        email = data.get('email', '').strip()
+        password = data.get('password', '')
         
         logger.info(f"Login attempt for email: {email}")
         
         if not email or not password:
-            return Response({'error': 'Email and password required'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Email and password are required'}, status=400)
         
         try:
-            # Find company by email
-            company = Company.objects.get(email=email)
+            # Find company by email (case-insensitive)
+            company = Company.objects.get(email__iexact=email)
             logger.info(f"Found company: {company.company_name}")
             
-            # Check password
-            if check_password(password, company.password):
-                if company.is_active:
-                    # Get or create auth token
-                    token, created = Token.objects.get_or_create(user=company)
-                    
-                    # Return company data
-                    company_data = {
-                        'id': str(company.id),
-                        'company_name': company.company_name,
-                        'email': company.email,
-                        'description': company.description,
-                        'company_address': company.company_address,
-                        'phone_number': company.phone_number,
-                        'city': company.city,
-                        'country': company.country,
-                        'website': company.website,
-                        'is_verified': company.is_verified,
-                        'current_plan': getattr(company, 'current_plan', 'basic'),
-                        'created_at': company.created_at.isoformat()
-                    }
-                    
-                    logger.info(f"Login successful for: {company.company_name}")
-                    
-                    return Response({
-                        'message': 'Login successful',
-                        'company': company_data,
-                        'token': token.key
-                    })
-                else:
-                    logger.warning(f"Inactive account login attempt: {email}")
-                    return Response({'error': 'Account is disabled'}, status=status.HTTP_400_BAD_REQUEST)
+            # Check if account is active
+            if not company.is_active:
+                logger.warning(f"Inactive account login attempt: {email}")
+                return JsonResponse({'error': 'Account is disabled'}, status=400)
+            
+            # Check password using Django's built-in method
+            if company.check_password(password):
+                # Get or create auth token
+                token, created = Token.objects.get_or_create(user=company)
+                
+                # Prepare company data for response
+                company_data = {
+                    'id': str(company.id),
+                    'company_name': company.company_name,
+                    'email': company.email,
+                    'description': company.description or '',
+                    'company_address': company.company_address or '',
+                    'phone_number': company.phone_number or '',
+                    'city': company.city,
+                    'country': company.country,
+                    'website': company.website or '',
+                    'is_verified': company.is_verified,
+                    'current_plan': getattr(company, 'current_plan', 'basic'),
+                    'created_at': company.created_at.isoformat()
+                }
+                
+                logger.info(f"Login successful for: {company.company_name}")
+                
+                return JsonResponse({
+                    'message': 'Login successful',
+                    'company': company_data,
+                    'token': token.key
+                })
             else:
                 logger.warning(f"Invalid password for: {email}")
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': 'Invalid email or password'}, status=400)
                 
         except Company.DoesNotExist:
             logger.warning(f"Login attempt for non-existent email: {email}")
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Invalid email or password'}, status=400)
             
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in request body")
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
-        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
 @csrf_exempt
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def api_register(request):
-    """FIXED Register a new company with CSRF exemption"""
+    """FIXED Register a new company"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
     try:
-        # Handle both JSON and form data
+        # Parse request data
         if request.content_type == 'application/json':
-            data = request.data
+            data = json.loads(request.body)
         else:
             data = request.POST
             
@@ -194,11 +144,11 @@ def api_register(request):
         required_fields = ['company_name', 'email', 'password']
         for field in required_fields:
             if not data.get(field):
-                return Response({'error': f'{field} is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({'error': f'{field} is required'}, status=400)
         
         # Check if email already exists
-        if Company.objects.filter(email=data['email']).exists():
-            return Response({'error': 'Email already registered'}, status=status.HTTP_400_BAD_REQUEST)
+        if Company.objects.filter(email__iexact=data['email']).exists():
+            return JsonResponse({'error': 'Email already registered'}, status=400)
         
         # Create company
         company = Company.objects.create_user(
@@ -255,18 +205,19 @@ def api_register(request):
         
         logger.info(f"Company registered: {company.company_name}")
         
-        return Response({
+        return JsonResponse({
             'message': 'Company registered successfully',
             'company': company_data,
             'token': token.key
-        }, status=status.HTTP_201_CREATED)
+        }, status=201)
         
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in request body")
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def api_companies(request):
     """Get all companies - FIXED VERSION"""
     try:
@@ -322,16 +273,14 @@ def api_companies(request):
         # Sort by verification status and name
         companies_data.sort(key=lambda x: (not x['is_verified'], x['company_name']))
         
-        return Response(companies_data)
+        return JsonResponse(companies_data, safe=False)
         
     except Exception as e:
         logger.error(f"Companies API error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def api_company_detail(request, company_id):
-    """Get detailed company information - MISSING FUNCTION ADDED"""
+    """Get detailed company information"""
     try:
         company = get_object_or_404(Company, id=company_id)
         
@@ -362,14 +311,12 @@ def api_company_detail(request, company_id):
             'created_at': company.created_at.isoformat()
         }
         
-        return Response(company_data)
+        return JsonResponse(company_data)
         
     except Exception as e:
         logger.error(f"Company detail error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def api_departments(request):
     """Get all available departments"""
     try:
@@ -383,13 +330,11 @@ def api_departments(request):
             }
             for dept in departments
         ]
-        return Response(departments_data)
+        return JsonResponse(departments_data, safe=False)
     except Exception as e:
         logger.error(f"Departments error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def api_stats(request):
     """Get platform statistics"""
     try:
@@ -399,42 +344,47 @@ def api_stats(request):
             'total_departments': Department.objects.filter(is_active=True).count(),
             'total_messages': 0,  # Placeholder
         }
-        return Response(stats)
+        return JsonResponse(stats)
     except Exception as e:
         logger.error(f"Stats error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def api_send_message(request):
-    """Send message to another company - MISSING FUNCTION ADDED"""
+    """Send message to another company"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
     try:
-        receiver_id = request.data.get('receiver_id')
-        subject = request.data.get('subject')
-        message = request.data.get('message')
+        # Parse request data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+            
+        receiver_id = data.get('receiver_id')
+        subject = data.get('subject')
+        message = data.get('message')
         
         if not receiver_id or not message:
-            return Response({'error': 'Receiver ID and message are required'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Receiver ID and message are required'}, status=400)
         
         receiver = get_object_or_404(Company, id=receiver_id)
         
         # In a real app, you'd create a Message model and save this
         # For now, just return success
-        return Response({
+        return JsonResponse({
             'message': 'Message sent successfully',
             'id': 'demo-message-id',
             'receiver': receiver.company_name
-        }, status=status.HTTP_201_CREATED)
+        }, status=201)
         
     except Exception as e:
         logger.error(f"Send message error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
 def api_subscription_plans(request):
-    """Get all available subscription plans - MISSING FUNCTION ADDED"""
+    """Get all available subscription plans"""
     try:
         plans = [
             {
@@ -484,42 +434,45 @@ def api_subscription_plans(request):
                 ]
             }
         ]
-        return Response(plans)
+        return JsonResponse(plans, safe=False)
     except Exception as e:
         logger.error(f"Subscription plans error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def api_upgrade_subscription(request):
-    """Upgrade user's subscription plan - MISSING FUNCTION ADDED"""
+    """Upgrade user's subscription plan"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
     try:
-        plan_type = request.data.get('plan_type')
+        # Parse request data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+            
+        plan_type = data.get('plan_type')
         if not plan_type:
-            return Response({'error': 'Plan type required'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Plan type required'}, status=400)
         
         # Validate plan type
         valid_plans = ['basic', 'standard', 'premium']
         if plan_type not in valid_plans:
-            return Response({'error': f'Invalid plan type. Must be one of: {valid_plans}'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': f'Invalid plan type. Must be one of: {valid_plans}'}, status=400)
         
-        # Update user's plan
-        company = request.user
-        old_plan = getattr(company, 'current_plan', 'basic')
-        company.current_plan = plan_type
-        company.save()
+        # For demo purposes, we'll just return success
+        # In a real app, you would:
+        # 1. Authenticate the user
+        # 2. Update their subscription
+        # 3. Process payment
         
-        logger.info(f"Company {company.company_name} upgraded from {old_plan} to {plan_type}")
-        
-        return Response({
+        return JsonResponse({
             'message': f'Successfully upgraded to {plan_type} plan',
-            'old_plan': old_plan,
             'new_plan': plan_type,
-            'status': 'active',
-            'company': company.company_name
+            'status': 'active'
         })
         
     except Exception as e:
         logger.error(f"Upgrade subscription error: {str(e)}")
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': str(e)}, status=500)
