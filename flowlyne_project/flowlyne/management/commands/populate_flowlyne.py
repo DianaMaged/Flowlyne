@@ -1,3 +1,5 @@
+# flowlyne/management/commands/populate_flowlyne.py - FIXED VERSION
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from flowlyne.models import Department, Company, CompanyDepartment, SubscriptionPlan, CompanyReview
@@ -18,17 +20,17 @@ class Command(BaseCommand):
         # Create departments
         self.create_departments()
         
-        # Create demo companies
+        # Create demo companies - ALL START WITH BASIC PLAN
         self.create_demo_companies()
         
         # Create sample reviews
         self.create_sample_reviews()
         
         self.stdout.write(self.style.SUCCESS('✅ Database populated successfully!'))
-        self.stdout.write('🔑 Demo login credentials:')
-        self.stdout.write('   Email: info@techsolutions.eg | Password: demo123456')
-        self.stdout.write('   Email: hello@creativestudio.alex | Password: demo123456')
-        self.stdout.write('   Email: contact@digitalagency.cairo | Password: demo123456')
+        self.stdout.write('🔑 Demo login credentials (ALL start with Basic Plan):')
+        self.stdout.write('   Email: info@techsolutions.eg | Password: demo123456 | Plan: BASIC')
+        self.stdout.write('   Email: hello@creativestudio.alex | Password: demo123456 | Plan: BASIC')
+        self.stdout.write('   Email: contact@digitalagency.cairo | Password: demo123456 | Plan: BASIC')
     
     def create_subscription_plans(self):
         """Create subscription plans"""
@@ -119,8 +121,8 @@ class Command(BaseCommand):
                 self.stdout.write(f'  ✓ Created department: {department.name}')
     
     def create_demo_companies(self):
-        """Create comprehensive demo companies"""
-        self.stdout.write('🏢 Creating demo companies...')
+        """Create comprehensive demo companies - ALL START WITH BASIC PLAN"""
+        self.stdout.write('🏢 Creating demo companies (ALL starting with Basic Plan)...')
         
         demo_companies = [
             {
@@ -133,7 +135,7 @@ class Command(BaseCommand):
                 'website': 'https://techsolutions.eg',
                 'city': 'Cairo',
                 'is_verified': True,
-                'current_plan': 'standard',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['Web Development', 'Mobile App Development']
             },
             {
@@ -146,7 +148,7 @@ class Command(BaseCommand):
                 'website': 'https://creativestudio.alex',
                 'city': 'Alexandria',
                 'is_verified': True,
-                'current_plan': 'premium',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['Graphic Design', 'UI/UX Design']
             },
             {
@@ -159,7 +161,7 @@ class Command(BaseCommand):
                 'website': 'https://digitalagency.cairo',
                 'city': 'Cairo',
                 'is_verified': True,
-                'current_plan': 'standard',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['Digital Marketing', 'Content Creation']
             },
             {
@@ -172,7 +174,7 @@ class Command(BaseCommand):
                 'website': 'https://financeexpert.com.eg',
                 'city': 'Cairo',
                 'is_verified': False,
-                'current_plan': 'basic',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['Accounting & Finance', 'Business Consulting']
             },
             {
@@ -184,7 +186,7 @@ class Command(BaseCommand):
                 'phone_number': '+20-104-567-8901',
                 'city': 'Cairo',
                 'is_verified': True,
-                'current_plan': 'standard',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['Video Production', 'Content Creation']
             },
             {
@@ -196,7 +198,7 @@ class Command(BaseCommand):
                 'phone_number': '+20-105-678-9012',
                 'city': 'Cairo',
                 'is_verified': False,
-                'current_plan': 'basic',
+                'current_plan': 'basic',  # ✅ FIXED: Start with basic
                 'departments': ['IT Support']
             }
         ]
@@ -212,7 +214,7 @@ class Command(BaseCommand):
             if created:
                 company.set_password(company_data['password'])
                 company.save()
-                self.stdout.write(f'  ✓ Created company: {company.company_name}')
+                self.stdout.write(f'  ✅ Created company: {company.company_name} (Plan: {company.current_plan.upper()})')
                 
                 # Add departments
                 for i, dept_name in enumerate(departments_list):
@@ -225,6 +227,13 @@ class Command(BaseCommand):
                         )
                     except Department.DoesNotExist:
                         pass
+            else:
+                # Update existing company to basic plan if needed
+                if company.current_plan != 'basic':
+                    old_plan = company.current_plan
+                    company.current_plan = 'basic'
+                    company.save()
+                    self.stdout.write(f'  🔄 Updated {company.company_name}: {old_plan} → basic')
     
     def create_sample_reviews(self):
         """Create sample reviews for demo companies"""
@@ -306,3 +315,34 @@ class Command(BaseCommand):
             action='store_true',
             help='Reset existing data before populating',
         )
+        parser.add_argument(
+            '--fix-plans',
+            action='store_true',
+            help='Fix all existing companies to start with basic plan',
+        )
+    
+    def handle(self, *args, **options):
+        if options.get('fix_plans'):
+            self.fix_existing_plans()
+            return
+            
+        # Continue with normal population...
+        self.stdout.write(self.style.SUCCESS('🚀 Starting Flowlyne database population...'))
+        # ... rest of the method
+    
+    def fix_existing_plans(self):
+        """Fix all existing companies to have basic plan"""
+        self.stdout.write(self.style.WARNING('🔧 Fixing existing company plans...'))
+        
+        companies = Company.objects.all()
+        fixed_count = 0
+        
+        for company in companies:
+            if company.current_plan != 'basic':
+                old_plan = company.current_plan
+                company.current_plan = 'basic'
+                company.save()
+                self.stdout.write(f'  🔄 Fixed {company.company_name}: {old_plan} → basic')
+                fixed_count += 1
+        
+        self.stdout.write(self.style.SUCCESS(f'✅ Fixed {fixed_count} companies to start with Basic Plan'))

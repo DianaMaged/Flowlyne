@@ -18,9 +18,11 @@
             --off-white: #FAFBFC;
             --success: #00D4AA;
             --warning: #FFB800;
+            --error: #FF6B6B;
             --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
             --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
             --gradient-dark: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+            --gradient-success: linear-gradient(135deg, var(--success), #00B894);
         }
 
         * {
@@ -43,7 +45,7 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -131,8 +133,13 @@
         }
 
         .nav-links a:hover {
-            background: var(--glass-bg);
+            background: rgba(78, 205, 196, 0.1);
             transform: translateY(-1px);
+        }
+
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
         }
 
         .nav-cta {
@@ -220,14 +227,14 @@
         }
 
         .pricing-toggle {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 16px;
             padding: 0.5rem;
             display: inline-flex;
             border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 3rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .toggle-btn {
@@ -274,7 +281,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
-            margin-bottom: 4rem;
+            margin-bottom: 5rem;
             align-items: start;
         }
 
@@ -468,6 +475,7 @@
 
         .btn-basic:hover {
             background: rgba(149, 165, 166, 0.2);
+            transform: translateY(-2px);
         }
 
         .btn-standard {
@@ -493,48 +501,245 @@
         }
 
         .current-plan {
-            background: var(--success);
-            color: white;
-            cursor: default;
+            background: var(--success) !important;
+            color: white !important;
+            cursor: default !important;
         }
 
         .current-plan:hover {
-            transform: none;
+            transform: none !important;
         }
 
-        /* Modern Comparison Table */
+        /* IMPROVED COMPARISON SECTION */
         .comparison-section {
             background: var(--white);
             border-radius: 24px;
-            padding: 4rem 3rem;
+            padding: 4rem 2rem;
             margin: 4rem 0;
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison-section::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -20%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.03) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
         }
 
         .comparison-title {
             font-size: 2.5rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             color: var(--dark-grey);
             background: var(--gradient-dark);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 10;
         }
 
-        .comparison-container {
-            overflow-x: auto;
+        .comparison-subtitle {
+            text-align: center;
+            color: var(--medium-grey);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Modern Cards-Based Comparison */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .plan-comparison-card {
+            background: var(--white);
             border-radius: 20px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 2px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-comparison-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .plan-comparison-card.featured {
+            border-color: var(--primary-teal);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.15);
+        }
+
+        .plan-comparison-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .plan-comparison-card.basic::before {
+            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+        }
+
+        .plan-comparison-card.premium::before {
+            background: var(--gradient-accent);
+        }
+
+        .comparison-plan-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .comparison-plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-grey);
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-plan-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-plan-period {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background: var(--warning);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .feature-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-category {
+            background: rgba(78, 205, 196, 0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(78, 205, 196, 0.1);
+        }
+
+        .category-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark-grey);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feature-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .feature-name {
+            font-size: 0.9rem;
+            color: var(--dark-grey);
+            font-weight: 500;
+        }
+
+        .feature-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .x-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(149, 165, 166, 0.2);
+            color: var(--medium-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .value-text {
+            color: var(--dark-grey);
+        }
+
+        .value-text.muted {
+            color: var(--medium-grey);
+        }
+
+        /* Traditional Table for Desktop (Hidden on Mobile) */
+        .desktop-comparison {
+            display: none;
+            overflow-x: auto;
+            border-radius: 16px;
             background: var(--off-white);
             padding: 1rem;
+            margin-top: 2rem;
         }
 
         .comparison-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             background: var(--white);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -542,17 +747,17 @@
 
         .comparison-table th,
         .comparison-table td {
-            padding: 1.5rem 1rem;
+            padding: 1.25rem 1rem;
             text-align: center;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            position: relative;
+            vertical-align: middle;
         }
 
         .comparison-table th {
             background: linear-gradient(135deg, var(--off-white), #f8f9fa);
             font-weight: 700;
             color: var(--dark-grey);
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -572,14 +777,14 @@
         .comparison-table th.featured::after {
             content: "Most Popular";
             position: absolute;
-            top: -0.5rem;
+            top: -0.4rem;
             left: 50%;
             transform: translateX(-50%);
             background: var(--warning);
             color: white;
-            font-size: 0.7rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -589,11 +794,7 @@
             background: rgba(78, 205, 196, 0.02);
         }
 
-        .comparison-table tbody tr:hover td {
-            background: transparent;
-        }
-
-        .feature-name {
+        .table-feature-name {
             font-weight: 600;
             color: var(--dark-grey);
             text-align: left;
@@ -602,63 +803,48 @@
             gap: 0.75rem;
         }
 
-        .feature-category {
-            background: var(--gradient-primary);
-            color: white;
+        .table-category-row {
+            background: var(--gradient-primary) !important;
+            color: white !important;
+        }
+
+        .table-category-row td {
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-size: 0.8rem;
-        }
-
-        .feature-category td {
             padding: 1rem;
         }
 
-        .feature-value {
+        .table-feature-value {
             font-weight: 500;
             color: var(--dark-grey);
         }
 
-        .check-mark {
+        .table-check-mark {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             background: var(--success);
             color: white;
             border-radius: 50%;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
 
-        .x-mark {
+        .table-x-mark {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             background: rgba(149, 165, 166, 0.2);
             color: var(--medium-grey);
             border-radius: 50%;
             font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .feature-highlight {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(69, 183, 209, 0.05));
-            position: relative;
-        }
-
-        .feature-highlight::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--gradient-primary);
+            font-size: 0.7rem;
         }
 
         /* FAQ Section */
@@ -813,14 +999,22 @@
                 padding: 2rem 1rem;
             }
 
-            .comparison-table th,
-            .comparison-table td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.9rem;
+            .comparison-grid {
+                grid-template-columns: 1fr;
             }
 
-            .comparison-container {
-                padding: 0.5rem;
+            .desktop-comparison {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .desktop-comparison {
+                display: block;
+            }
+            
+            .comparison-grid {
+                display: none;
             }
         }
 
@@ -836,6 +1030,12 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -1042,10 +1242,297 @@
             </div>
         </div>
 
-        <!-- Modern Comparison Table -->
+        <!-- IMPROVED COMPARISON SECTION -->
         <div class="comparison-section fade-in">
-            <h2 class="comparison-title">Feature Comparison</h2>
-            <div class="comparison-container">
+            <h2 class="comparison-title">Detailed Feature Comparison</h2>
+            <p class="comparison-subtitle">Compare all features side-by-side to find the perfect plan for your business</p>
+            
+            <!-- Mobile/Tablet Cards View -->
+            <div class="comparison-grid">
+                <!-- Basic Plan Card -->
+                <div class="plan-comparison-card basic">
+                    <div class="comparison-plan-header">
+                        <h3 class="comparison-plan-name">Basic Plan</h3>
+                        <div class="comparison-plan-price">FREE</div>
+                        <div class="comparison-plan-period">Forever</div>
+                    </div>
+                    
+                    <div class="feature-categories">
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>🔍</span>
+                                <span>Search & Visibility</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Search Ranking</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">Standard</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Homepage Featured</span>
+                                    <div class="feature-value">
+                                        <div class="x-icon">×</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📁</span>
+                                <span>Portfolio & Content</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Portfolio Display</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">Basic Profile</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Monthly Uploads</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">5 at signup only</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>💰</span>
+                                <span>Financial Benefits</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Commission Rate</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📊</span>
+                                <span>Analytics & Support</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Analytics</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">Basic stats</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Support Level</span>
+                                    <div class="feature-value">
+                                        <span class="value-text muted">Email only</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standard Plan Card -->
+                <div class="plan-comparison-card featured">
+                    <div class="comparison-plan-header">
+                        <div class="featured-badge">Most Popular</div>
+                        <h3 class="comparison-plan-name">Standard Plan</h3>
+                        <div class="comparison-plan-price">EGP 200</div>
+                        <div class="comparison-plan-period">per month</div>
+                    </div>
+                    
+                    <div class="feature-categories">
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>🔍</span>
+                                <span>Search & Visibility</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Search Ranking</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Higher Priority</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Homepage Featured</span>
+                                    <div class="feature-value">
+                                        <div class="x-icon">×</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📁</span>
+                                <span>Portfolio & Content</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Portfolio Display</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Full Portfolio</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Monthly Uploads</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">5 per month</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>💰</span>
+                                <span>Financial Benefits</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Commission Rate</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">8% (2% discount)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📊</span>
+                                <span>Analytics & Support</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Analytics</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Engagement analytics</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Support Level</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Priority support</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Plan Card -->
+                <div class="plan-comparison-card premium">
+                    <div class="comparison-plan-header">
+                        <h3 class="comparison-plan-name">Premium Plan</h3>
+                        <div class="comparison-plan-price">EGP 500</div>
+                        <div class="comparison-plan-period">per month</div>
+                    </div>
+                    
+                    <div class="feature-categories">
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>🔍</span>
+                                <span>Search & Visibility</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Search Ranking</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Top Placement</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Homepage Featured</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Featured</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📁</span>
+                                <span>Portfolio & Content</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Portfolio Display</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Advanced Portfolio</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Monthly Uploads</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">10 per month</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>💰</span>
+                                <span>Financial Benefits</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Commission Rate</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">5% (5% discount)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-category">
+                            <div class="category-title">
+                                <span>📊</span>
+                                <span>Analytics & Support</span>
+                            </div>
+                            <div class="category-features">
+                                <div class="feature-row">
+                                    <span class="feature-name">Analytics</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Full analytics + trends</span>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="feature-name">Support Level</span>
+                                    <div class="feature-value">
+                                        <div class="check-icon">✓</div>
+                                        <span class="value-text">Dedicated manager</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="desktop-comparison">
                 <table class="comparison-table">
                     <thead>
                         <tr>
@@ -1056,105 +1543,105 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="feature-category">
+                        <tr class="table-category-row">
                             <td colspan="4">🔍 Search & Visibility</td>
                         </tr>
-                        <tr class="feature-highlight">
-                            <td class="feature-name">
+                        <tr>
+                            <td class="table-feature-name">
                                 <span>🎯</span>
                                 Search Ranking Priority
                             </td>
-                            <td class="feature-value">Standard</td>
-                            <td class="feature-value">Higher Priority</td>
-                            <td class="feature-value">Top Placement</td>
+                            <td class="table-feature-value">Standard</td>
+                            <td class="table-feature-value">Higher Priority</td>
+                            <td class="table-feature-value">Top Placement</td>
                         </tr>
                         <tr>
-                            <td class="feature-name">
+                            <td class="table-feature-name">
                                 <span>🏠</span>
                                 Homepage Featured
                             </td>
-                            <td><span class="x-mark">×</span></td>
-                            <td><span class="x-mark">×</span></td>
-                            <td><span class="check-mark">✓</span></td>
+                            <td><span class="table-x-mark">×</span></td>
+                            <td><span class="table-x-mark">×</span></td>
+                            <td><span class="table-check-mark">✓</span></td>
                         </tr>
                         
-                        <tr class="feature-category">
+                        <tr class="table-category-row">
                             <td colspan="4">📁 Portfolio & Content</td>
                         </tr>
-                        <tr class="feature-highlight">
-                            <td class="feature-name">
+                        <tr>
+                            <td class="table-feature-name">
                                 <span>📂</span>
                                 Portfolio Display
                             </td>
-                            <td class="feature-value">Basic Profile</td>
-                            <td class="feature-value">Full Portfolio</td>
-                            <td class="feature-value">Advanced Portfolio</td>
+                            <td class="table-feature-value">Basic Profile</td>
+                            <td class="table-feature-value">Full Portfolio</td>
+                            <td class="table-feature-value">Advanced Portfolio</td>
                         </tr>
                         <tr>
-                            <td class="feature-name">
+                            <td class="table-feature-name">
                                 <span>📤</span>
                                 Monthly Project Uploads
                             </td>
-                            <td class="feature-value">0 (5 at signup only)</td>
-                            <td class="feature-value">5 per month</td>
-                            <td class="feature-value">10 per month</td>
+                            <td class="table-feature-value">0 (5 at signup only)</td>
+                            <td class="table-feature-value">5 per month</td>
+                            <td class="table-feature-value">10 per month</td>
                         </tr>
                         
-                        <tr class="feature-category">
+                        <tr class="table-category-row">
                             <td colspan="4">💰 Financial Benefits</td>
                         </tr>
-                        <tr class="feature-highlight">
-                            <td class="feature-name">
+                        <tr>
+                            <td class="table-feature-name">
                                 <span>💳</span>
                                 Commission Rate
                             </td>
-                            <td class="feature-value">10%</td>
-                            <td class="feature-value">8% (2% discount)</td>
-                            <td class="feature-value">5% (5% discount)</td>
+                            <td class="table-feature-value">10%</td>
+                            <td class="table-feature-value">8% (2% discount)</td>
+                            <td class="table-feature-value">5% (5% discount)</td>
                         </tr>
                         
-                        <tr class="feature-category">
+                        <tr class="table-category-row">
                             <td colspan="4">📊 Analytics & Insights</td>
                         </tr>
                         <tr>
-                            <td class="feature-name">
+                            <td class="table-feature-name">
                                 <span>📈</span>
                                 Business Analytics
                             </td>
-                            <td class="feature-value">Basic stats</td>
-                            <td class="feature-value">Engagement analytics</td>
-                            <td class="feature-value">Full analytics + trends</td>
+                            <td class="table-feature-value">Basic stats</td>
+                            <td class="table-feature-value">Engagement analytics</td>
+                            <td class="table-feature-value">Full analytics + trends</td>
                         </tr>
                         <tr>
-                            <td class="feature-name">
+                            <td class="table-feature-name">
                                 <span>👥</span>
                                 Client Behavior Insights
                             </td>
-                            <td><span class="x-mark">×</span></td>
-                            <td><span class="check-mark">✓</span></td>
-                            <td><span class="check-mark">✓ Advanced</span></td>
+                            <td><span class="table-x-mark">×</span></td>
+                            <td><span class="table-check-mark">✓</span></td>
+                            <td><span class="table-check-mark">✓</span></td>
                         </tr>
                         
-                        <tr class="feature-category">
+                        <tr class="table-category-row">
                             <td colspan="4">🎧 Support & Service</td>
                         </tr>
-                        <tr class="feature-highlight">
-                            <td class="feature-name">
+                        <tr>
+                            <td class="table-feature-name">
                                 <span>💬</span>
                                 Support Level
                             </td>
-                            <td class="feature-value">Email only</td>
-                            <td class="feature-value">Priority support</td>
-                            <td class="feature-value">Dedicated manager</td>
+                            <td class="table-feature-value">Email only</td>
+                            <td class="table-feature-value">Priority support</td>
+                            <td class="table-feature-value">Dedicated manager</td>
                         </tr>
                         <tr>
-                            <td class="feature-name">
+                            <td class="table-feature-name">
                                 <span>⚡</span>
                                 Response Time
                             </td>
-                            <td class="feature-value">48 hours</td>
-                            <td class="feature-value">24 hours</td>
-                            <td class="feature-value">4 hours</td>
+                            <td class="table-feature-value">48 hours</td>
+                            <td class="table-feature-value">24 hours</td>
+                            <td class="table-feature-value">4 hours</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1248,7 +1735,8 @@
         // Initialize pricing toggle
         document.addEventListener('DOMContentLoaded', function() {
             setupPricingToggle();
-            updatePlanButtons();
+            updatePlanButtons(); // This should only show "Current Plan" if actually logged in
+            setupAnimations();
         });
 
         // Setup pricing toggle functionality
@@ -1318,6 +1806,9 @@
                 premiumNote.textContent = data.premium.note;
                 premiumSavings.style.display = 'none';
             }
+            
+            // ✅ IMPORTANT: After updating pricing, make sure buttons are correct
+            updatePlanButtons();
         }
 
         // Plan selection
@@ -1342,30 +1833,83 @@
                 return;
             }
             
-            // Add period to plan selection
-            const planWithPeriod = `${planType}_${currentPeriod}`;
-            
             // Redirect to payment page with period
             window.location.href = `/payment/?plan=${planType}&period=${currentPeriod}`;
         }
 
-        // Update plan buttons based on current user
+        // ✅ FIXED: Update plan buttons based on ACTUAL login status
         function updatePlanButtons() {
-            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+            console.log('🔍 Checking login status...');
             
-            if (currentUser && currentUser.current_plan) {
+            // Check if user is actually logged in
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
+            const token = localStorage.getItem('flowlyne_token');
+            
+            console.log('Current user:', currentUser);
+            console.log('Has token:', !!token);
+            
+            // Reset ALL buttons to default state first
+            resetAllButtons();
+            
+            // Only update if user is ACTUALLY logged in (has both user data AND token)
+            if (currentUser && token && currentUser.current_plan) {
                 const currentPlan = currentUser.current_plan;
+                console.log('✅ User logged in with plan:', currentPlan);
+                
                 const buttons = document.querySelectorAll('.plan-button');
                 
                 buttons.forEach(button => {
-                    const planType = button.getAttribute('onclick').match(/'(\w+)'/)[1];
-                    if (planType === currentPlan) {
-                        button.textContent = 'Current Plan ✓';
-                        button.className = 'plan-button current-plan';
-                        button.setAttribute('onclick', `selectPlan('${planType}')`);
+                    const onclickAttr = button.getAttribute('onclick');
+                    if (onclickAttr) {
+                        const match = onclickAttr.match(/'(\w+)'/);
+                        if (match) {
+                            const planType = match[1];
+                            if (planType === currentPlan) {
+                                button.textContent = 'Current Plan ✓';
+                                button.className = 'plan-button current-plan';
+                                console.log(`✅ Set ${planType} as current plan`);
+                            }
+                        }
                     }
                 });
+            } else {
+                console.log('❌ User not logged in - no current plan shown');
             }
+        }
+
+        // ✅ NEW: Reset all buttons to default state
+        function resetAllButtons() {
+            const defaultButtons = {
+                'basic': 'Get Started Free',
+                'standard': 'Choose Standard', 
+                'premium': 'Go Premium'
+            };
+            
+            const defaultClasses = {
+                'basic': 'plan-button btn-basic',
+                'standard': 'plan-button btn-standard',
+                'premium': 'plan-button btn-premium'
+            };
+            
+            document.querySelectorAll('.plan-button').forEach(button => {
+                const onclickAttr = button.getAttribute('onclick');
+                if (onclickAttr) {
+                    const match = onclickAttr.match(/'(\w+)'/);
+                    if (match) {
+                        const planType = match[1];
+                        button.textContent = defaultButtons[planType] || `Select ${planType}`;
+                        button.className = defaultClasses[planType] || 'plan-button';
+                    }
+                }
+            });
+        }
+
+        // ✅ NEW: Clear localStorage function for testing
+        function clearUserData() {
+            localStorage.removeItem('flowlyne_current_company');
+            localStorage.removeItem('flowlyne_token');
+            console.log('🧹 Cleared user data');
+            updatePlanButtons();
         }
 
         // FAQ Toggle functionality
@@ -1386,29 +1930,30 @@
             }
         }
 
-        // Scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        // Setup animations
+        function setupAnimations() {
+            // Scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.animationDelay = `${index * 0.1}s`;
-                        entry.target.classList.add('fade-in');
-                    }, index * 100);
-                }
-            });
-        }, observerOptions);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.animationDelay = `${index * 0.1}s`;
+                            entry.target.classList.add('fade-in');
+                        }, index * 100);
+                    }
+                });
+            }, observerOptions);
 
-        // Observe elements for animation
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.plan-card, .comparison-section, .faq-item').forEach(el => {
+            // Observe elements for animation
+            document.querySelectorAll('.plan-card, .comparison-section, .faq-item, .plan-comparison-card').forEach(el => {
                 observer.observe(el);
             });
-        });
+        }
 
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
@@ -1421,6 +1966,28 @@
                 navbar.style.boxShadow = 'none';
             }
         });
+
+        // Add smooth hover effects to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.plan-comparison-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // ✅ NEW: Debug function - call this in browser console to test
+        function debugLoginStatus() {
+            console.log('=== LOGIN STATUS DEBUG ===');
+            console.log('localStorage flowlyne_current_company:', localStorage.getItem('flowlyne_current_company'));
+            console.log('localStorage flowlyne_token:', localStorage.getItem('flowlyne_token'));
+            console.log('Parsed user:', JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null'));
+            updatePlanButtons();
+        }
     </script>
 </body>
 </html>
