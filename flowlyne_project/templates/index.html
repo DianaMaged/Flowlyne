@@ -304,6 +304,238 @@
             font-weight: 500;
         }
 
+        /* Image Slider Section */
+        .slider-section {
+            padding: 6rem 2rem;
+            background: var(--white);
+            position: relative;
+        }
+
+        .slider-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .slider-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .slider-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .slider-subtitle {
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            max-width: 600px;
+            margin: 0 auto 1rem;
+        }
+
+        .slider-tagline {
+            font-size: 1rem;
+            color: var(--primary-teal);
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .image-slider {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            background: var(--white);
+        }
+
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .slider-track {
+            display: flex;
+            width: 500%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            width: 20%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--off-white), #f8f9fa);
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .slide:hover img {
+            transform: scale(1.05);
+        }
+
+        .slide-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .slide:hover .slide-overlay {
+            transform: translateY(0);
+        }
+
+        .slide-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-description {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Slider Navigation */
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            color: var(--dark-grey);
+            z-index: 10;
+        }
+
+        .slider-nav:hover {
+            background: var(--primary-teal);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .slider-nav.prev {
+            left: 20px;
+        }
+
+        .slider-nav.next {
+            right: 20px;
+        }
+
+        /* Slider Dots */
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(78, 205, 196, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dot:hover {
+            background: rgba(78, 205, 196, 0.6);
+            transform: scale(1.2);
+        }
+
+        .dot.active {
+            background: var(--primary-teal);
+            transform: scale(1.3);
+        }
+
+        .dot.active::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 2px solid var(--primary-teal);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.2;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        /* Placeholder for missing images */
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        .placeholder-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .placeholder-subtext {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
         /* Features Section */
         .features {
             padding: 8rem 2rem;
@@ -528,6 +760,36 @@
             .feature-card {
                 padding: 2rem 1.5rem;
             }
+
+            .slider-wrapper {
+                height: 300px;
+            }
+
+            .slider-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .slider-nav.prev {
+                left: 10px;
+            }
+
+            .slider-nav.next {
+                right: 10px;
+            }
+
+            .slide-overlay {
+                padding: 1rem;
+            }
+
+            .slide-title {
+                font-size: 1.2rem;
+            }
+
+            .slide-description {
+                font-size: 0.9rem;
+            }
         }
 
         /* Smooth animations */
@@ -621,6 +883,81 @@
         </div>
     </section>
 
+    <!-- Image Slider Section -->
+    <section class="slider-section">
+        <div class="slider-container">
+            <div class="slider-header fade-in">
+                <h2 class="slider-title">Success Stories in Motion</h2>
+                <p class="slider-subtitle">Discover how Egyptian businesses are transforming their growth through Flowlyne partnerships</p>
+                <p class="slider-tagline">Smooth and Fine, That's Flowlyne</p>
+            </div>
+
+            <div class="image-slider fade-in">
+                <div class="slider-wrapper">
+                    <div class="slider-track" id="slider-track">
+                        <!-- Slide 1 -->
+                        <div class="slide">
+                            <img src="/static/images/slider1.jpg" alt="Business Partnership Success" onerror="this.parentElement.innerHTML='<div class=image-placeholder><span>🤝</span><div class=placeholder-text>Partnership Success</div><div class=placeholder-subtext>Growing together</div></div>'">
+                            <div class="slide-overlay">
+                                <h3 class="slide-title">Strategic Partnerships</h3>
+                                <p class="slide-description">Egyptian companies collaborating to achieve remarkable growth and innovation</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="slide">
+                            <img src="/static/images/slider2.jpg" alt="Digital Transformation" onerror="this.parentElement.innerHTML='<div class=image-placeholder><span>💻</span><div class=placeholder-text>Digital Innovation</div><div class=placeholder-subtext>Technology leaders</div></div>'">
+                            <div class="slide-overlay">
+                                <h3 class="slide-title">Digital Transformation</h3>
+                                <p class="slide-description">Leading tech companies revolutionizing business processes across Egypt</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="slide">
+                            <img src="/static/images/slider3.jpg" alt="Creative Solutions" onerror="this.parentElement.innerHTML='<div class=image-placeholder><span>🎨</span><div class=placeholder-text>Creative Excellence</div><div class=placeholder-subtext>Design mastery</div></div>'">
+                            <div class="slide-overlay">
+                                <h3 class="slide-title">Creative Excellence</h3>
+                                <p class="slide-description">Award-winning design agencies creating stunning visual identities</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="slide">
+                            <img src="/static/images/slider4.jpg" alt="Business Growth" onerror="this.parentElement.innerHTML='<div class=image-placeholder><span>📈</span><div class=placeholder-text>Business Growth</div><div class=placeholder-subtext>Scaling success</div></div>'">
+                            <div class="slide-overlay">
+                                <h3 class="slide-title">Scaling Success</h3>
+                                <p class="slide-description">Marketing experts driving exponential growth for Egyptian businesses</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="slide">
+                            <img src="/static/images/slider5.jpg" alt="Innovation Hub" onerror="this.parentElement.innerHTML='<div class=image-placeholder><span>🚀</span><div class=placeholder-text>Innovation Hub</div><div class=placeholder-subtext>Future-ready</div></div>'">
+                            <div class="slide-overlay">
+                                <h3 class="slide-title">Innovation Hub</h3>
+                                <p class="slide-description">Cutting-edge companies shaping the future of Egyptian business landscape</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="slider-nav prev" onclick="previousSlide()">‹</button>
+                <button class="slider-nav next" onclick="nextSlide()">›</button>
+            </div>
+
+            <!-- Dots Navigation -->
+            <div class="slider-dots" id="slider-dots">
+                <span class="dot active" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+                <span class="dot" onclick="currentSlide(4)"></span>
+                <span class="dot" onclick="currentSlide(5)"></span>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features">
         <div class="section-container">
@@ -695,6 +1032,58 @@
     </footer>
 
     <script>
+        // Slider functionality
+        let currentSlideIndex = 0;
+        const totalSlides = 5;
+        let autoSlideInterval;
+
+        function updateSlider() {
+            const track = document.getElementById('slider-track');
+            const dots = document.querySelectorAll('.dot');
+            
+            // Move the track
+            track.style.transform = `translateX(-${currentSlideIndex * 20}%)`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlideIndex);
+            });
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function previousSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+
+        function currentSlide(index) {
+            currentSlideIndex = index - 1;
+            updateSlider();
+        }
+
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        }
+
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+
+        // Initialize slider
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSlider();
+            startAutoSlide();
+            
+            // Pause auto slide on hover
+            const slider = document.querySelector('.image-slider');
+            slider.addEventListener('mouseenter', stopAutoSlide);
+            slider.addEventListener('mouseleave', startAutoSlide);
+        });
+
         // Smooth scroll animations
         const observerOptions = {
             threshold: 0.1,
@@ -711,7 +1100,7 @@
         }, observerOptions);
 
         // Observe all elements that should fade in
-        document.querySelectorAll('.feature-card, .section-header, .cta-content').forEach(el => {
+        document.querySelectorAll('.feature-card, .section-header, .cta-content, .slider-header, .image-slider').forEach(el => {
             observer.observe(el);
         });
 
@@ -737,6 +1126,39 @@
                 e.target.style.transform = 'translateY(0) scale(1)';
             });
         });
+
+        // Keyboard navigation for slider
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        const slider = document.querySelector('.slider-wrapper');
+
+        slider.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        slider.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide(); // Swipe left - next slide
+            }
+            if (touchEndX > touchStartX + 50) {
+                previousSlide(); // Swipe right - previous slide
+            }
+        }
     </script>
 </body>
 </html>
