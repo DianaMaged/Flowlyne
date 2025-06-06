@@ -1,6 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-import uuid
+from datetime import timedelta
+
+class Admin(models.Model):
+    admin_id = models.AutoField(primary_key=True)
+    email = models.EmailField(unique=True)  # Changed from Email to email
+    password = models.CharField(max_length=128)
+    
+    class Meta:
+        db_table = 'admin'
+    
+    def __str__(self):
+        return self.email
 
 class CompanyManager(BaseUserManager):
     """Custom manager for Company model"""
@@ -35,202 +46,151 @@ class CompanyManager(BaseUserManager):
         return self.create_user(email, company_name, password, **extra_fields)
 
 class Company(AbstractUser):
-    """Custom User model representing a Company"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Basic company information
-    company_name = models.CharField(max_length=200)
-    email = models.EmailField(unique=True)
-    
-    # Contact information
-    company_address = models.TextField(blank=True)
-    phone_number = models.CharField(max_length=17, blank=True)
-    
-    # Company details
-    description = models.TextField(help_text="Describe your company and what you do", blank=True)
-    website = models.URLField(blank=True, null=True)
-    
-    # Verification and media
-    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
-    portfolio = models.FileField(upload_to='company_portfolios/', blank=True, null=True)
-    certifications = models.FileField(upload_to='company_certifications/', blank=True, null=True)
-    
-    # Verification status
+    company_id = models.AutoField(primary_key=True)
+    company_name = models.CharField(max_length=250)
+    company_address = models.CharField(max_length=250, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)  # Changed from varchar to specific length
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    logo = models.CharField(max_length=255, blank=True)  # Store file path as varchar
+    date_joined = models.DateTimeField(auto_now_add=True)
+    certification = models.CharField(max_length=255, blank=True)  # Store file path as varchar
     is_verified = models.BooleanField(default=False)
-    
-    # Location
-    city = models.CharField(max_length=100, default="Cairo")
-    country = models.CharField(max_length=100, default="Egypt")
-
-    # Subscription Plan (FIXED - removed duplicate)
-    current_plan = models.CharField(
-        max_length=20, 
-        default='basic', 
-        choices=[
-            ('basic', 'Basic Plan (Free)'),
-            ('standard', 'Standard Plan'),
-            ('premium', 'Premium Plan')
-        ],
-        help_text="Current subscription plan"
-    )
-    
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    current_plan = models.CharField(max_length=20, default='basic')  # Changed from choices
+    city = models.CharField(max_length=100, default="Cairo")
+    country = models.CharField(max_length=100, default="Egypt")
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='companies', db_column='admin_id')
     
     # Use email as username
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['company_name']
     
-    # Use custom manager
     objects = CompanyManager()
     
     class Meta:
+        db_table = 'company'
         verbose_name = "Company"
         verbose_name_plural = "Companies"
     
     def __str__(self):
         return self.company_name
 
-class Department(models.Model):
-    """Service departments/categories"""
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    icon = models.CharField(max_length=10, help_text="Emoji icon for the department")
-    is_active = models.BooleanField(default=True)
+class Service(models.Model):
+    service_id = models.AutoField(primary_key=True)
+    service_name = models.CharField(max_length=200)
+    service_description = models.TextField()  # Changed from varchar to text
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='services', db_column='admin_id')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='services', db_column='company_id')
     
     class Meta:
-        ordering = ['name']
+        db_table = 'service'
     
     def __str__(self):
-        return f"{self.icon} {self.name}"
+        return f"{self.company.company_name} - {self.service_name}"
 
-class CompanyDepartment(models.Model):
-    """Many-to-many relationship between companies and departments"""
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='departments')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    is_primary = models.BooleanField(default=False)
+class Category(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=100)
+    category_description = models.TextField(blank=True)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='categories', db_column='admin_id')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='categories', db_column='service_id')
     
     class Meta:
-        unique_together = ['company', 'department']
+        db_table = 'category'
+        verbose_name_plural = "Categories"
     
     def __str__(self):
-        return f"{self.company.company_name} - {self.department.name}"
+        return self.category_name
 
-class SubscriptionPlan(models.Model):
-    """Subscription plans available on the platform"""
-    PLAN_CHOICES = [
-        ('basic', 'Basic Plan (Free)'),
-        ('standard', 'Standard Plan'),
-        ('premium', 'Premium Plan'),
-    ]
-    
-    name = models.CharField(max_length=20, choices=PLAN_CHOICES, unique=True)
-    display_name = models.CharField(max_length=100)
-    price_egp = models.DecimalField(max_digits=10, decimal_places=2)
-    price_period = models.CharField(max_length=20, default='month')
-    
-    # Features
-    search_ranking = models.CharField(max_length=200)
-    portfolio_view = models.CharField(max_length=200)
-    portfolio_uploads_per_month = models.IntegerField()
-    comments_view = models.CharField(max_length=200)
-    commission_discount = models.CharField(max_length=200)
-    business_insights = models.CharField(max_length=200)
-    support_level = models.CharField(max_length=200)
-    
-    # Additional benefits
-    featured_on_homepage = models.BooleanField(default=False)
-    priority_support = models.BooleanField(default=False)
-    advanced_analytics = models.BooleanField(default=False)
-    
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+class Advertising(models.Model):
+    adv_id = models.AutoField(primary_key=True)
+    image = models.CharField(max_length=255)  # Store file path as varchar
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='advertisements', db_column='admin_id')
     
     class Meta:
-        ordering = ['price_egp']
+        db_table = 'advertising'
     
     def __str__(self):
-        return f"{self.display_name} - EGP {self.price_egp}/{self.price_period}"
+        return f"Ad {self.adv_id} - {self.price}"
 
-class CompanySubscription(models.Model):
-    """Company's current subscription"""
-    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='subscription')
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE)
-    
-    # Subscription details
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(null=True, blank=True)
+class Payment(models.Model):
+    payment_id = models.AutoField(primary_key=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     is_active = models.BooleanField(default=True)
-    auto_renewal = models.BooleanField(default=True)
-    
-    # Payment tracking
     last_payment_date = models.DateTimeField(null=True, blank=True)
     next_payment_date = models.DateTimeField(null=True, blank=True)
     payment_method = models.CharField(max_length=50, blank=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='payments', db_column='company_id')
+    adv = models.ForeignKey(Advertising, on_delete=models.CASCADE, related_name='payments', null=True, blank=True, db_column='adv_id')
     
     class Meta:
-        ordering = ['-created_at']
+        db_table = 'payment'
     
     def __str__(self):
-        return f"{self.company.company_name} - {self.plan.display_name}"
-    
-    @property
-    def is_expired(self):
-        if not self.end_date:
-            return False
-        from django.utils import timezone
-        return timezone.now() > self.end_date
+        return f"Payment {self.payment_id} - {self.company.company_name}"
 
-# Add additional models for messaging system
-class Message(models.Model):
-    """Messages between companies"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='received_messages')
-    
-    subject = models.CharField(max_length=200)
-    content = models.TextField()
-    
-    is_read = models.BooleanField(default=False)
-    replied_to = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
-    
+class SubscriptionPlan(models.Model):
+    plan_id = models.AutoField(primary_key=True)
+    plan_name = models.CharField(max_length=100)
+    price_egp = models.DecimalField(max_digits=10, decimal_places=2)
+    search_ranking = models.CharField(max_length=200)
+    plan_duration = models.DurationField(default=timedelta(days=30))  # Changed from timestamp to duration
+    portfolio_view = models.CharField(max_length=200)
+    portfolio_upload_per_month = models.CharField(max_length=100)
+    comments_view = models.CharField(max_length=200)
+    commission_discount = models.CharField(max_length=200)
+    business_insights = models.CharField(max_length=200)
+    support_level = models.CharField(max_length=200)  # Fixed typo from varcher
+    featured_on_homepage = models.BooleanField(default=False)
+    priority_support = models.BooleanField(default=False)  # Fixed typo from pirority_support
+    advanced_analytics = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    read_at = models.DateTimeField(null=True, blank=True)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='subscription_plans', db_column='admin_id')
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='subscription_plans', db_column='payment_id')
     
     class Meta:
-        ordering = ['-created_at']
+        db_table = 'subscriptionplan'
     
     def __str__(self):
-        return f"{self.sender.company_name} → {self.receiver.company_name}: {self.subject}"
+        return f"{self.plan_name} - {self.price_egp} EGP"
 
-class CompanyReview(models.Model):
-    """Reviews for companies"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    reviewer = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='given_reviews')
-    reviewed_company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='received_reviews')
+class CompanySubscription(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, db_column='company_id')
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, db_column='plan_id')
     
-    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    class Meta:
+        db_table = 'companysubscription'
+        unique_together = ['company', 'plan']
+    
+    def __str__(self):
+        return f"{self.company.company_name} - {self.plan.plan_name}"
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
     title = models.CharField(max_length=200)
     content = models.TextField()
-    
-    # Project details
     project_type = models.CharField(max_length=100, blank=True)
-    project_duration = models.CharField(max_length=50, blank=True)
-    project_budget_range = models.CharField(max_length=50, blank=True)
-    
+    project_duration = models.DurationField(default=timedelta(days=30))  # Changed from timestamp to duration
     would_recommend = models.BooleanField(default=True)
-    is_verified = models.BooleanField(default=False)  # For verified project reviews
-    
+    is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='reviews', db_column='admin_id')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='received_reviews', db_column='company_id')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews', db_column='service_id')
     
     class Meta:
-        unique_together = ['reviewer', 'reviewed_company']  # One review per company pair
-        ordering = ['-created_at']
+        db_table = 'review'
     
     def __str__(self):
-        return f"{self.reviewer.company_name} → {self.reviewed_company.company_name} ({self.rating}★)"
+        return f"Review {self.review_id} - {self.company.company_name} ({self.rating}★)"

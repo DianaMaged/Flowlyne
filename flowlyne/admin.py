@@ -1,31 +1,41 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Company, Department, CompanyDepartment
+from .models import Company, Service, Category, Admin, SubscriptionPlan, Review, Payment, CompanySubscription, Advertising
+
+@admin.register(Admin)
+class AdminModelAdmin(admin.ModelAdmin):
+    list_display = ['admin_id', 'email']
+    search_fields = ['email']
+    ordering = ['admin_id']
 
 @admin.register(Company)
 class CompanyAdmin(UserAdmin):
-    list_display = ['company_name', 'email', 'city', 'is_verified', 'is_active', 'created_at']
-    list_filter = ['is_verified', 'is_active', 'city', 'country']
+    list_display = ['company_id', 'company_name', 'email', 'city', 'is_verified', 'is_active', 'created_at']
+    list_filter = ['is_verified', 'is_active', 'city', 'country', 'current_plan']
     search_fields = ['company_name', 'email', 'description']
     ordering = ['-created_at']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Company Information', {
-            'fields': ('company_name', 'description', 'website')
+            'fields': ('company_name', 'description')
         }),
         ('Contact Information', {
             'fields': ('company_address', 'phone_number', 'city', 'country')
         }),
         ('Media Files', {
-            'fields': ('logo', 'portfolio', 'certifications'),
+            'fields': ('logo', 'certification'),
             'classes': ('collapse',)
         }),
-        ('Verification', {
-            'fields': ('is_verified',)
+        ('Verification & Subscription', {
+            'fields': ('is_verified', 'current_plan')
         }),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser'),
+            'classes': ('collapse',)
+        }),
+        ('Admin Relations', {
+            'fields': ('admin',),
             'classes': ('collapse',)
         }),
     )
@@ -33,26 +43,158 @@ class CompanyAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'company_name', 'password1', 'password2'),
+            'fields': ('email', 'company_name', 'password1', 'password2', 'admin'),
         }),
     )
 
-@admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'icon', 'is_active', 'company_count']
-    list_filter = ['is_active']
-    search_fields = ['name', 'description']
-    ordering = ['name']
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ['service_id', 'service_name', 'company', 'admin']
+    list_filter = ['admin', 'company']
+    search_fields = ['service_name', 'service_description', 'company__company_name']
+    ordering = ['-service_id']
     
-    def company_count(self, obj):
-        return obj.companydepartment_set.count()
-    company_count.short_description = 'Companies'
+    fieldsets = (
+        ('Service Information', {
+            'fields': ('service_name', 'service_description')
+        }),
+        ('Relations', {
+            'fields': ('company', 'admin')
+        }),
+    )
 
-@admin.register(CompanyDepartment)
-class CompanyDepartmentAdmin(admin.ModelAdmin):
-    list_display = ['company', 'department', 'is_primary']
-    list_filter = ['is_primary', 'department']
-    search_fields = ['company__company_name', 'department__name']
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['category_id', 'category_name', 'service', 'admin']
+    list_filter = ['admin']
+    search_fields = ['category_name', 'category_description']
+    ordering = ['category_name']
+    
+    fieldsets = (
+        ('Category Information', {
+            'fields': ('category_name', 'category_description')
+        }),
+        ('Relations', {
+            'fields': ('service', 'admin')
+        }),
+    )
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ['review_id', 'title', 'rating', 'company', 'service', 'is_verified', 'created_at']
+    list_filter = ['rating', 'is_verified', 'would_recommend', 'admin']
+    search_fields = ['title', 'content', 'company__company_name', 'service__service_name']
+    ordering = ['-created_at']
+    readonly_fields = ['review_id', 'created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Review Information', {
+            'fields': ('title', 'content', 'rating', 'would_recommend')
+        }),
+        ('Project Details', {
+            'fields': ('project_type', 'project_duration'),
+            'classes': ('collapse',)
+        }),
+        ('Relations', {
+            'fields': ('company', 'service', 'admin')
+        }),
+        ('Status', {
+            'fields': ('is_verified',)
+        }),
+        ('Timestamps', {
+            'fields': ('review_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ['payment_id', 'company', 'is_active', 'payment_method', 'created_at']
+    list_filter = ['is_active', 'payment_method']
+    search_fields = ['company__company_name', 'payment_method']
+    ordering = ['-created_at']
+    readonly_fields = ['payment_id', 'created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Payment Information', {
+            'fields': ('start_date', 'end_date', 'is_active', 'payment_method')
+        }),
+        ('Payment History', {
+            'fields': ('last_payment_date', 'next_payment_date'),
+            'classes': ('collapse',)
+        }),
+        ('Relations', {
+            'fields': ('company', 'adv')
+        }),
+        ('Timestamps', {
+            'fields': ('payment_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(SubscriptionPlan)
+class SubscriptionPlanAdmin(admin.ModelAdmin):
+    list_display = ['plan_id', 'plan_name', 'price_egp', 'is_active', 'created_at']
+    list_filter = ['is_active', 'featured_on_homepage', 'priority_support', 'advanced_analytics']
+    search_fields = ['plan_name', 'search_ranking']
+    ordering = ['price_egp']
+    readonly_fields = ['plan_id', 'created_at']
+    
+    fieldsets = (
+        ('Plan Information', {
+            'fields': ('plan_name', 'price_egp', 'plan_duration')
+        }),
+        ('Features', {
+            'fields': (
+                'search_ranking', 'portfolio_view', 'portfolio_upload_per_month',
+                'comments_view', 'commission_discount', 'business_insights', 'support_level'
+            )
+        }),
+        ('Premium Features', {
+            'fields': ('featured_on_homepage', 'priority_support', 'advanced_analytics'),
+            'classes': ('collapse',)
+        }),
+        ('Relations', {
+            'fields': ('admin', 'payment')
+        }),
+        ('Status', {
+            'fields': ('is_active',)
+        }),
+        ('Timestamps', {
+            'fields': ('plan_id', 'created_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(CompanySubscription)
+class CompanySubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['company', 'plan']
+    list_filter = ['plan']
+    search_fields = ['company__company_name', 'plan__plan_name']
+
+@admin.register(Advertising)
+class AdvertisingAdmin(admin.ModelAdmin):
+    list_display = ['adv_id', 'price', 'start_date', 'end_date', 'admin']
+    list_filter = ['admin', 'start_date', 'end_date']
+    search_fields = ['admin__email']
+    ordering = ['-start_date']
+    readonly_fields = ['adv_id']
+    
+    fieldsets = (
+        ('Advertisement Information', {
+            'fields': ('image', 'price')
+        }),
+        ('Schedule', {
+            'fields': ('start_date', 'end_date')
+        }),
+        ('Relations', {
+            'fields': ('admin',)
+        }),
+        ('ID', {
+            'fields': ('adv_id',),
+            'classes': ('collapse',)
+        }),
+    )
 
 # Customize admin site
 admin.site.site_header = "Flowlyne Administration"

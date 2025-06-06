@@ -13,15 +13,22 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('about/', views.about, name='about'),
+    path('offering/', views.offering_view, name='offering'),
     
     # API endpoints
     path('api/register/', views.api_register, name='api_register'),
     path('api/login/', views.api_login, name='api_login'),
     path('api/companies/', views.api_companies, name='api_companies'),
-    path('api/companies/<uuid:company_id>/', views.api_company_detail, name='api_company_detail'),
-    path('api/departments/', views.api_departments, name='api_departments'),
+    path('api/companies/<int:company_id>/', views.api_company_detail, name='api_company_detail'),
+    path('api/categories/', views.api_categories, name='api_categories'),
     path('api/stats/', views.api_stats, name='api_stats'),
     path('api/messages/', views.api_send_message, name='api_send_message'),
-    path('api/subscription-plans/', views.api_subscription_plans, name='api_subscription_plans'),  # Add this
-    path('api/upgrade/', views.api_upgrade_subscription, name='api_upgrade_subscription'),  # Add this
+    path('api/subscription-plans/', views.api_subscription_plans, name='api_subscription_plans'),
+    path('api/upgrade/', views.api_upgrade_subscription, name='api_upgrade_subscription'),
+    path('api/services/', views.api_company_services, name='api_company_services'),  # GET: user's services
+    path('api/services/create/', views.api_create_service, name='api_create_service'),  # POST: create service
+    path('api/services/<int:service_id>/', views.api_service_detail, name='api_service_detail'),  # GET/PUT/DELETE specific service
+    path('api/services/all/', views.api_all_services, name='api_all_services'),  # GET: all services (public)
+    path('api/services/categories/', views.api_service_categories, name='api_service_categories'),  # GET: categories
+    
 ]

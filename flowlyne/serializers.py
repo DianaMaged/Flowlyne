@@ -1,33 +1,51 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Company, Department, CompanyDepartment, SubscriptionPlan, CompanySubscription, Message, CompanyReview
+from .models import Company, Service, Category, Admin, SubscriptionPlan, Review, Payment, CompanySubscription, Advertising
 
-class DepartmentSerializer(serializers.ModelSerializer):
+class AdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Department
-        fields = ['id', 'name', 'description', 'icon']
+        model = Admin
+        fields = ['admin_id', 'email']
 
-class CompanyDepartmentSerializer(serializers.ModelSerializer):
-    department = DepartmentSerializer(read_only=True)
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['category_id', 'category_name', 'category_description']
+
+class ServiceSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
     
     class Meta:
-        model = CompanyDepartment
-        fields = ['department', 'is_primary']
+        model = Service
+        fields = [
+            'service_id', 'service_name', 'service_description',
+            'company_name', 'categories'
+        ]
+
+class ServiceCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['service_name', 'service_description']
+    
+    def validate_service_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Service name cannot be empty")
+        return value.strip()
+    
+    def validate_service_description(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Service description cannot be empty")
+        return value.strip()
 
 class CompanyRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
-    departments = serializers.ListField(
-        child=serializers.CharField(), 
-        write_only=True, 
-        required=False
-    )
     
     class Meta:
         model = Company
         fields = [
             'company_name', 'email', 'password', 'description',
-            'company_address', 'phone_number', 'website', 
-            'city', 'country', 'departments'
+            'company_address', 'phone_number', 'city', 'country'
         ]
     
     def validate_email(self, value):
@@ -36,27 +54,21 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
         return value
     
     def create(self, validated_data):
-        departments_data = validated_data.pop('departments', [])
         password = validated_data.pop('password')
+        
+        # Get or create default admin
+        admin, created = Admin.objects.get_or_create(
+            email='admin@flowlyne.com',
+            defaults={'password': 'admin123'}
+        )
         
         # Create company
         company = Company.objects.create_user(
             password=password,
             current_plan='basic',
+            admin=admin,
             **validated_data
         )
-        
-        # Add departments
-        for dept_name in departments_data:
-            try:
-                department = Department.objects.get(name=dept_name)
-                CompanyDepartment.objects.create(
-                    company=company,
-                    department=department,
-                    is_primary=len(departments_data) == 1
-                )
-            except Department.DoesNotExist:
-                pass
         
         return company
 
@@ -81,61 +93,55 @@ class CompanyLoginSerializer(serializers.Serializer):
         return attrs
 
 class CompanyListSerializer(serializers.ModelSerializer):
-    departments = CompanyDepartmentSerializer(many=True, read_only=True)
-    primary_department = serializers.SerializerMethodField()
+    services_count = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
-    review_count = serializers.SerializerMethodField()
-    logo_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Company
         fields = [
-            'id', 'company_name', 'description', 'city', 'country',
-            'website', 'is_verified', 'logo_url', 'departments',
-            'primary_department', 'rating', 'review_count', 'created_at'
+            'company_id', 'company_name', 'description', 'city', 'country',
+            'is_verified', 'logo', 'services_count', 'reviews_count', 'rating',
+            'created_at'
         ]
     
-    def get_primary_department(self, obj):
-        primary = obj.departments.filter(is_primary=True).first()
-        if not primary:
-            primary = obj.departments.first()
-        return primary.department.name if primary else None
+    def get_services_count(self, obj):
+        return obj.services.count()
+    
+    def get_reviews_count(self, obj):
+        return obj.received_reviews.count()
     
     def get_rating(self, obj):
-        # Calculate average rating from reviews
         reviews = obj.received_reviews.all()
         if reviews.exists():
             return round(reviews.aggregate(avg=serializers.models.Avg('rating'))['avg'], 1)
         return 4.5  # Default rating for demo
-    
-    def get_review_count(self, obj):
-        return obj.received_reviews.count() or 12  # Demo fallback
-    
-    def get_logo_url(self, obj):
-        if obj.logo:
-            return obj.logo.url
-        return None
 
 class CompanyDetailSerializer(CompanyListSerializer):
-    portfolio_url = serializers.SerializerMethodField()
-    certifications_url = serializers.SerializerMethodField()
+    services = ServiceSerializer(many=True, read_only=True)
     recent_reviews = serializers.SerializerMethodField()
     
     class Meta(CompanyListSerializer.Meta):
         fields = CompanyListSerializer.Meta.fields + [
             'email', 'company_address', 'phone_number', 
-            'portfolio_url', 'certifications_url', 'recent_reviews'
+            'certification', 'services', 'recent_reviews'
         ]
-    
-    def get_portfolio_url(self, obj):
-        return obj.portfolio.url if obj.portfolio else None
-    
-    def get_certifications_url(self, obj):
-        return obj.certifications.url if obj.certifications else None
     
     def get_recent_reviews(self, obj):
         recent_reviews = obj.received_reviews.filter(is_verified=True)[:3]
-        return CompanyReviewSerializer(recent_reviews, many=True).data
+        return ReviewSerializer(recent_reviews, many=True).data
+
+class ReviewSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
+    service_name = serializers.CharField(source='service.service_name', read_only=True)
+    
+    class Meta:
+        model = Review
+        fields = [
+            'review_id', 'rating', 'title', 'content', 'project_type',
+            'project_duration', 'would_recommend', 'is_verified',
+            'created_at', 'company_name', 'service_name'
+        ]
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
     features_list = serializers.SerializerMethodField()
@@ -143,22 +149,21 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubscriptionPlan
         fields = [
-            'id', 'name', 'display_name', 'price_egp', 'price_period',
-            'search_ranking', 'portfolio_view', 'portfolio_uploads_per_month',
+            'plan_id', 'plan_name', 'price_egp', 'search_ranking',
+            'plan_duration', 'portfolio_view', 'portfolio_upload_per_month',
             'comments_view', 'commission_discount', 'business_insights',
             'support_level', 'featured_on_homepage', 'priority_support',
             'advanced_analytics', 'features_list'
         ]
     
     def get_features_list(self, obj):
-        """Generate a list of features for frontend display"""
         features = []
         if obj.search_ranking:
             features.append(f"🔍 {obj.search_ranking}")
         if obj.portfolio_view:
             features.append(f"📁 {obj.portfolio_view}")
-        if obj.portfolio_uploads_per_month:
-            features.append(f"📤 {obj.portfolio_uploads_per_month} uploads/month")
+        if obj.portfolio_upload_per_month:
+            features.append(f"📤 {obj.portfolio_upload_per_month}")
         if obj.commission_discount:
             features.append(f"💰 {obj.commission_discount}")
         if obj.business_insights:
@@ -169,59 +174,40 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
             features.append("⭐ Featured on homepage")
         return features
 
-class MessageSerializer(serializers.ModelSerializer):
-    sender_name = serializers.CharField(source='sender.company_name', read_only=True)
-    receiver_name = serializers.CharField(source='receiver.company_name', read_only=True)
+class PaymentSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
     
     class Meta:
-        model = Message
+        model = Payment
         fields = [
-            'id', 'sender', 'receiver', 'sender_name', 'receiver_name',
-            'subject', 'content', 'is_read', 'replied_to', 
-            'created_at', 'read_at'
+            'payment_id', 'start_date', 'end_date', 'is_active',
+            'last_payment_date', 'next_payment_date', 'payment_method',
+            'created_at', 'updated_at', 'company_name'
         ]
-        read_only_fields = ['sender', 'created_at']
-
-class CompanyReviewSerializer(serializers.ModelSerializer):
-    reviewer_name = serializers.CharField(source='reviewer.company_name', read_only=True)
-    reviewer_logo = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = CompanyReview
-        fields = [
-            'id', 'reviewer', 'reviewer_name', 'reviewer_logo',
-            'rating', 'title', 'content', 'project_type',
-            'project_duration', 'project_budget_range',
-            'would_recommend', 'is_verified', 'created_at'
-        ]
-        read_only_fields = ['reviewer', 'created_at']
-    
-    def get_reviewer_logo(self, obj):
-        return obj.reviewer.logo.url if obj.reviewer.logo else None
 
 class CompanySubscriptionSerializer(serializers.ModelSerializer):
-    plan_details = SubscriptionPlanSerializer(source='plan', read_only=True)
-    days_remaining = serializers.SerializerMethodField()
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
+    plan_name = serializers.CharField(source='plan.plan_name', read_only=True)
+    plan_price = serializers.DecimalField(source='plan.price_egp', read_only=True, max_digits=10, decimal_places=2)
     
     class Meta:
         model = CompanySubscription
-        fields = [
-            'id', 'plan', 'plan_details', 'start_date', 'end_date',
-            'is_active', 'auto_renewal', 'last_payment_date',
-            'next_payment_date', 'payment_method', 'days_remaining'
-        ]
+        fields = ['company_name', 'plan_name', 'plan_price']
+
+class AdvertisingSerializer(serializers.ModelSerializer):
+    admin_email = serializers.CharField(source='admin.email', read_only=True)
     
-    def get_days_remaining(self, obj):
-        if not obj.end_date:
-            return None
-        from django.utils import timezone
-        remaining = (obj.end_date - timezone.now()).days
-        return max(0, remaining)
+    class Meta:
+        model = Advertising
+        fields = [
+            'adv_id', 'image', 'price', 'start_date', 'end_date', 'admin_email'
+        ]
 
 class StatsSerializer(serializers.Serializer):
     total_companies = serializers.IntegerField()
     verified_companies = serializers.IntegerField()
-    total_departments = serializers.IntegerField()
-    total_messages = serializers.IntegerField()
+    total_services = serializers.IntegerField()
+    total_categories = serializers.IntegerField()
     total_reviews = serializers.IntegerField()
+    total_payments = serializers.IntegerField()
     average_rating = serializers.FloatField()

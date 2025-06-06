@@ -1,6 +1,5 @@
-# flowlyne/views.py - COMPLETE FIXED VERSION
-
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,10 +11,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import check_password
+from django.shortcuts import get_object_or_404
+from .serializers import ServiceSerializer, ServiceCreateSerializer
 import json
 import logging
 
-from .models import Company, Department, CompanyDepartment
+from .models import Company, Service, Category, Admin, SubscriptionPlan, Review, Payment
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +48,18 @@ def plans(request):
 def payment(request):
     return render(request, 'payment.html')
 
+@login_required
+def offering_view(request):
+    """Offering services page - requires authentication"""
+    return render(request, 'offering.html')
+
 # ================================
-# API VIEWS - FIXED VERSIONS
+# API VIEWS - UPDATED FOR NEW SCHEMA
 # ================================
 
 @csrf_exempt
 def api_login(request):
-    """FIXED Login company"""
+    """Login company"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST method allowed'}, status=405)
     
@@ -89,7 +95,7 @@ def api_login(request):
                 
                 # Prepare company data for response
                 company_data = {
-                    'id': str(company.id),
+                    'id': company.company_id,
                     'company_name': company.company_name,
                     'email': company.email,
                     'description': company.description or '',
@@ -97,9 +103,8 @@ def api_login(request):
                     'phone_number': company.phone_number or '',
                     'city': company.city,
                     'country': company.country,
-                    'website': company.website or '',
                     'is_verified': company.is_verified,
-                    'current_plan': getattr(company, 'current_plan', 'basic'),
+                    'current_plan': company.current_plan,
                     'created_at': company.created_at.isoformat()
                 }
                 
@@ -127,7 +132,7 @@ def api_login(request):
 
 @csrf_exempt
 def api_register(request):
-    """FIXED Register a new company"""
+    """Register a new company"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST method allowed'}, status=405)
     
@@ -150,6 +155,12 @@ def api_register(request):
         if Company.objects.filter(email__iexact=data['email']).exists():
             return JsonResponse({'error': 'Email already registered'}, status=400)
         
+        # Get or create default admin (for now, create a default admin)
+        admin, created = Admin.objects.get_or_create(
+            email='admin@flowlyne.com',
+            defaults={'password': 'admin123'}  # In production, this should be hashed
+        )
+        
         # Create company
         company = Company.objects.create_user(
             email=data['email'],
@@ -158,38 +169,18 @@ def api_register(request):
             company_address=data.get('company_address', ''),
             phone_number=data.get('phone_number', ''),
             description=data.get('description', ''),
-            website=data.get('website', ''),
             city=data.get('city', 'Cairo'),
             country=data.get('country', 'Egypt'),
-            current_plan='basic'
+            current_plan='basic',
+            admin=admin
         )
-        
-        # Handle departments
-        departments = data.get('departments', [])
-        if isinstance(departments, str):
-            departments = [departments]  # Handle single department as string
-            
-        if departments:
-            for dept_name in departments:
-                try:
-                    department, created = Department.objects.get_or_create(
-                        name=dept_name,
-                        defaults={'icon': '🏢', 'description': f'{dept_name} services'}
-                    )
-                    CompanyDepartment.objects.create(
-                        company=company,
-                        department=department,
-                        is_primary=len(departments) == 1
-                    )
-                except Exception as e:
-                    logger.warning(f"Could not add department {dept_name}: {e}")
         
         # Create auth token
         token, created = Token.objects.get_or_create(user=company)
         
         # Return company data
         company_data = {
-            'id': str(company.id),
+            'id': company.company_id,
             'company_name': company.company_name,
             'email': company.email,
             'description': company.description,
@@ -197,7 +188,6 @@ def api_register(request):
             'phone_number': company.phone_number,
             'city': company.city,
             'country': company.country,
-            'website': company.website,
             'is_verified': company.is_verified,
             'current_plan': company.current_plan,
             'created_at': company.created_at.isoformat()
@@ -219,9 +209,9 @@ def api_register(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 def api_companies(request):
-    """Get all companies - FIXED VERSION"""
+    """Get all companies"""
     try:
-        companies = Company.objects.filter(is_active=True).prefetch_related('departments__department')
+        companies = Company.objects.filter(is_active=True).select_related('admin')
         
         # Add search functionality
         search_query = request.GET.get('search', '')
@@ -229,43 +219,23 @@ def api_companies(request):
             companies = companies.filter(
                 Q(company_name__icontains=search_query) |
                 Q(description__icontains=search_query) |
-                Q(departments__department__name__icontains=search_query) |
                 Q(city__icontains=search_query)
             ).distinct()
         
-        # Add department filter
-        department = request.GET.get('department', '')
-        if department:
-            companies = companies.filter(departments__department__name=department)
-        
         companies_data = []
         for company in companies:
-            # Get primary department
-            primary_dept = company.departments.filter(is_primary=True).first()
-            if not primary_dept:
-                primary_dept = company.departments.first()
-            
             company_info = {
-                'id': str(company.id),
+                'id': company.company_id,
                 'company_name': company.company_name,
                 'email': company.email,
                 'description': company.description,
                 'city': company.city,
                 'country': company.country,
-                'website': company.website,
                 'is_verified': company.is_verified,
-                'logo': company.logo.url if company.logo else None,
+                'logo': company.logo if company.logo else None,
                 'rating': 4.5,  # Mock rating for demo
-                'review_count': 12,  # Mock review count
-                'primary_department': primary_dept.department.name if primary_dept else None,
-                'departments': [
-                    {
-                        'name': cd.department.name,
-                        'icon': cd.department.icon,
-                        'is_primary': cd.is_primary,
-                    }
-                    for cd in company.departments.all()
-                ],
+                'review_count': company.received_reviews.count(),
+                'services_count': company.services.count(),
                 'created_at': company.created_at.isoformat()
             }
             companies_data.append(company_info)
@@ -282,31 +252,29 @@ def api_companies(request):
 def api_company_detail(request, company_id):
     """Get detailed company information"""
     try:
-        company = get_object_or_404(Company, id=company_id)
+        company = get_object_or_404(Company, company_id=company_id)
         
         company_data = {
-            'id': str(company.id),
+            'id': company.company_id,
             'company_name': company.company_name,
             'email': company.email,
             'description': company.description,
             'company_address': company.company_address,
             'phone_number': company.phone_number,
-            'website': company.website,
             'city': company.city,
             'country': company.country,
             'is_verified': company.is_verified,
-            'logo': company.logo.url if company.logo else None,
-            'portfolio': company.portfolio.url if company.portfolio else None,
-            'certifications': company.certifications.url if company.certifications else None,
+            'logo': company.logo if company.logo else None,
+            'certification': company.certification if company.certification else None,
             'rating': 4.5,  # Mock rating
-            'review_count': 12,  # Mock review count
-            'departments': [
+            'review_count': company.received_reviews.count(),
+            'services': [
                 {
-                    'name': cd.department.name,
-                    'icon': cd.department.icon,
-                    'is_primary': cd.is_primary,
+                    'id': service.service_id,
+                    'name': service.service_name,
+                    'description': service.service_description
                 }
-                for cd in company.departments.all()
+                for service in company.services.all()
             ],
             'created_at': company.created_at.isoformat()
         }
@@ -317,22 +285,22 @@ def api_company_detail(request, company_id):
         logger.error(f"Company detail error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-def api_departments(request):
-    """Get all available departments"""
+def api_categories(request):
+    """Get all available categories"""
     try:
-        departments = Department.objects.filter(is_active=True).order_by('name')
-        departments_data = [
+        categories = Category.objects.all().select_related('service')
+        categories_data = [
             {
-                'id': dept.id,
-                'name': dept.name,
-                'description': dept.description,
-                'icon': dept.icon
+                'id': cat.category_id,
+                'name': cat.category_name,
+                'description': cat.category_description,
+                'service_name': cat.service.service_name if cat.service else None
             }
-            for dept in departments
+            for cat in categories
         ]
-        return JsonResponse(departments_data, safe=False)
+        return JsonResponse(categories_data, safe=False)
     except Exception as e:
-        logger.error(f"Departments error: {str(e)}")
+        logger.error(f"Categories error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
 def api_stats(request):
@@ -341,47 +309,191 @@ def api_stats(request):
         stats = {
             'total_companies': Company.objects.filter(is_active=True).count(),
             'verified_companies': Company.objects.filter(is_active=True, is_verified=True).count(),
-            'total_departments': Department.objects.filter(is_active=True).count(),
-            'total_messages': 0,  # Placeholder
+            'total_services': Service.objects.count(),
+            'total_categories': Category.objects.count(),
+            'total_reviews': Review.objects.count(),
         }
         return JsonResponse(stats)
     except Exception as e:
         logger.error(f"Stats error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt
-def api_send_message(request):
-    """Send message to another company"""
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_company_services(request):
+    """Get all services for the current user's company"""
     try:
-        # Parse request data
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-            
-        receiver_id = data.get('receiver_id')
-        subject = data.get('subject')
-        message = data.get('message')
+        company = request.user
+        services = Service.objects.filter(company=company)
         
-        if not receiver_id or not message:
-            return JsonResponse({'error': 'Receiver ID and message are required'}, status=400)
+        services_data = [
+            {
+                'id': service.service_id,
+                'service_name': service.service_name,
+                'service_description': service.service_description,
+                'categories': [
+                    {
+                        'id': cat.category_id,
+                        'name': cat.category_name,
+                        'description': cat.category_description
+                    }
+                    for cat in service.categories.all()
+                ]
+            }
+            for service in services
+        ]
         
-        receiver = get_object_or_404(Company, id=receiver_id)
-        
-        # In a real app, you'd create a Message model and save this
-        # For now, just return success
-        return JsonResponse({
-            'message': 'Message sent successfully',
-            'id': 'demo-message-id',
-            'receiver': receiver.company_name
-        }, status=201)
+        return Response({
+            'services': services_data,
+            'count': services.count()
+        })
         
     except Exception as e:
-        logger.error(f"Send message error: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_create_service(request):
+    """Create a new service for the current user's company"""
+    try:
+        service_name = request.data.get('service_name')
+        service_description = request.data.get('service_description')
+        
+        if not service_name or not service_description:
+            return Response({
+                'error': 'Service name and description are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get or create default admin
+        admin, created = Admin.objects.get_or_create(
+            email='admin@flowlyne.com',
+            defaults={'password': 'admin123'}
+        )
+        
+        # Create service
+        service = Service.objects.create(
+            service_name=service_name,
+            service_description=service_description,
+            company=request.user,
+            admin=admin
+        )
+        
+        service_data = {
+            'id': service.service_id,
+            'service_name': service.service_name,
+            'service_description': service.service_description,
+            'company_name': service.company.company_name
+        }
+        
+        return Response({
+            'message': 'Service created successfully',
+            'service': service_data
+        }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def api_service_detail(request, service_id):
+    """Get, update, or delete a specific service"""
+    try:
+        service = get_object_or_404(
+            Service, 
+            service_id=service_id, 
+            company=request.user
+        )
+        
+        if request.method == 'GET':
+            service_data = {
+                'id': service.service_id,
+                'service_name': service.service_name,
+                'service_description': service.service_description,
+                'company_name': service.company.company_name
+            }
+            return Response(service_data)
+            
+        elif request.method == 'PUT':
+            service_name = request.data.get('service_name', service.service_name)
+            service_description = request.data.get('service_description', service.service_description)
+            
+            service.service_name = service_name
+            service.service_description = service_description
+            service.save()
+            
+            service_data = {
+                'id': service.service_id,
+                'service_name': service.service_name,
+                'service_description': service.service_description,
+                'company_name': service.company.company_name
+            }
+            
+            return Response({
+                'message': 'Service updated successfully',
+                'service': service_data
+            })
+                
+        elif request.method == 'DELETE':
+            service_name = service.service_name
+            service.delete()
+            return Response({
+                'message': f'Service "{service_name}" deleted successfully'
+            })
+            
+    except Service.DoesNotExist:
+        return Response(
+            {'error': 'Service not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+def api_all_services(request):
+    """Get all active services from all companies"""
+    try:
+        services = Service.objects.all().select_related('company')
+        
+        # Add search functionality
+        search_query = request.GET.get('search', '')
+        if search_query:
+            services = services.filter(
+                Q(service_name__icontains=search_query) |
+                Q(service_description__icontains=search_query) |
+                Q(company__company_name__icontains=search_query)
+            )
+        
+        services_data = [
+            {
+                'id': service.service_id,
+                'service_name': service.service_name,
+                'service_description': service.service_description,
+                'company_name': service.company.company_name,
+                'company_id': service.company.company_id,
+                'company_verified': service.company.is_verified
+            }
+            for service in services
+        ]
+        
+        return Response({
+            'services': services_data,
+            'count': services.count()
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 def api_subscription_plans(request):
     """Get all available subscription plans"""
@@ -392,12 +504,11 @@ def api_subscription_plans(request):
                 'name': 'basic',
                 'display_name': 'Basic Plan (Free)',
                 'price_egp': 0,
-                'price_period': 'month',
                 'features': [
                     '🏢 Standard listing in search results',
                     '📝 Basic company profile',
                     '📧 Email support',
-                    '📤 5 project uploads during signup',
+                    '📤 Basic service listings',
                     '💸 10% commission on projects'
                 ]
             },
@@ -406,14 +517,13 @@ def api_subscription_plans(request):
                 'name': 'standard',
                 'display_name': 'Standard Plan',
                 'price_egp': 200,
-                'price_period': 'month',
                 'features': [
                     '⬆️ Higher ranking in search results',
-                    '📁 Full portfolio display',
-                    '📤 Upload 5 new projects/month',
-                    '💬 View & respond to comments',
+                    '📁 Enhanced company profile',
+                    '📤 Advanced service listings',
+                    '💬 Priority customer support',
                     '💰 8% commission (2% discount)',
-                    '📊 Engagement analytics',
+                    '📊 Basic analytics',
                     '🎧 Priority support'
                 ]
             },
@@ -422,14 +532,13 @@ def api_subscription_plans(request):
                 'name': 'premium',
                 'display_name': 'Premium Plan',
                 'price_egp': 500,
-                'price_period': 'month',
                 'features': [
-                    '🔝 Top placement + Featured on homepage',
-                    '🌟 Advanced portfolio with priority exposure',
-                    '📤 Upload 10 new projects/month',
-                    '⭐ Highlight top reviews + Reply to comments',
+                    '🔝 Top placement + Featured listings',
+                    '🌟 Premium company profile',
+                    '📤 Unlimited service listings',
+                    '⭐ Featured in search results',
                     '💎 5% commission (5% discount)',
-                    '📈 Full analytics with client trends',
+                    '📈 Advanced analytics and insights',
                     '👨‍💼 Dedicated account manager'
                 ]
             }
@@ -446,7 +555,6 @@ def api_upgrade_subscription(request):
         return JsonResponse({'error': 'Only POST method allowed'}, status=405)
     
     try:
-        # Parse request data
         if request.content_type == 'application/json':
             data = json.loads(request.body)
         else:
@@ -456,16 +564,9 @@ def api_upgrade_subscription(request):
         if not plan_type:
             return JsonResponse({'error': 'Plan type required'}, status=400)
         
-        # Validate plan type
         valid_plans = ['basic', 'standard', 'premium']
         if plan_type not in valid_plans:
             return JsonResponse({'error': f'Invalid plan type. Must be one of: {valid_plans}'}, status=400)
-        
-        # For demo purposes, we'll just return success
-        # In a real app, you would:
-        # 1. Authenticate the user
-        # 2. Update their subscription
-        # 3. Process payment
         
         return JsonResponse({
             'message': f'Successfully upgraded to {plan_type} plan',
@@ -475,4 +576,35 @@ def api_upgrade_subscription(request):
         
     except Exception as e:
         logger.error(f"Upgrade subscription error: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def api_send_message(request):
+    """Send message to another company"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
+    try:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+            
+        receiver_id = data.get('receiver_id')
+        subject = data.get('subject')
+        message = data.get('message')
+        
+        if not receiver_id or not message:
+            return JsonResponse({'error': 'Receiver ID and message are required'}, status=400)
+        
+        receiver = get_object_or_404(Company, company_id=receiver_id)
+        
+        return JsonResponse({
+            'message': 'Message sent successfully',
+            'id': 'demo-message-id',
+            'receiver': receiver.company_name
+        }, status=201)
+        
+    except Exception as e:
+        logger.error(f"Send message error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
