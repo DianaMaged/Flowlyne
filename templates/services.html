@@ -835,7 +835,7 @@
             </a>
             <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/services/" class="active">Companies</a>
+                <a href="/services/" class="active">Services</a>
                 <a href="/plans/">Plans</a>
                 <a href="/login/">Login</a>
                 <a href="/about/">About</a>
@@ -981,6 +981,7 @@
                         primary_department: 'Web Development',
                         rating: 4.8,
                         review_count: 15,
+                        services_count: 8,
                         departments: [
                             { name: 'Web Development', icon: '💻', is_primary: true }
                         ]
@@ -995,6 +996,7 @@
                         primary_department: 'Graphic Design',
                         rating: 4.9,
                         review_count: 22,
+                        services_count: 12,
                         departments: [
                             { name: 'Graphic Design', icon: '🎨', is_primary: true }
                         ]
@@ -1009,8 +1011,39 @@
                         primary_department: 'Digital Marketing',
                         rating: 4.7,
                         review_count: 18,
+                        services_count: 6,
                         departments: [
                             { name: 'Digital Marketing', icon: '📈', is_primary: true }
+                        ]
+                    },
+                    {
+                        id: '4',
+                        company_name: 'Mobile App Developers',
+                        description: 'Specialized mobile application development company creating innovative iOS and Android apps.',
+                        city: 'Giza',
+                        country: 'Egypt',
+                        is_verified: false,
+                        primary_department: 'Mobile App Development',
+                        rating: 4.6,
+                        review_count: 11,
+                        services_count: 5,
+                        departments: [
+                            { name: 'Mobile App Development', icon: '📱', is_primary: true }
+                        ]
+                    },
+                    {
+                        id: '5',
+                        company_name: 'Business Consultants Pro',
+                        description: 'Strategic business consulting firm helping companies optimize operations and accelerate growth.',
+                        city: 'New Cairo',
+                        country: 'Egypt',
+                        is_verified: true,
+                        primary_department: 'Business Consulting',
+                        rating: 4.8,
+                        review_count: 25,
+                        services_count: 10,
+                        departments: [
+                            { name: 'Business Consulting', icon: '🎯', is_primary: true }
                         ]
                     }
                 ];
@@ -1119,7 +1152,7 @@
                                 <div class="stat-label">Reviews</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">${company.departments ? company.departments.length : '1'}</div>
+                                <div class="stat-value">${company.services_count || company.departments ? company.departments.length : '1'}</div>
                                 <div class="stat-label">Services</div>
                             </div>
                         </div>
@@ -1165,6 +1198,7 @@
             const container = document.getElementById('companies-container');
             
             if (!searchTerm) {
+                // Reset to show all companies with current filter
                 filteredCompanies = allCompanies.filter(company => {
                     if (!currentFilter) return true;
                     return company.primary_department === currentFilter ||
@@ -1184,6 +1218,7 @@
             `;
             
             try {
+                // Try API search first
                 const response = await fetch(`/api/companies/?search=${encodeURIComponent(searchTerm)}`);
                 
                 if (response.ok) {
@@ -1192,19 +1227,25 @@
                     displayCompanies(companies);
                     updateResultsCount(companies.length);
                 } else {
-                    throw new Error('Search failed');
+                    throw new Error('Search API failed');
                 }
                 
             } catch (error) {
                 console.error('Search error:', error);
                 
                 // Fallback to client-side search
-                const searchResults = allCompanies.filter(company => 
-                    company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    company.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    company.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (company.primary_department && company.primary_department.toLowerCase().includes(searchTerm.toLowerCase()))
-                );
+                const searchResults = allCompanies.filter(company => {
+                    const searchLower = searchTerm.toLowerCase();
+                    return (
+                        company.company_name.toLowerCase().includes(searchLower) ||
+                        company.description.toLowerCase().includes(searchLower) ||
+                        company.city.toLowerCase().includes(searchLower) ||
+                        (company.primary_department && company.primary_department.toLowerCase().includes(searchLower)) ||
+                        (company.departments && company.departments.some(dept => 
+                            dept.name.toLowerCase().includes(searchLower)
+                        ))
+                    );
+                });
                 
                 filteredCompanies = searchResults;
                 displayCompanies(searchResults);
@@ -1260,7 +1301,7 @@
         }
 
         function contactCompany(companyId, companyName) {
-            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
             
             if (!currentUser) {
                 alert('Please login to contact companies');
@@ -1284,7 +1325,7 @@
                 navbar.style.background = 'rgba(255, 255, 255, 0.95)';
                 navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
             } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.9)';
+                navbar.style.background = 'rgba(255, 255, 255, 0.8)';
                 navbar.style.boxShadow = 'none';
             }
         });
