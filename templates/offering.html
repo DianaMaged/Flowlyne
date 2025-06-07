@@ -3,51 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Services - Flowlyne</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    
+    <title>Offering Services - Flowlyne</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/logo.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo.png">
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="apple-touch-icon" href="/static/images/logo.png">
+    <link rel="shortcut icon" href="/static/images/logo.ico">
     <style>
+        :root {
+            --primary-teal: #4ECDC4;
+            --primary-blue: #45B7D1;
+            --accent-purple: #6C5CE7;
+            --dark-grey: #2D3436;
+            --medium-grey: #636E72;
+            --light-grey: #DDD6FE;
+            --white: #FFFFFF;
+            --off-white: #FAFBFC;
+            --success: #00D4AA;
+            --warning: #FFB800;
+            --error: #FF6B6B;
+            --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+            --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            --gradient-dark: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-teal: #4ECDC4;
-            --secondary-coral: #FF6B6B;
-            --accent-purple: #6C5CE7;
-            --warm-yellow: #FDCB6E;
-            --success: #00D4AA;
-            --error: #FF6B6B;
-            --warning: #FFA726;
-            --white: #FFFFFF;
-            --light-grey: #F8F9FA;
-            --medium-grey: #6C757D;
-            --dark-grey: #2C3E50;
-            --gradient-primary: linear-gradient(135deg, #4ECDC4, #44A08D);
-            --gradient-secondary: linear-gradient(135deg, #FF6B6B, #ee5a6f);
-            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --shadow-heavy: 0 16px 60px rgba(0, 0, 0, 0.15);
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
+            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
             color: var(--dark-grey);
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            line-height: 1.6;
             min-height: 100vh;
         }
 
-        /* Header */
-        .header {
-            background: var(--white);
-            padding: 1rem 0;
-            box-shadow: var(--shadow-light);
-            position: sticky;
+        /* Navigation */
+        .navbar {
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -59,13 +65,58 @@
             align-items: center;
         }
 
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .nav-brand:hover .nav-logo {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+        }
+
+        .nav-brand h1 {
+            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            font-weight: 500;
+            font-style: italic;
+            opacity: 0.8;
         }
 
         .nav-links {
@@ -74,94 +125,222 @@
             align-items: center;
         }
 
-        .nav-link {
-            text-decoration: none;
+        .nav-links a {
             color: var(--dark-grey);
+            text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
-        .nav-link:hover {
-            color: var(--primary-teal);
+        .nav-links a:hover {
+            background: rgba(78, 205, 196, 0.1);
+            transform: translateY(-1px);
         }
 
-        .nav-link.active {
-            color: var(--primary-teal);
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: 600;
+            font-size: 0.875rem;
         }
 
         /* Main Content */
         .main-content {
+            padding-top: 6rem;
+            min-height: 100vh;
+        }
+
+        .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 2rem;
         }
 
-        .page-header {
+        /* Hero Section */
+        .hero-section {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
+            position: relative;
+            overflow: hidden;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .page-title {
-            font-size: 3rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.08) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, -15px) rotate(2deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-dark);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
         }
 
-        .page-subtitle {
+        .hero-subtitle {
             font-size: 1.25rem;
             color: var(--medium-grey);
-            max-width: 600px;
-            margin: 0 auto;
+            margin-bottom: 2rem;
         }
 
-        /* Add Service Button */
-        .add-service-btn {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 16px;
+        .hero-tagline {
+            font-size: 1rem;
+            color: var(--primary-teal);
             font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
+            font-style: italic;
             margin-bottom: 2rem;
+        }
+
+        .hero-image {
+            max-width: 300px;
+            height: auto;
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Services Section */
+        .services-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-grey);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
+        .services-count {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .add-service-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
         .add-service-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.4);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
 
         /* Services Grid */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
 
         .service-card {
             background: var(--white);
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 2rem;
-            box-shadow: var(--shadow-medium);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
         .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-heavy);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
         }
 
         .service-header {
@@ -260,7 +439,7 @@
 
         .add-service-form.active {
             display: block;
-            animation: slideDown 0.3s ease;
+            animation: slideDown 0.5s ease;
         }
 
         @keyframes slideDown {
@@ -274,8 +453,13 @@
             }
         }
 
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
         .form-title {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--dark-grey);
             margin-bottom: 0.5rem;
@@ -283,7 +467,7 @@
 
         .form-subtitle {
             color: var(--medium-grey);
-            margin-bottom: 2rem;
+            font-size: 1rem;
         }
 
         .form-grid {
@@ -294,8 +478,7 @@
         }
 
         .form-group {
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 1.5rem;
         }
 
         .form-group.full-width {
@@ -303,12 +486,17 @@
         }
 
         .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--dark-grey);
-            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .form-input, .form-textarea {
+        .form-input {
+            width: 100%;
             padding: 1rem;
             border: 2px solid rgba(0, 0, 0, 0.1);
             border-radius: 12px;
@@ -318,10 +506,11 @@
             background: var(--white);
         }
 
-        .form-input:focus, .form-textarea:focus {
+        .form-input:focus {
             outline: none;
             border-color: var(--primary-teal);
-            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+            transform: translateY(-1px);
         }
 
         .form-textarea {
@@ -333,13 +522,12 @@
             display: flex;
             gap: 1rem;
             justify-content: flex-end;
-            margin-top: 2rem;
         }
 
         .cancel-btn {
-            background: transparent;
+            background: rgba(149, 165, 166, 0.1);
             color: var(--medium-grey);
-            border: 2px solid rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(149, 165, 166, 0.2);
             padding: 1rem 2rem;
             border-radius: 12px;
             font-weight: 600;
@@ -348,7 +536,7 @@
         }
 
         .cancel-btn:hover {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(149, 165, 166, 0.2);
         }
 
         .submit-btn {
@@ -360,12 +548,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.4);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
 
         .submit-btn:disabled {
@@ -374,16 +562,44 @@
             transform: none;
         }
 
-        /* Notification */
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-grey);
+        }
+
+        .empty-text {
+            color: var(--medium-grey);
+            margin-bottom: 2rem;
+        }
+
+        /* Notifications */
         .notification {
             position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: var(--white);
-            border-radius: 12px;
+            top: 100px;
+            right: 20px;
+            background: var(--success);
+            color: white;
             padding: 1rem 1.5rem;
-            box-shadow: var(--shadow-medium);
-            z-index: 1000;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            z-index: 1001;
             transform: translateX(400px);
             transition: all 0.3s ease;
         }
@@ -392,110 +608,166 @@
             transform: translateX(0);
         }
 
-        .notification.success {
-            border-left: 4px solid var(--success);
-        }
-
         .notification.error {
-            border-left: 4px solid var(--error);
+            background: var(--error);
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
         }
 
-        /* Loading states */
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--primary-teal);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--medium-grey);
-            grid-column: 1 / -1;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--dark-grey);
-        }
-
-        .empty-state p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Responsive */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-container {
                 padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
             }
 
-            .main-content {
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .hero-section {
                 padding: 2rem 1rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+
+            .add-service-form {
+                padding: 2rem;
             }
 
             .form-grid {
                 grid-template-columns: 1fr;
             }
 
-            .services-grid {
-                grid-template-columns: 1fr;
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
             .service-actions {
                 flex-direction: column;
             }
+        }
 
-            .form-actions {
-                flex-direction: column;
-            }
+        /* Loading animation */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <nav class="nav-container">
-            <div class="logo">Flowlyne</div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <div class="nav-logo">
+                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
+                </div>
+                <div>
+                    <h1>Flowlyne</h1>
+                    <div class="nav-tagline">Smooth and Fine</div>
+                </div>
+            </a>
             <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/services/" class="nav-link">Explore</a>
-                <a href="/offering/" class="nav-link active">Manage Services</a>
-                <a href="/dashboard/" class="nav-link">Dashboard</a>
-                <a href="/plans/" class="nav-link">Plans</a>
-                <a href="#" class="nav-link" onclick="logout()">Logout</a>
+                <a href="/">Home</a>
+                <a href="/services/">Find Services</a>
+                <a href="/offering/" class="active">My Services</a>
+                <a href="/dashboard/">Dashboard</a>
+                <a href="/plans/">Plans</a>
             </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Manage Your Services</h1>
-            <p class="page-subtitle">Add, edit, and manage the services your company offers</p>
+            <div class="user-menu" onclick="showUserMenu()">
+                <div class="user-avatar" id="user-avatar">?</div>
+                <span id="user-name">Loading...</span>
+            </div>
         </div>
+    </nav>
 
-        <div class="content-section">
-            <button class="add-service-btn" onclick="toggleAddServiceForm()">
-                ➕ Add New Service
-            </button>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">The Services that Power Your Growth</h1>
+                    <p class="hero-subtitle">We handle the heavy lifting - so you can focus on your vision.</p>
+                    <p class="hero-tagline">"Smooth and Fine, That's Flowlyne"</p>
+                    
+                    <!-- Hero Image Placeholder -->
+                    <div style="display: flex; justify-content: center; margin: 2rem 0;">
+                        <div style="width: 300px; height: 200px; background: var(--gradient-primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                            🚀
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <!-- Add/Edit Service Form -->
+            <!-- Services Section -->
+            <section class="services-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">
+                            🎯 My Offered Services
+                            <span class="services-count" id="services-count">0 Services</span>
+                        </h2>
+                    </div>
+                    <button class="add-service-btn" onclick="toggleAddServiceForm()">
+                        <span>➕</span>
+                        <span>Add New Service</span>
+                    </button>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="services-grid" id="services-grid">
+                    <!-- Services will be loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <div class="empty-icon">📦</div>
+                    <h3 class="empty-title">No Services Yet</h3>
+                    <p class="empty-text">Start building your service portfolio by adding your first service offering.</p>
+                    <button class="add-service-btn" onclick="toggleAddServiceForm()">
+                        <span>➕</span>
+                        <span>Add Your First Service</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Add Service Form -->
             <section class="add-service-form" id="add-service-form">
-                <h2 class="form-title">Add New Service</h2>
-                <p class="form-subtitle">Tell customers about your service offerings</p>
-                
-                <form onsubmit="handleServiceSubmit(event)" id="service-form">
+                <div class="form-header">
+                    <h3 class="form-title">Add a New Service</h3>
+                    <p class="form-subtitle">Expand your offerings and reach more clients</p>
+                </div>
+
+                <form onsubmit="handleAddService(event)" id="service-form">
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="service-title">Service Title *</label>
@@ -546,11 +818,6 @@
                     </div>
                 </form>
             </section>
-
-            <!-- Services Grid -->
-            <section class="services-grid" id="services-grid">
-                <!-- Services will be loaded here -->
-            </section>
         </div>
     </main>
 
@@ -558,7 +825,6 @@
     <div class="notification" id="notification"></div>
 
     <script>
-        // Global variables
         let currentCompany = null;
         let services = [];
         let editingServiceId = null;
@@ -574,7 +840,7 @@
             return localStorage.getItem('flowlyne_token') || '';
         }
 
-        // API helper function
+        // API helper function - FIXED to work with Django backend
         async function apiRequest(endpoint, options = {}) {
             const token = getAuthToken();
             const headers = {
@@ -600,89 +866,67 @@
             return await response.json();
         }
 
-        // Check authentication
-        function checkAuth() {
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            checkAuthentication();
+            loadServices();
+        });
+
+        // Check if user is logged in
+        function checkAuthentication() {
             const token = getAuthToken();
             if (!token) {
+                alert('Please login to access your services');
                 window.location.href = '/login/';
-                return false;
+                return;
             }
-            return true;
-        }
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('flowlyne_token');
-            localStorage.removeItem('flowlyne_current_company');
-            window.location.href = '/';
-        }
-
-        // Show notification
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
+            currentCompany = JSON.parse(localStorage.getItem('flowlyne_current_company'));
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
-        }
-
-        // Toggle add service form
-        function toggleAddServiceForm() {
-            const form = document.getElementById('add-service-form');
-            const isActive = form.classList.contains('active');
-            
-            if (isActive) {
-                form.classList.remove('active');
-                resetForm();
-            } else {
-                form.classList.add('active');
-                form.scrollIntoView({ behavior: 'smooth' });
+            if (!currentCompany) {
+                alert('Please login to access your services');
+                window.location.href = '/login/';
+                return;
             }
+
+            // Update user info in navbar
+            document.getElementById('user-name').textContent = currentCompany.company_name;
+            document.getElementById('user-avatar').textContent = currentCompany.company_name.charAt(0).toUpperCase();
         }
 
-        // Reset form
-        function resetForm() {
-            document.getElementById('service-form').reset();
-            editingServiceId = null;
-            document.querySelector('.form-title').textContent = 'Add New Service';
-            document.querySelector('.form-subtitle').textContent = 'Tell customers about your service offerings';
-            document.getElementById('submit-text').textContent = 'Add Service';
-        }
-
-        // Load services - FIXED: Make sure this function exists
+        // Load existing services from Django API
         async function loadServices() {
             try {
-                console.log('Loading services...');
+                console.log('Loading services from API...');
                 const response = await apiRequest('/api/services/');
                 services = response.services || [];
                 console.log('Loaded services:', services);
-                renderServices();
+                displayServices();
+                updateServicesCount();
             } catch (error) {
                 console.error('Error loading services:', error);
                 showNotification('Error loading services: ' + error.message, 'error');
                 // Show empty state even if there's an error
-                renderServices();
+                services = [];
+                displayServices();
+                updateServicesCount();
             }
         }
 
-        // Render services - FIXED: Make sure this function is properly defined
-        function renderServices() {
+        // Display services in grid
+        function displayServices() {
             const grid = document.getElementById('services-grid');
-            
-            if (!services || services.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No Services Yet</h3>
-                        <p>Start by adding your first service to attract customers</p>
-                        <button class="add-service-btn" onclick="toggleAddServiceForm()">
-                            ➕ Add Your First Service
-                        </button>
-                    </div>
-                `;
+            const emptyState = document.getElementById('empty-state');
+
+            if (services.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
                 return;
             }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
 
             grid.innerHTML = services.map(service => {
                 const serviceId = service.id || service.service_id;
@@ -693,47 +937,97 @@
                 const serviceDuration = service.duration || '';
 
                 return `
-                    <div class="service-card">
+                    <div class="service-card" data-id="${serviceId}">
                         <div class="service-header">
                             <div>
-                                <h3 class="service-title">${serviceName}</h3>
+                                <h4 class="service-title">${serviceName}</h4>
+                                <div class="service-meta">
+                                    ${serviceCategory ? `<span class="meta-tag">${serviceCategory}</span>` : ''}
+                                    ${serviceDuration ? `<span class="meta-tag">⏱️ ${serviceDuration}</span>` : ''}
+                                </div>
                             </div>
-                            <div class="service-price">EGP ${servicePrice}</div>
+                            <div class="service-price">EGP ${parseFloat(servicePrice).toLocaleString()}</div>
                         </div>
                         <p class="service-description">${serviceDescription}</p>
-                        <div class="service-meta">
-                            ${serviceCategory ? `<span class="meta-tag">${serviceCategory}</span>` : ''}
-                            ${serviceDuration ? `<span class="meta-tag">⏱️ ${serviceDuration}</span>` : ''}
-                        </div>
                         <div class="service-actions">
-                            <button class="edit-btn" onclick="editService(${serviceId})">
-                                Edit
+                            <button class="edit-btn" onclick="editService('${serviceId}')">
+                                ✏️ Edit
                             </button>
-                            <button class="delete-btn" onclick="deleteService(${serviceId})">
-                                Delete
+                            <button class="delete-btn" onclick="deleteService('${serviceId}')">
+                                🗑️ Delete
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            // Add entrance animations
+            setTimeout(() => {
+                document.querySelectorAll('.service-card').forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 100);
         }
 
-        // Handle service form submission - FIXED: Call renderServices properly
-        async function handleServiceSubmit(event) {
+        // Update services count
+        function updateServicesCount() {
+            const countElement = document.getElementById('services-count');
+            const count = services.length;
+            countElement.textContent = `${count} ${count === 1 ? 'Service' : 'Services'}`;
+        }
+
+        // Toggle add service form
+        function toggleAddServiceForm() {
+            const form = document.getElementById('add-service-form');
+            const isVisible = form.classList.contains('active');
+            
+            if (isVisible) {
+                form.classList.remove('active');
+                clearForm();
+                editingServiceId = null;
+            } else {
+                form.classList.add('active');
+                // Scroll to form
+                setTimeout(() => {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+
+        // Handle add/edit service - FIXED to use Django API
+        async function handleAddService(event) {
             event.preventDefault();
             
+            const formData = new FormData(event.target);
+            const serviceData = {
+                service_name: formData.get('title'),
+                service_description: formData.get('description'),
+                price: parseFloat(formData.get('price')),
+                category: formData.get('category'),
+                duration: formData.get('duration') || null
+            };
+
+            // Validate data
+            if (!serviceData.service_name || !serviceData.service_description || !serviceData.price) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            if (serviceData.price <= 0) {
+                showNotification('Price must be greater than 0', 'error');
+                return;
+            }
+
             const submitBtn = document.getElementById('submit-btn');
             const submitText = document.getElementById('submit-text');
             
-            // Prepare service data
-            const serviceData = {
-                service_name: document.getElementById('service-title').value,
-                service_description: document.getElementById('service-description').value,
-                price: parseFloat(document.getElementById('service-price').value),
-                category: document.getElementById('service-category').value,
-                duration: document.getElementById('service-duration').value || null
-            };
-
             try {
                 // Show loading state
                 submitBtn.disabled = true;
@@ -748,15 +1042,15 @@
                     });
                     showNotification('Service updated successfully! 🎉', 'success');
                 } else {
-                    // Create new service
+                    // Add new service
                     response = await apiRequest('/api/services/create/', {
                         method: 'POST',
                         body: JSON.stringify(serviceData)
                     });
                     showNotification('Service added successfully! 🎉', 'success');
                 }
-                
-                // Reload services
+
+                // Reload services from API
                 await loadServices();
                 
                 // Close form
@@ -794,7 +1088,14 @@
                 
                 // Show form
                 document.getElementById('add-service-form').classList.add('active');
-                document.getElementById('add-service-form').scrollIntoView({ behavior: 'smooth' });
+                
+                // Scroll to form
+                setTimeout(() => {
+                    document.getElementById('add-service-form').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
                 
             } catch (error) {
                 console.error('Error loading service:', error);
@@ -804,42 +1105,95 @@
 
         // Delete service
         async function deleteService(serviceId) {
-            if (!confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
-                return;
-            }
+            const service = services.find(s => (s.id || s.service_id) == serviceId);
+            const serviceName = service ? (service.service_name || service.title || 'this service') : 'this service';
 
-            try {
-                await apiRequest(`/api/services/${serviceId}/`, {
-                    method: 'DELETE'
-                });
-                
-                showNotification('Service deleted successfully! 🗑️', 'success');
-                await loadServices();
-                
-            } catch (error) {
-                console.error('Error deleting service:', error);
-                showNotification('Error deleting service: ' + error.message, 'error');
+            if (confirm(`Are you sure you want to delete "${serviceName}"?\n\nThis action cannot be undone.`)) {
+                try {
+                    await apiRequest(`/api/services/${serviceId}/`, {
+                        method: 'DELETE'
+                    });
+                    
+                    showNotification('Service deleted successfully! 🗑️', 'success');
+                    await loadServices();
+                    
+                } catch (error) {
+                    console.error('Error deleting service:', error);
+                    showNotification('Error deleting service: ' + error.message, 'error');
+                }
             }
         }
 
-        // Initialize page
+        // Clear form
+        function clearForm() {
+            document.getElementById('service-form').reset();
+            document.querySelector('.form-title').textContent = 'Add a New Service';
+            document.querySelector('.form-subtitle').textContent = 'Expand your offerings and reach more clients';
+            document.getElementById('submit-text').textContent = 'Add Service';
+            editingServiceId = null;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // User menu
+        function showUserMenu() {
+            if (confirm('Sign out of your account?')) {
+                logout();
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('flowlyne_token');
+            localStorage.removeItem('flowlyne_current_company');
+            alert('Logged out successfully');
+            window.location.href = '/';
+        }
+
+        // Add smooth focus animations to form inputs
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing...');
-            
-            // Check authentication
-            if (!checkAuth()) {
-                return;
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('focus', (e) => {
+                    e.target.style.transform = 'translateY(-1px)';
+                });
+                
+                input.addEventListener('blur', (e) => {
+                    e.target.style.transform = 'translateY(0)';
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.8)';
+                navbar.style.boxShadow = 'none';
             }
-            
-            // Load current company data
-            const companyData = localStorage.getItem('flowlyne_current_company');
-            if (companyData) {
-                currentCompany = JSON.parse(companyData);
-                console.log('Current company:', currentCompany);
-            }
-            
-            // Load services
-            loadServices();
+        });
+
+        // Auto-resize textareas
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('.form-textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            });
         });
     </script>
 </body>
