@@ -29,6 +29,7 @@ db.sqlite3
 db.sqlite3-journal
 
 # Virtual Environment
+flowlyne_env/
 venv/
 ENV/
 env/
