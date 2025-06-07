@@ -17,7 +17,10 @@ Welcome to Flowlyne - a platform for connecting Egyptian businesses for mutual g
 4. Click "Install"
 
 **Test it worked:**
-- Open Command Prompt (search "cmd" in Start menu)
+- Open your preferred terminal:
+  - **Command Prompt**: Search "cmd" in Start menu
+  - **PowerShell**: Search "PowerShell" in Start menu  
+  - **Git Bash**: Right-click on desktop → "Git Bash Here"
 - Type: `git --version`
 - You should see something like "git version 2.x.x"
 
@@ -29,22 +32,32 @@ Welcome to Flowlyne - a platform for connecting Egyptian businesses for mutual g
 4. Click "Install Now"
 
 **Test it worked:**
-- Open Command Prompt
+- Open your terminal (Command Prompt, PowerShell, or Git Bash)
 - Type: `python --version`
 - You should see something like "Python 3.x.x"
 
 ## Step 3: Get the Project
 
-1. Open Command Prompt
+1. Open your preferred terminal (Command Prompt, PowerShell, or Git Bash)
 2. Go to your Desktop (or wherever you want the project):
+   
+   **Command Prompt or PowerShell:**
    ```
    cd Desktop
    ```
+   
+   **Git Bash:**
+   ```
+   cd Desktop
+   ```
+   *(Note: All terminals use the same command for changing directories)*
+
 3. Clone the project:
    ```
    git clone https://github.com/YOUR_USERNAME/flowlyne.git
    ```
    *(Replace YOUR_USERNAME with the actual GitHub username)*
+
 4. Go into the project folder:
    ```
    cd flowlyne
@@ -57,10 +70,23 @@ Welcome to Flowlyne - a platform for connecting Egyptian businesses for mutual g
    python -m venv flowlyne_env
    ```
 
-2. Activate it:
+2. Activate it (choose based on what you're using):
+
+   **Command Prompt (cmd):**
    ```
    flowlyne_env\Scripts\activate
    ```
+
+   **PowerShell:**
+   ```
+   flowlyne_env\Scripts\Activate.ps1
+   ```
+
+   **Git Bash:**
+   ```
+   source flowlyne_env/Scripts/activate
+   ```
+
    *(You should see (flowlyne_env) at the start of your command line)*
 
 ## Step 5: Install Required Packages
@@ -124,9 +150,25 @@ To stop the server, press `Ctrl + C` in the Command Prompt.
 
 ## Next Time You Want to Work on the Project
 
-1. Open Command Prompt
-2. Go to the project folder: `cd Desktop\flowlyne`
-3. Activate the environment: `flowlyne_env\Scripts\activate`
+1. Open your terminal (Command Prompt, PowerShell, or Git Bash)
+2. Go to the project folder: `cd Desktop\flowlyne` (use `cd Desktop/flowlyne` for Git Bash)
+3. Activate the environment based on what you're using:
+
+   **Command Prompt (cmd):**
+   ```
+   flowlyne_env\Scripts\activate
+   ```
+
+   **PowerShell:**
+   ```
+   flowlyne_env\Scripts\Activate.ps1
+   ```
+
+   **Git Bash:**
+   ```
+   source flowlyne_env/Scripts/activate
+   ```
+
 4. Start the server: `python manage.py runserver`
 
 ## Common Problems
@@ -140,7 +182,10 @@ To stop the server, press `Ctrl + C` in the Command Prompt.
 
 **Virtual environment won't activate**
 - Make sure you're in the right folder (flowlyne)
-- Try the full path: `C:\Users\YourName\Desktop\flowlyne\flowlyne_env\Scripts\activate`
+- Try the full path based on your terminal:
+  - **Command Prompt**: `C:\Users\YourName\Desktop\flowlyne\flowlyne_env\Scripts\activate`
+  - **PowerShell**: `C:\Users\YourName\Desktop\flowlyne\flowlyne_env\Scripts\Activate.ps1`
+  - **Git Bash**: `source /c/Users/YourName/Desktop/flowlyne/flowlyne_env/Scripts/activate`
 
 **Can't access the website**
 - Make sure the server is running (you should see the "Starting development server" message)
