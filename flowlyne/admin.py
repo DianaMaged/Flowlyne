@@ -49,57 +49,63 @@ class CompanyAdmin(UserAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['service_id', 'service_name', 'company', 'admin']
-    list_filter = ['admin', 'company']
+    list_display = ['service_id', 'service_name', 'company', 'price', 'category', 'created_at']
+    list_filter = ['category', 'created_at', 'company']
     search_fields = ['service_name', 'service_description', 'company__company_name']
-    ordering = ['-service_id']
+    ordering = ['-created_at']
+    readonly_fields = ['service_id', 'created_at', 'updated_at']
     
     fieldsets = (
         ('Service Information', {
-            'fields': ('service_name', 'service_description')
+            'fields': ('service_name', 'service_description', 'price', 'category', 'duration')
         }),
         ('Relations', {
-            'fields': ('company', 'admin')
+            'fields': ('company',)
+        }),
+        ('Timestamps', {
+            'fields': ('service_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['category_id', 'category_name', 'service', 'admin']
-    list_filter = ['admin']
+    list_display = ['category_id', 'category_name', 'service', 'created_at']
+    list_filter = ['created_at', 'service']
     search_fields = ['category_name', 'category_description']
-    ordering = ['category_name']
+    ordering = ['-created_at']
+    readonly_fields = ['category_id', 'created_at']
     
     fieldsets = (
         ('Category Information', {
             'fields': ('category_name', 'category_description')
         }),
         ('Relations', {
-            'fields': ('service', 'admin')
+            'fields': ('service',)
+        }),
+        ('Timestamps', {
+            'fields': ('category_id', 'created_at'),
+            'classes': ('collapse',)
         }),
     )
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['review_id', 'title', 'rating', 'company', 'service', 'is_verified', 'created_at']
-    list_filter = ['rating', 'is_verified', 'would_recommend', 'admin']
-    search_fields = ['title', 'content', 'company__company_name', 'service__service_name']
+    list_display = ['review_id', 'company', 'rating', 'title', 'is_verified', 'created_at']
+    list_filter = ['rating', 'is_verified', 'would_recommend', 'created_at']
+    search_fields = ['title', 'content', 'company__company_name']
     ordering = ['-created_at']
     readonly_fields = ['review_id', 'created_at', 'updated_at']
     
     fieldsets = (
         ('Review Information', {
-            'fields': ('title', 'content', 'rating', 'would_recommend')
+            'fields': ('title', 'content', 'rating', 'project_type', 'project_duration')
         }),
-        ('Project Details', {
-            'fields': ('project_type', 'project_duration'),
-            'classes': ('collapse',)
+        ('Verification', {
+            'fields': ('would_recommend', 'is_verified')
         }),
         ('Relations', {
             'fields': ('company', 'service', 'admin')
-        }),
-        ('Status', {
-            'fields': ('is_verified',)
         }),
         ('Timestamps', {
             'fields': ('review_id', 'created_at', 'updated_at'),

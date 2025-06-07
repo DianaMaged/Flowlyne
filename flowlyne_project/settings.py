@@ -103,6 +103,11 @@ DATABASES = {
 # Custom User Model
 AUTH_USER_MODEL = 'flowlyne.Company'
 
+# Login/Logout URLs - IMPORTANT: Add these
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},

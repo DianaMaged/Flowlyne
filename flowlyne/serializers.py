@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.db.models import Avg
 from .models import Company, Service, Category, Admin, SubscriptionPlan, Review, Payment, CompanySubscription, Advertising
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -114,7 +115,7 @@ class CompanyListSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         reviews = obj.received_reviews.all()
         if reviews.exists():
-            return round(reviews.aggregate(avg=serializers.models.Avg('rating'))['avg'], 1)
+            return round(reviews.aggregate(avg=Avg('rating'))['avg'], 1)
         return 4.5  # Default rating for demo
 
 class CompanyDetailSerializer(CompanyListSerializer):
