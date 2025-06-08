@@ -429,6 +429,20 @@
             font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .service-price:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+            color: white;
+        }
+
+        .service-price:active {
+            transform: translateY(0);
         }
 
         /* Company Details List */
@@ -880,7 +894,12 @@
                             <div class="service-card">
                                 <h4>${service.service_name}</h4>
                                 <p>${service.service_description || 'No description available.'}</p>
-                                ${service.price ? `<span class="service-price">$${service.price}</span>` : ''}
+                                ${service.price ? 
+                                    `<button class="service-price" onclick="redirectToPayment('${service.service_id}', '${service.service_name}', '${service.price}')">
+                                        $${service.price}
+                                    </button>` : 
+                                    ''
+                                }
                             </div>
                         `).join('')}
                     </div>
@@ -918,6 +937,22 @@
             
             // Update page title
             document.title = `${company.company_name} - Company Profile - Flowlyne | Smooth and Fine, That's Flowlyne`;
+        }
+
+        // New function to redirect to payment page with service information
+        function redirectToPayment(serviceId, serviceName, servicePrice) {
+            // Check if user is authenticated
+            {% if user.is_authenticated %}
+                // Create URL with service parameters
+                const paymentUrl = `{% url 'flowlyne:payment' %}?service_id=${serviceId}&service_name=${encodeURIComponent(serviceName)}&price=${servicePrice}&company_id=${currentCompany.company_id}&company_name=${encodeURIComponent(currentCompany.company_name)}`;
+                
+                // Redirect to payment page
+                window.location.href = paymentUrl;
+            {% else %}
+                // User not authenticated, redirect to login
+                alert('Please log in to purchase this service.');
+                window.location.href = '{% url "flowlyne:login" %}';
+            {% endif %}
         }
 
         function formatDate(dateString) {
