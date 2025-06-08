@@ -885,12 +885,12 @@
             console.log('User authenticated');
         }
 
-        // Load existing services from Django
+        // Load existing services from Django - FIXED URLS
         async function loadServices() {
             try {
                 console.log('Loading services from backend...');
-                // Use Django view endpoint instead of DRF API
-                const response = await fetch('{% url "flowlyne:api_services_list" %}', {
+                // Use correct Django URL pattern name
+                const response = await fetch('{% url "flowlyne:api_company_services" %}', {
                     method: 'GET',
                     headers: {
                         'X-CSRFToken': getCSRFToken(),
@@ -1005,7 +1005,7 @@
             }
         }
 
-        // Handle add/edit service - Fixed for Django
+        // Handle add/edit service - FIXED URLS
         async function handleAddService(event) {
             event.preventDefault();
             
@@ -1039,7 +1039,7 @@
                 
                 let response;
                 if (editingServiceId) {
-                    // Update existing service
+                    // Update existing service - use correct URL pattern
                     response = await fetch(`{% url 'flowlyne:api_service_detail' 0 %}`.replace('0', editingServiceId), {
                         method: 'PUT',
                         headers: {
@@ -1051,8 +1051,8 @@
                     });
                     showNotification('Service updated successfully! 🎉', 'success');
                 } else {
-                    // Add new service
-                    response = await fetch('{% url "flowlyne:api_service_create" %}', {
+                    // Add new service - use correct URL pattern
+                    response = await fetch('{% url "flowlyne:api_create_service" %}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1085,7 +1085,7 @@
             }
         }
 
-        // Edit service
+        // Edit service - FIXED URLS
         async function editService(serviceId) {
             try {
                 const response = await fetch(`{% url 'flowlyne:api_service_detail' 0 %}`.replace('0', serviceId), {
@@ -1134,7 +1134,7 @@
             }
         }
 
-        // Delete service
+        // Delete service - FIXED URLS
         async function deleteService(serviceId) {
             const service = services.find(s => (s.id || s.service_id) == serviceId);
             const serviceName = service ? (service.service_name || service.title || 'this service') : 'this service';
