@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offering Services - Flowlyne</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="icon" type="image/x-icon" href="/static/images/logo.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo.png">
     <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
@@ -843,13 +844,7 @@
                 document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         }
 
-        // Get auth token
-        function getAuthToken() {
-            // For Django sessions, we don't need tokens - authentication is handled by session
-            return '';
-        }
-
-        // API helper function - FIXED to work with Django backend
+        // API helper function - Fixed for Django authentication
         async function apiRequest(endpoint, options = {}) {
             const headers = {
                 'Content-Type': 'application/json',
@@ -857,7 +852,7 @@
                 ...options.headers
             };
 
-            const response = await fetch(`http://localhost:8000${endpoint}`, {
+            const response = await fetch(endpoint, {
                 ...options,
                 headers,
                 credentials: 'include' // Include session cookies
@@ -890,12 +885,26 @@
             console.log('User authenticated');
         }
 
-        // Load existing services from Django API
+        // Load existing services from Django
         async function loadServices() {
             try {
-                console.log('Loading services from API...');
-                const response = await apiRequest('/api/services/');
-                services = response.services || [];
+                console.log('Loading services from backend...');
+                // Use Django view endpoint instead of DRF API
+                const response = await fetch('{% url "flowlyne:api_services_list" %}', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                services = data.services || [];
                 console.log('Loaded services:', services);
                 displayServices();
                 updateServicesCount();
@@ -996,7 +1005,7 @@
             }
         }
 
-        // Handle add/edit service - FIXED to use Django API
+        // Handle add/edit service - Fixed for Django
         async function handleAddService(event) {
             event.preventDefault();
             
@@ -1031,21 +1040,36 @@
                 let response;
                 if (editingServiceId) {
                     // Update existing service
-                    response = await apiRequest(`/api/services/${editingServiceId}/`, {
+                    response = await fetch(`{% url 'flowlyne:api_service_detail' 0 %}`.replace('0', editingServiceId), {
                         method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                        credentials: 'include',
                         body: JSON.stringify(serviceData)
                     });
                     showNotification('Service updated successfully! 🎉', 'success');
                 } else {
                     // Add new service
-                    response = await apiRequest('/api/services/create/', {
+                    response = await fetch('{% url "flowlyne:api_service_create" %}', {
                         method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                        credentials: 'include',
                         body: JSON.stringify(serviceData)
                     });
                     showNotification('Service added successfully! 🎉', 'success');
                 }
 
-                // Reload services from API
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || errorData.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                // Reload services
                 await loadServices();
                 
                 // Close form
@@ -1064,8 +1088,20 @@
         // Edit service
         async function editService(serviceId) {
             try {
-                const response = await apiRequest(`/api/services/${serviceId}/`);
-                const service = response;
+                const response = await fetch(`{% url 'flowlyne:api_service_detail' 0 %}`.replace('0', serviceId), {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const service = await response.json();
                 
                 editingServiceId = serviceId;
                 
@@ -1105,9 +1141,18 @@
 
             if (confirm(`Are you sure you want to delete "${serviceName}"?\n\nThis action cannot be undone.`)) {
                 try {
-                    await apiRequest(`/api/services/${serviceId}/`, {
-                        method: 'DELETE'
+                    const response = await fetch(`{% url 'flowlyne:api_service_detail' 0 %}`.replace('0', serviceId), {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': getCSRFToken(),
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include'
                     });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     
                     showNotification('Service deleted successfully! 🗑️', 'success');
                     await loadServices();
