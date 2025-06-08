@@ -686,7 +686,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
+            <a href="{% url 'flowlyne:index' %}" class="nav-brand">
                 <div class="nav-logo">
                     <img src="/static/images/logo.png" alt="Flowlyne Logo" />
                 </div>
@@ -696,16 +696,23 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Find Services</a>
-                <a href="/offering/" class="active">My Services</a>
-                <a href="/dashboard/">Dashboard</a>
-                <a href="/plans/">Plans</a>
+                <a href="{% url 'flowlyne:index' %}">Home</a>
+                <a href="{% url 'flowlyne:services' %}">Services</a>
+                <a href="{% url 'flowlyne:offering' %}" class="active">My Services</a>
+                <a href="{% url 'flowlyne:dashboard' %}">Dashboard</a>
+                <a href="{% url 'flowlyne:plans' %}">Plans</a>
             </div>
+            {% if user.is_authenticated %}
             <div class="user-menu" onclick="showUserMenu()">
-                <div class="user-avatar" id="user-avatar">?</div>
-                <span id="user-name">Loading...</span>
+                <div class="user-avatar" id="user-avatar">{{ user.company_name|first|upper }}</div>
+                <span id="user-name">{{ user.company_name }}</span>
             </div>
+            {% else %}
+            <div class="nav-links">
+                <a href="{% url 'flowlyne:login' %}">Login</a>
+                <a href="{% url 'flowlyne:register' %}">Register</a>
+            </div>
+            {% endif %}
         </div>
     </nav>
 
@@ -768,6 +775,7 @@
                 </div>
 
                 <form onsubmit="handleAddService(event)" id="service-form">
+                    {% csrf_token %}
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="service-title">Service Title *</label>
@@ -837,25 +845,22 @@
 
         // Get auth token
         function getAuthToken() {
-            return localStorage.getItem('flowlyne_token') || '';
+            // For Django sessions, we don't need tokens - authentication is handled by session
+            return '';
         }
 
         // API helper function - FIXED to work with Django backend
         async function apiRequest(endpoint, options = {}) {
-            const token = getAuthToken();
             const headers = {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(),
                 ...options.headers
             };
-            
-            if (token) {
-                headers['Authorization'] = `Token ${token}`;
-            }
 
             const response = await fetch(`http://localhost:8000${endpoint}`, {
                 ...options,
-                headers
+                headers,
+                credentials: 'include' // Include session cookies
             });
 
             if (!response.ok) {
@@ -875,24 +880,14 @@
 
         // Check if user is logged in
         function checkAuthentication() {
-            const token = getAuthToken();
-            if (!token) {
-                alert('Please login to access your services');
-                window.location.href = '/login/';
-                return;
-            }
+            {% if not user.is_authenticated %}
+            alert('Please login to access your services');
+            window.location.href = '{% url "flowlyne:login" %}';
+            return;
+            {% endif %}
 
-            currentCompany = JSON.parse(localStorage.getItem('flowlyne_current_company'));
-            
-            if (!currentCompany) {
-                alert('Please login to access your services');
-                window.location.href = '/login/';
-                return;
-            }
-
-            // Update user info in navbar
-            document.getElementById('user-name').textContent = currentCompany.company_name;
-            document.getElementById('user-avatar').textContent = currentCompany.company_name.charAt(0).toUpperCase();
+            // User info is already available from Django template
+            console.log('User authenticated');
         }
 
         // Load existing services from Django API
@@ -1154,10 +1149,7 @@
 
         // Logout
         function logout() {
-            localStorage.removeItem('flowlyne_token');
-            localStorage.removeItem('flowlyne_current_company');
-            alert('Logged out successfully');
-            window.location.href = '/';
+            window.location.href = '{% url "flowlyne:logout" %}';
         }
 
         // Add smooth focus animations to form inputs

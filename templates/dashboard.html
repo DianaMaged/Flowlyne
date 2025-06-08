@@ -751,17 +751,8 @@
                 </div>
                 <span class="nav-tagline">Smooth and Fine</span>
             </a>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Services</a>
-                <a href="/offering/">My Services</a>
-                <a href="/plans/">Plans</a>
-                <a href="/about/">About</a>
-                <a href="/dashboard/" class="active">Dashboard</a>
-            </div>
-            <div class="user-menu" onclick="showUserMenu()">
-                <div class="user-avatar" id="user-avatar">?</div>
-                <span id="user-name">Loading...</span>
+            <div class="nav-links" id="nav-links">
+                <!-- Navigation will be populated by JavaScript -->
             </div>
         </div>
     </nav>
@@ -959,30 +950,57 @@
 
     <script>
         // Global variables
-        let currentCompany = null;
+        let currentUser = null;
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            loadDashboard();
+            initializeDashboard();
         });
 
-        // Load dashboard data
-        async function loadDashboard() {
-            currentCompany = JSON.parse(localStorage.getItem('flowlyne_current_company'));
+        // Initialize dashboard
+        function initializeDashboard() {
+            checkAuthentication();
+            loadDashboard();
+            setupNavigation();
+        }
+
+        // Check if user is logged in
+        function checkAuthentication() {
+            const token = localStorage.getItem('flowlyne_token');
+            currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
             
-            if (!currentCompany) {
+            if (!token || !currentUser) {
                 alert('Please login to access your dashboard');
                 window.location.href = '/login/';
                 return;
             }
+        }
 
+        // Setup navigation
+        function setupNavigation() {
+            const navLinks = document.getElementById('nav-links');
+            
+            if (currentUser) {
+                navLinks.innerHTML = `
+                    <a href="/">Home</a>
+                    <a href="/services/">Services</a>
+                    <a href="/plans/">Plans</a>
+                    <a href="/about/">About</a>
+                    <a href="/offering/">My Services</a>
+                    <a href="/dashboard/" class="active">Dashboard</a>
+                    <div class="user-menu" onclick="showUserMenu()">
+                        <div class="user-avatar">${currentUser.company_name.charAt(0).toUpperCase()}</div>
+                        <span>${currentUser.company_name}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
             try {
                 // Update welcome message
-                document.getElementById('welcome-title').textContent = `Welcome back, ${currentCompany.company_name}! 👋`;
-                
-                // Update user menu
-                document.getElementById('user-name').textContent = currentCompany.company_name;
-                document.getElementById('user-avatar').textContent = currentCompany.company_name.charAt(0).toUpperCase();
+                document.getElementById('welcome-title').textContent = `Welcome back, ${currentUser.company_name}! 👋`;
 
                 // Load platform statistics
                 const response = await fetch('/api/stats/');
@@ -994,7 +1012,7 @@
                 document.getElementById('total-departments').textContent = stats.total_departments;
                 
                 // Calculate member since days
-                const memberDate = new Date(currentCompany.created_at);
+                const memberDate = new Date(currentUser.created_at);
                 const today = new Date();
                 const daysDiff = Math.floor((today - memberDate) / (1000 * 60 * 60 * 24));
                 document.getElementById('member-since').textContent = daysDiff;
@@ -1016,7 +1034,7 @@
 
         // Update subscription section based on current plan
         function updateSubscriptionSection() {
-            const currentPlan = currentCompany.current_plan || 'basic';
+            const currentPlan = currentUser.current_plan || 'basic';
             const badge = document.getElementById('current-plan-badge');
             const upgradeSection = document.getElementById('upgrade-cta');
             
@@ -1093,14 +1111,14 @@
             const profileGrid = document.getElementById('profile-grid');
             
             const profileData = [
-                { label: 'Company Name', value: currentCompany.company_name },
-                { label: 'Email Address', value: currentCompany.email },
-                { label: 'Phone Number', value: currentCompany.phone_number || 'Not specified' },
-                { label: 'Website', value: currentCompany.website || 'Not specified' },
-                { label: 'City', value: `${currentCompany.city}, ${currentCompany.country}` },
-                { label: 'Member Since', value: new Date(currentCompany.created_at).toLocaleDateString() },
-                { label: 'Verification Status', value: currentCompany.is_verified ? '✅ Verified' : '⏳ Pending' },
-                { label: 'Company Description', value: currentCompany.description || 'No description provided' }
+                { label: 'Company Name', value: currentUser.company_name },
+                { label: 'Email Address', value: currentUser.email },
+                { label: 'Phone Number', value: currentUser.phone_number || 'Not specified' },
+                { label: 'Website', value: currentUser.website || 'Not specified' },
+                { label: 'City', value: `${currentUser.city}, ${currentUser.country}` },
+                { label: 'Member Since', value: new Date(currentUser.created_at).toLocaleDateString() },
+                { label: 'Verification Status', value: currentUser.is_verified ? '✅ Verified' : '⏳ Pending' },
+                { label: 'Company Description', value: currentUser.description || 'No description provided' }
             ];
 
             profileGrid.innerHTML = profileData.map(item => `
@@ -1138,16 +1156,16 @@
 
         // Show user menu
         function showUserMenu() {
-            if (confirm('Sign out of your account?')) {
-                logout();
+            if (confirm(`Sign out of ${currentUser.company_name}?\n\nYou will be redirected to the home page.`)) {
+                performLogout();
             }
         }
 
-        // Logout functionality
-        function logout() {
+        // Perform logout
+        function performLogout() {
             localStorage.removeItem('flowlyne_token');
             localStorage.removeItem('flowlyne_current_company');
-            alert('Logged out successfully');
+            alert('✅ Logged out successfully!\n\nThank you for using Flowlyne.');
             window.location.href = '/';
         }
 

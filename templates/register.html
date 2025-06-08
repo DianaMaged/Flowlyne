@@ -135,8 +135,13 @@
         }
 
         .nav-links a:hover {
-            background: var(--glass-bg);
+            background: rgba(78, 205, 196, 0.1);
             transform: translateY(-1px);
+        }
+
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
         }
 
         .nav-cta {
@@ -761,7 +766,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
+            <a href="{% url 'flowlyne:index' %}" class="nav-brand">
                 <div class="nav-logo">
                     <img src="/static/images/logo.png" alt="Flowlyne Logo" />
                 </div>
@@ -771,11 +776,17 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Services</a>
-                <a href="/plans/">Plans</a>
-                <a href="/login/">Login</a>
-                <a href="/about/">About</a>
+                <a href="{% url 'flowlyne:index' %}">Home</a>
+                <a href="{% url 'flowlyne:services' %}">Services</a>
+                <a href="{% url 'flowlyne:plans' %}">Plans</a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'flowlyne:login' %}">Login</a>
+                <a href="{% url 'flowlyne:register' %}" class="active">Register</a>
+                {% else %}
+                <a href="{% url 'flowlyne:dashboard' %}">Dashboard</a>
+                <a href="{% url 'flowlyne:offering' %}">My Services</a>
+                {% endif %}
+                <a href="{% url 'flowlyne:about' %}">About</a>
             </div>
         </div>
     </nav>
@@ -813,6 +824,7 @@
             <div class="debug-info" id="debug-info"></div>
 
             <form onsubmit="handleRegistration(event)" id="register-form" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="company_name">Company Name *</label>
@@ -1020,7 +1032,7 @@
             </div>
 
             <div class="login-link">
-                <p>Already have an account? <a href="/login/">Sign in here</a></p>
+                <p>Already have an account? <a href="{% url 'flowlyne:login' %}">Sign in here</a></p>
             </div>
         </div>
     </main>
@@ -1312,7 +1324,8 @@
                 // Note: Since we're using FormData, we don't set Content-Type header
                 const response = await fetch('/api/register/', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include' // Include session cookies
                 });
                 
                 console.log('Response status:', response.status);
@@ -1321,10 +1334,6 @@
                 console.log('Response data:', data);
                 
                 if (response.ok) {
-                    // Store user data
-                    localStorage.setItem('flowlyne_token', data.token);
-                    localStorage.setItem('flowlyne_current_company', JSON.stringify(data.company));
-                    
                     // Show success message
                     let successMessage = '🎉 Account created successfully!';
                     if (Object.keys(uploadedFiles).length > 0) {
@@ -1336,7 +1345,7 @@
                     
                     // Redirect after short delay
                     setTimeout(() => {
-                        window.location.href = '/services/';
+                        window.location.href = '{% url "flowlyne:services" %}';
                     }, 2000);
                 } else {
                     throw new Error(data.error || `Registration failed with status ${response.status}`);

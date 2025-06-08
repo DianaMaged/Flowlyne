@@ -138,6 +138,11 @@
             background: var(--glass-bg);
             transform: translateY(-1px);
         }
+        
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
 
         .nav-cta {
             background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
@@ -151,6 +156,35 @@
         .nav-cta:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+        }
+        
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
 
@@ -406,10 +440,7 @@
             text-decoration: underline;
         }
 
-        .error-message {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            color: var(--error);
+        .error-message, .success-message, .debug-info {
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
@@ -417,15 +448,23 @@
             display: none;
         }
 
+        .error-message {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: var(--error);
+        }
+
         .success-message {
             background: rgba(0, 212, 170, 0.1);
             border: 1px solid rgba(0, 212, 170, 0.3);
             color: var(--success);
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-            display: none;
+        }
+
+        .debug-info {
+            background: rgba(108, 92, 231, 0.1);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            color: var(--accent-purple);
+            font-family: 'Courier New', monospace;
         }
 
         /* Footer */
@@ -494,12 +533,8 @@
                     <div class="nav-tagline">Smooth and Fine</div>
                 </div>
             </a>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Services</a>
-                <a href="/plans/">Plans</a>
-                <a href="/about/">About</a>
-                <a href="/register/">Register</a>
+            <div class="nav-links" id="nav-links">
+                <!-- Navigation will be populated by JavaScript -->
             </div>
         </div>
     </nav>
@@ -578,6 +613,50 @@
     </footer>
 
     <script>
+        // Global user state
+        let currentUser = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+            setupFormAnimations();
+            checkIfAlreadyLoggedIn();
+        });
+
+        // Initialize navigation
+        function initializeNavigation() {
+            const navLinks = document.getElementById('nav-links');
+            
+            // For login page, always show guest navigation
+            navLinks.innerHTML = `
+                <a href="/">Home</a>
+                <a href="/services/">Services</a>
+                <a href="/plans/">Plans</a>
+                <a href="/login/" class="active">Login</a>
+                <a href="/register/" class="nav-cta">Register</a>
+                <a href="/about/">About</a>
+            `;
+        }
+
+        // Check if user is already logged in
+        function checkIfAlreadyLoggedIn() {
+            const token = localStorage.getItem('flowlyne_token');
+            const userData = localStorage.getItem('flowlyne_current_company');
+            
+            if (token && userData) {
+                try {
+                    currentUser = JSON.parse(userData);
+                    // User is already logged in, redirect to dashboard
+                    window.location.href = '/dashboard/';
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    // Clear invalid data
+                    localStorage.removeItem('flowlyne_token');
+                    localStorage.removeItem('flowlyne_current_company');
+                }
+            }
+        }
+
         // Show messages
         function showMessage(message, type = 'error') {
             const errorMsg = document.getElementById('error-message');
@@ -614,7 +693,7 @@
             }, 500);
         }
 
-        // FIXED Handle login function
+        // Handle login function
         async function handleLogin(event) {
             event.preventDefault();
             
@@ -720,71 +799,30 @@
             }
         }
 
-        // Alternative method using FormData (in case JSON doesn't work)
-        async function handleLoginFormData(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            
-            const loginBtn = document.getElementById('login-btn');
-            const loginText = document.getElementById('login-text');
-            
-            try {
-                // Show loading state
-                loginBtn.disabled = true;
-                loginText.innerHTML = '<div class="loading-spinner"></div>Signing In...';
-                
-                console.log('Making API request with FormData');
-                
-                const response = await fetch('/api/login/', {
-                    method: 'POST',
-                    body: formData  // Send as FormData instead of JSON
+        // Add smooth focus animations
+        function setupFormAnimations() {
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('focus', (e) => {
+                    e.target.parentElement.style.transform = 'scale(1.02)';
                 });
                 
-                console.log('Response status:', response.status);
-                
-                const data = await response.json();
-                console.log('Response data:', data);
-                
-                if (response.ok) {
-                    localStorage.setItem('flowlyne_token', data.token);
-                    localStorage.setItem('flowlyne_current_company', JSON.stringify(data.company));
-                    showMessage('Login successful! Redirecting...', 'success');
-                    setTimeout(() => window.location.href = '/dashboard/', 1500);
-                } else {
-                    throw new Error(data.error || 'Login failed');
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage(error.message);
-                loginBtn.disabled = false;
-                loginText.textContent = 'Sign In';
-            }
-        }
-
-        // Add smooth focus animations
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('focus', (e) => {
-                e.target.parentElement.style.transform = 'scale(1.02)';
+                input.addEventListener('blur', (e) => {
+                    e.target.parentElement.style.transform = 'scale(1)';
+                });
             });
-            
-            input.addEventListener('blur', (e) => {
-                e.target.parentElement.style.transform = 'scale(1)';
-            });
-        });
 
-        // Add entrance animation
-        window.addEventListener('load', () => {
-            document.querySelector('.login-container').style.opacity = '0';
-            document.querySelector('.login-container').style.transform = 'translateY(20px)';
-            
+            // Add entrance animation
             setTimeout(() => {
-                document.querySelector('.login-container').style.transition = 'all 0.6s ease';
-                document.querySelector('.login-container').style.opacity = '1';
-                document.querySelector('.login-container').style.transform = 'translateY(0)';
+                document.querySelector('.login-container').style.opacity = '0';
+                document.querySelector('.login-container').style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    document.querySelector('.login-container').style.transition = 'all 0.6s ease';
+                    document.querySelector('.login-container').style.opacity = '1';
+                    document.querySelector('.login-container').style.transform = 'translateY(0)';
+                }, 100);
             }, 100);
-        });
+        }
     </script>
 </body>
 </html>

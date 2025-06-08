@@ -11,12 +11,12 @@ urlpatterns = [
     path('payment/', views.payment, name='payment'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),  # ADD THIS LINE
+    path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('about/', views.about, name='about'),
     path('offering/', views.offering_view, name='offering'),
     
-    # KEEP ALL YOUR EXISTING API ENDPOINTS EXACTLY THE SAME
+    # API endpoints
     path('api/register/', views.api_register, name='api_register'),
     path('api/login/', views.api_login, name='api_login'),
     path('api/companies/', views.api_companies, name='api_companies'),

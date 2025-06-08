@@ -133,8 +133,42 @@
         }
 
         .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(78, 205, 196, 0.1);
             transform: translateY(-1px);
+        }
+
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .nav-cta {
@@ -824,7 +858,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
+            <a href="{% url 'flowlyne:index' %}" class="nav-brand">
                 <div class="nav-logo">
                     <img src="/static/images/logo.png" alt="Flowlyne Logo" />
                 </div>
@@ -834,13 +868,24 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/" class="active">Services</a>
-                <a href="/plans/">Plans</a>
-                <a href="/login/">Login</a>
-                <a href="/about/">About</a>
-                <a href="/register/">Register</a>
+                <a href="{% url 'flowlyne:index' %}">Home</a>
+                <a href="{% url 'flowlyne:services' %}" class="active">Services</a>
+                <a href="{% url 'flowlyne:plans' %}">Plans</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'flowlyne:dashboard' %}">Dashboard</a>
+                <a href="{% url 'flowlyne:offering' %}">My Services</a>
+                {% else %}
+                <a href="{% url 'flowlyne:login' %}">Login</a>
+                <a href="{% url 'flowlyne:register' %}" class="nav-cta">Register</a>
+                {% endif %}
+                <a href="{% url 'flowlyne:about' %}">About</a>
             </div>
+            {% if user.is_authenticated %}
+            <div class="user-menu" onclick="showUserMenu()">
+                <div class="user-avatar" id="user-avatar">{{ user.company_name|first|upper }}</div>
+                <span id="user-name">{{ user.company_name }}</span>
+            </div>
+            {% endif %}
         </div>
     </nav>
 
@@ -950,7 +995,9 @@
         async function loadCompanies() {            
             try {
                 console.log('Loading companies...');
-                const response = await fetch('/api/companies/');
+                const response = await fetch('/api/companies/', {
+                    credentials: 'include' // Include session cookies
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -981,7 +1028,6 @@
                         primary_department: 'Web Development',
                         rating: 4.8,
                         review_count: 15,
-                        services_count: 8,
                         departments: [
                             { name: 'Web Development', icon: '💻', is_primary: true }
                         ]
@@ -996,7 +1042,6 @@
                         primary_department: 'Graphic Design',
                         rating: 4.9,
                         review_count: 22,
-                        services_count: 12,
                         departments: [
                             { name: 'Graphic Design', icon: '🎨', is_primary: true }
                         ]
@@ -1011,39 +1056,8 @@
                         primary_department: 'Digital Marketing',
                         rating: 4.7,
                         review_count: 18,
-                        services_count: 6,
                         departments: [
                             { name: 'Digital Marketing', icon: '📈', is_primary: true }
-                        ]
-                    },
-                    {
-                        id: '4',
-                        company_name: 'Mobile App Developers',
-                        description: 'Specialized mobile application development company creating innovative iOS and Android apps.',
-                        city: 'Giza',
-                        country: 'Egypt',
-                        is_verified: false,
-                        primary_department: 'Mobile App Development',
-                        rating: 4.6,
-                        review_count: 11,
-                        services_count: 5,
-                        departments: [
-                            { name: 'Mobile App Development', icon: '📱', is_primary: true }
-                        ]
-                    },
-                    {
-                        id: '5',
-                        company_name: 'Business Consultants Pro',
-                        description: 'Strategic business consulting firm helping companies optimize operations and accelerate growth.',
-                        city: 'New Cairo',
-                        country: 'Egypt',
-                        is_verified: true,
-                        primary_department: 'Business Consulting',
-                        rating: 4.8,
-                        review_count: 25,
-                        services_count: 10,
-                        departments: [
-                            { name: 'Business Consulting', icon: '🎯', is_primary: true }
                         ]
                     }
                 ];
@@ -1152,7 +1166,7 @@
                                 <div class="stat-label">Reviews</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">${company.services_count || company.departments ? company.departments.length : '1'}</div>
+                                <div class="stat-value">${company.departments ? company.departments.length : '1'}</div>
                                 <div class="stat-label">Services</div>
                             </div>
                         </div>
@@ -1198,7 +1212,6 @@
             const container = document.getElementById('companies-container');
             
             if (!searchTerm) {
-                // Reset to show all companies with current filter
                 filteredCompanies = allCompanies.filter(company => {
                     if (!currentFilter) return true;
                     return company.primary_department === currentFilter ||
@@ -1218,8 +1231,9 @@
             `;
             
             try {
-                // Try API search first
-                const response = await fetch(`/api/companies/?search=${encodeURIComponent(searchTerm)}`);
+                const response = await fetch(`/api/companies/?search=${encodeURIComponent(searchTerm)}`, {
+                    credentials: 'include' // Include session cookies
+                });
                 
                 if (response.ok) {
                     const companies = await response.json();
@@ -1227,25 +1241,19 @@
                     displayCompanies(companies);
                     updateResultsCount(companies.length);
                 } else {
-                    throw new Error('Search API failed');
+                    throw new Error('Search failed');
                 }
                 
             } catch (error) {
                 console.error('Search error:', error);
                 
                 // Fallback to client-side search
-                const searchResults = allCompanies.filter(company => {
-                    const searchLower = searchTerm.toLowerCase();
-                    return (
-                        company.company_name.toLowerCase().includes(searchLower) ||
-                        company.description.toLowerCase().includes(searchLower) ||
-                        company.city.toLowerCase().includes(searchLower) ||
-                        (company.primary_department && company.primary_department.toLowerCase().includes(searchLower)) ||
-                        (company.departments && company.departments.some(dept => 
-                            dept.name.toLowerCase().includes(searchLower)
-                        ))
-                    );
-                });
+                const searchResults = allCompanies.filter(company => 
+                    company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    company.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    company.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (company.primary_department && company.primary_department.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
                 
                 filteredCompanies = searchResults;
                 displayCompanies(searchResults);
@@ -1301,21 +1309,25 @@
         }
 
         function contactCompany(companyId, companyName) {
-            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
-            
-            if (!currentUser) {
-                alert('Please login to contact companies');
-                window.location.href = '/login/';
-                return;
-            }
-            
+            {% if user.is_authenticated %}
             // In a real app, this would open a messaging interface
             alert(`🚀 Contact Feature\n\nIn a full application, this would:\n• Open a direct messaging interface\n• Allow you to send a professional inquiry to ${companyName}\n• Track your conversation history\n• Send email notifications\n\nFor now, this is a demo!`);
+            {% else %}
+            alert('Please login to contact companies');
+            window.location.href = '{% url "flowlyne:login" %}';
+            {% endif %}
         }
 
         function viewCompanyProfile(companyId) {
             // In a real app, this would show detailed company profile
             alert(`👁️ Company Profile\n\nIn a full application, this would show:\n• Complete company information\n• Portfolio of past projects\n• Client testimonials and reviews\n• Services offered in detail\n• Team members and expertise\n• Contact information\n\nFor now, this is a demo!`);
+        }
+
+        // User menu for authenticated users
+        function showUserMenu() {
+            if (confirm('Sign out of your account?')) {
+                window.location.href = '{% url "flowlyne:logout" %}';
+            }
         }
 
         // Add scroll effect to navbar
@@ -1325,7 +1337,7 @@
                 navbar.style.background = 'rgba(255, 255, 255, 0.95)';
                 navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
             } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.8)';
+                navbar.style.background = 'rgba(255, 255, 255, 0.9)';
                 navbar.style.boxShadow = 'none';
             }
         });

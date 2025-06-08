@@ -145,6 +145,35 @@
             color: white;
         }
 
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
         .nav-cta {
             background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
             color: white !important;
@@ -1046,7 +1075,7 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
+            <a href="{% url 'flowlyne:index' %}" class="nav-brand">
                 <div class="nav-logo">
                     <img src="/static/images/logo.png" alt="Flowlyne Logo" />
                 </div>
@@ -1056,13 +1085,24 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Services</a>
-                <a href="/plans/" class="active">Plans</a>
-                <a href="/login/">Login</a>
-                <a href="/about/">About</a>
-                <a href="/register/">Register</a>
+                <a href="{% url 'flowlyne:index' %}">Home</a>
+                <a href="{% url 'flowlyne:services' %}">Services</a>
+                <a href="{% url 'flowlyne:plans' %}" class="active">Plans</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'flowlyne:dashboard' %}">Dashboard</a>
+                <a href="{% url 'flowlyne:offering' %}">My Services</a>
+                {% else %}
+                <a href="{% url 'flowlyne:login' %}">Login</a>
+                <a href="{% url 'flowlyne:register' %}" class="nav-cta">Register</a>
+                {% endif %}
+                <a href="{% url 'flowlyne:about' %}">About</a>
             </div>
+            {% if user.is_authenticated %}
+            <div class="user-menu" onclick="showUserMenu()">
+                <div class="user-avatar" id="user-avatar">{{ user.company_name|first|upper }}</div>
+                <span id="user-name">{{ user.company_name }}</span>
+            </div>
+            {% endif %}
         </div>
     </nav>
 
@@ -1816,68 +1856,61 @@
 
         // Plan selection
         function selectPlan(planType) {
-            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company'));
-            
-            if (!currentUser) {
-                alert('Please login to select a subscription plan');
-                window.location.href = '/login/';
-                return;
-            }
+            {% if not user.is_authenticated %}
+            alert('Please login to select a subscription plan');
+            window.location.href = '{% url "flowlyne:login" %}';
+            return;
+            {% endif %}
             
             if (planType === 'basic') {
                 alert('🎉 You\'re already on the Basic plan!\n\nThis plan is free and automatically assigned to all accounts. Consider upgrading to unlock more features and grow your business faster.');
                 return;
             }
             
-            // Check current plan
-            const currentPlan = currentUser.current_plan || 'basic';
+            // Check current plan from Django user object
+            {% if user.is_authenticated %}
+            const currentPlan = '{{ user.current_plan|default:"basic" }}';
             if (currentPlan === planType) {
                 alert(`✅ You're already on the ${planType.charAt(0).toUpperCase() + planType.slice(1)} plan!\n\nYou have access to all the features included in this plan.`);
                 return;
             }
+            {% endif %}
             
             // Redirect to payment page with period
             window.location.href = `/payment/?plan=${planType}&period=${currentPeriod}`;
         }
 
-        // ✅ FIXED: Update plan buttons based on ACTUAL login status
+        // ✅ FIXED: Update plan buttons based on ACTUAL Django authentication
         function updatePlanButtons() {
             console.log('🔍 Checking login status...');
-            
-            // Check if user is actually logged in
-            const currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
-            const token = localStorage.getItem('flowlyne_token');
-            
-            console.log('Current user:', currentUser);
-            console.log('Has token:', !!token);
             
             // Reset ALL buttons to default state first
             resetAllButtons();
             
-            // Only update if user is ACTUALLY logged in (has both user data AND token)
-            if (currentUser && token && currentUser.current_plan) {
-                const currentPlan = currentUser.current_plan;
-                console.log('✅ User logged in with plan:', currentPlan);
-                
-                const buttons = document.querySelectorAll('.plan-button');
-                
-                buttons.forEach(button => {
-                    const onclickAttr = button.getAttribute('onclick');
-                    if (onclickAttr) {
-                        const match = onclickAttr.match(/'(\w+)'/);
-                        if (match) {
-                            const planType = match[1];
-                            if (planType === currentPlan) {
-                                button.textContent = 'Current Plan ✓';
-                                button.className = 'plan-button current-plan';
-                                console.log(`✅ Set ${planType} as current plan`);
-                            }
+            // Only update if user is ACTUALLY logged in via Django
+            {% if user.is_authenticated %}
+            const currentPlan = '{{ user.current_plan|default:"basic" }}';
+            console.log('✅ User logged in with plan:', currentPlan);
+            
+            const buttons = document.querySelectorAll('.plan-button');
+            
+            buttons.forEach(button => {
+                const onclickAttr = button.getAttribute('onclick');
+                if (onclickAttr) {
+                    const match = onclickAttr.match(/'(\w+)'/);
+                    if (match) {
+                        const planType = match[1];
+                        if (planType === currentPlan) {
+                            button.textContent = 'Current Plan ✓';
+                            button.className = 'plan-button current-plan';
+                            console.log(`✅ Set ${planType} as current plan`);
                         }
                     }
-                });
-            } else {
-                console.log('❌ User not logged in - no current plan shown');
-            }
+                }
+            });
+            {% else %}
+            console.log('❌ User not logged in - no current plan shown');
+            {% endif %}
         }
 
         // ✅ NEW: Reset all buttons to default state
@@ -1907,12 +1940,11 @@
             });
         }
 
-        // ✅ NEW: Clear localStorage function for testing
-        function clearUserData() {
-            localStorage.removeItem('flowlyne_current_company');
-            localStorage.removeItem('flowlyne_token');
-            console.log('🧹 Cleared user data');
-            updatePlanButtons();
+        // User menu for authenticated users
+        function showUserMenu() {
+            if (confirm('Sign out of your account?')) {
+                window.location.href = '{% url "flowlyne:logout" %}';
+            }
         }
 
         // FAQ Toggle functionality
@@ -1982,15 +2014,6 @@
                 });
             });
         });
-
-        // ✅ NEW: Debug function - call this in browser console to test
-        function debugLoginStatus() {
-            console.log('=== LOGIN STATUS DEBUG ===');
-            console.log('localStorage flowlyne_current_company:', localStorage.getItem('flowlyne_current_company'));
-            console.log('localStorage flowlyne_token:', localStorage.getItem('flowlyne_token'));
-            console.log('Parsed user:', JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null'));
-            updatePlanButtons();
-        }
     </script>
 </body>
 </html>

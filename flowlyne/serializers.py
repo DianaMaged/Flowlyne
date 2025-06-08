@@ -15,19 +15,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ServiceSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.company_name', read_only=True)
-    categories = CategorySerializer(many=True, read_only=True)
+    category_name = serializers.CharField(source='category', read_only=True)  # Simple string field
     
     class Meta:
         model = Service
         fields = [
-            'service_id', 'service_name', 'service_description',
-            'company_name', 'categories'
+            'service_id', 'service_name', 'service_description', 'price', 
+            'category', 'category_name', 'duration', 'company_name', 'created_at'
         ]
 
 class ServiceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ['service_name', 'service_description']
+        fields = ['service_name', 'service_description', 'price', 'category', 'duration', 'company']
     
     def validate_service_name(self, value):
         if not value.strip():
@@ -57,18 +57,16 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         
-        # Get or create default admin
-        admin, created = Admin.objects.get_or_create(
-            email='admin@flowlyne.com',
-            defaults={'password': 'admin123'}
-        )
-        
-        # Create company
+        # Create company using the manager method
         company = Company.objects.create_user(
+            email=validated_data['email'],
             password=password,
-            current_plan='basic',
-            admin=admin,
-            **validated_data
+            company_name=validated_data['company_name'],
+            description=validated_data.get('description', ''),
+            company_address=validated_data.get('company_address', ''),
+            phone_number=validated_data.get('phone_number', ''),
+            city=validated_data.get('city', 'Cairo'),
+            country=validated_data.get('country', 'Egypt')
         )
         
         return company
@@ -82,12 +80,17 @@ class CompanyLoginSerializer(serializers.Serializer):
         password = attrs.get('password')
         
         if email and password:
-            company = authenticate(username=email, password=password)
-            if not company:
+            try:
+                company = Company.objects.get(email__iexact=email)
+                # Use username for authentication
+                user = authenticate(username=company.username, password=password)
+                if not user:
+                    raise serializers.ValidationError('Invalid credentials')
+                if not user.is_active:
+                    raise serializers.ValidationError('Account is disabled')
+                attrs['company'] = user
+            except Company.DoesNotExist:
                 raise serializers.ValidationError('Invalid credentials')
-            if not company.is_active:
-                raise serializers.ValidationError('Account is disabled')
-            attrs['company'] = company
         else:
             raise serializers.ValidationError('Email and password required')
         
@@ -110,10 +113,12 @@ class CompanyListSerializer(serializers.ModelSerializer):
         return obj.services.count()
     
     def get_reviews_count(self, obj):
-        return obj.received_reviews.count()
+        # Use the correct relationship name from your models
+        return Review.objects.filter(service__company=obj).count()
     
     def get_rating(self, obj):
-        reviews = obj.received_reviews.all()
+        # Get reviews through services
+        reviews = Review.objects.filter(service__company=obj)
         if reviews.exists():
             return round(reviews.aggregate(avg=Avg('rating'))['avg'], 1)
         return 4.5  # Default rating for demo
@@ -129,7 +134,8 @@ class CompanyDetailSerializer(CompanyListSerializer):
         ]
     
     def get_recent_reviews(self, obj):
-        recent_reviews = obj.received_reviews.filter(is_verified=True)[:3]
+        # Get reviews through services
+        recent_reviews = Review.objects.filter(service__company=obj)[:3]
         return ReviewSerializer(recent_reviews, many=True).data
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -145,45 +151,27 @@ class ReviewSerializer(serializers.ModelSerializer):
         ]
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
-    features_list = serializers.SerializerMethodField()
     
     class Meta:
         model = SubscriptionPlan
         fields = [
             'plan_id', 'plan_name', 'price_egp', 'search_ranking',
-            'plan_duration', 'portfolio_view', 'portfolio_upload_per_month',
-            'comments_view', 'commission_discount', 'business_insights',
-            'support_level', 'featured_on_homepage', 'priority_support',
-            'advanced_analytics', 'features_list'
+            'plan_duration', 'support_level', 'created_at'
         ]
     
-    def get_features_list(self, obj):
-        features = []
-        if obj.search_ranking:
-            features.append(f"🔍 {obj.search_ranking}")
-        if obj.portfolio_view:
-            features.append(f"📁 {obj.portfolio_view}")
-        if obj.portfolio_upload_per_month:
-            features.append(f"📤 {obj.portfolio_upload_per_month}")
-        if obj.commission_discount:
-            features.append(f"💰 {obj.commission_discount}")
-        if obj.business_insights:
-            features.append(f"📊 {obj.business_insights}")
-        if obj.support_level:
-            features.append(f"🎧 {obj.support_level}")
-        if obj.featured_on_homepage:
-            features.append("⭐ Featured on homepage")
-        return features
+    @property 
+    def price(self):
+        return self.price_egp
 
 class PaymentSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.company_name', read_only=True)
+    plan_name = serializers.CharField(source='plan.plan_name', read_only=True)
     
     class Meta:
         model = Payment
         fields = [
-            'payment_id', 'start_date', 'end_date', 'is_active',
-            'last_payment_date', 'next_payment_date', 'payment_method',
-            'created_at', 'updated_at', 'company_name'
+            'payment_id', 'amount', 'payment_method', 'status', 'transaction_id',
+            'created_at', 'company_name', 'plan_name'
         ]
 
 class CompanySubscriptionSerializer(serializers.ModelSerializer):
@@ -193,15 +181,16 @@ class CompanySubscriptionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CompanySubscription
-        fields = ['company_name', 'plan_name', 'plan_price']
+        fields = ['company_name', 'plan_name', 'plan_price', 'is_active', 'start_date', 'end_date']
 
 class AdvertisingSerializer(serializers.ModelSerializer):
-    admin_email = serializers.CharField(source='admin.email', read_only=True)
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
     
     class Meta:
         model = Advertising
         fields = [
-            'adv_id', 'image', 'price', 'start_date', 'end_date', 'admin_email'
+            'adv_id', 'title', 'description', 'image', 'target_audience', 
+            'budget', 'start_date', 'end_date', 'company_name', 'created_at'
         ]
 
 class StatsSerializer(serializers.Serializer):

@@ -154,6 +154,35 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
+        
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu:hover {
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
 
         /* Hero Section - Apple Style */
         .hero {
@@ -838,13 +867,8 @@
                     <div class="nav-tagline">Smooth and Fine</div>
                 </div>
             </a>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/services/">Services</a>
-                <a href="/plans/">Plans</a>
-                <a href="/login/">Login</a>
-                <a href="/about/">About</a>
-                <a href="/register/" class="nav-cta">Get Started</a>
+            <div class="nav-links" id="nav-links">
+                <!-- Navigation will be populated by JavaScript -->
             </div>
         </div>
     </nav>
@@ -1032,10 +1056,112 @@
     </footer>
 
     <script>
+        // Global user state
+        let currentUser = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNavigation();
+            initializeSlider();
+            setupAnimations();
+        });
+
+        // Initialize navigation and user state
+        function initializeNavigation() {
+            checkUserAuthentication();
+            setupNavigation();
+        }
+
+        // Check user authentication status
+        function checkUserAuthentication() {
+            const token = localStorage.getItem('flowlyne_token');
+            const userData = localStorage.getItem('flowlyne_current_company');
+            
+            if (token && userData) {
+                try {
+                    currentUser = JSON.parse(userData);
+                    console.log('User authenticated:', currentUser.company_name);
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    clearUserData();
+                }
+            } else {
+                currentUser = null;
+                console.log('User not authenticated');
+            }
+        }
+
+        // Setup navigation based on user status
+        function setupNavigation() {
+            const navLinks = document.getElementById('nav-links');
+            
+            if (currentUser) {
+                // User is logged in - show authenticated navigation
+                navLinks.innerHTML = `
+                    <a href="/" class="active">Home</a>
+                    <a href="/services/">Services</a>
+                    <a href="/plans/">Plans</a>
+                    <a href="/offering/">My Services</a>
+                    <a href="/dashboard/">Dashboard</a>
+                    <div class="user-menu" onclick="showUserMenu()">
+                        <div class="user-avatar">${currentUser.company_name.charAt(0).toUpperCase()}</div>
+                        <span>${currentUser.company_name}</span>
+                    </div>
+                    <a href="/about/">About</a>
+                `;
+            } else {
+                // User is not logged in - show guest navigation
+                navLinks.innerHTML = `
+                    <a href="/" class="active">Home</a>
+                    <a href="/services/">Services</a>
+                    <a href="/plans/">Plans</a>
+                    <a href="/login/">Login</a>
+                    <a href="/register/" class="nav-cta">Register</a>
+                    <a href="/about/">About</a>
+                `;
+            }
+        }
+
+        // Show user menu for logout
+        function showUserMenu() {
+            if (confirm(`Sign out of ${currentUser.company_name}?\n\nYou will be redirected to the home page.`)) {
+                performLogout();
+            }
+        }
+
+        // Perform logout
+        function performLogout() {
+            // Clear user data from localStorage
+            clearUserData();
+            
+            // Show success message
+            alert('✅ Logged out successfully!\n\nThank you for using Flowlyne.');
+            
+            // Refresh page to update navigation
+            window.location.reload();
+        }
+
+        // Clear user data
+        function clearUserData() {
+            localStorage.removeItem('flowlyne_token');
+            localStorage.removeItem('flowlyne_current_company');
+            currentUser = null;
+        }
+
         // Slider functionality
         let currentSlideIndex = 0;
         const totalSlides = 5;
         let autoSlideInterval;
+
+        function initializeSlider() {
+            updateSlider();
+            startAutoSlide();
+            
+            // Pause auto slide on hover
+            const slider = document.querySelector('.image-slider');
+            slider.addEventListener('mouseenter', stopAutoSlide);
+            slider.addEventListener('mouseleave', startAutoSlide);
+        }
 
         function updateSlider() {
             const track = document.getElementById('slider-track');
@@ -1073,36 +1199,28 @@
             clearInterval(autoSlideInterval);
         }
 
-        // Initialize slider
-        document.addEventListener('DOMContentLoaded', function() {
-            updateSlider();
-            startAutoSlide();
-            
-            // Pause auto slide on hover
-            const slider = document.querySelector('.image-slider');
-            slider.addEventListener('mouseenter', stopAutoSlide);
-            slider.addEventListener('mouseleave', startAutoSlide);
-        });
+        // Setup animations
+        function setupAnimations() {
+            // Smooth scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
 
-        // Smooth scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationDelay = `${Math.random() * 0.3}s`;
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationDelay = `${Math.random() * 0.3}s`;
-                    entry.target.classList.add('fade-in');
-                }
+            // Observe all elements that should fade in
+            document.querySelectorAll('.feature-card, .section-header, .cta-content, .slider-header, .image-slider').forEach(el => {
+                observer.observe(el);
             });
-        }, observerOptions);
-
-        // Observe all elements that should fade in
-        document.querySelectorAll('.feature-card, .section-header, .cta-content, .slider-header, .image-slider').forEach(el => {
-            observer.observe(el);
-        });
+        }
 
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
