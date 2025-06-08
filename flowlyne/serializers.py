@@ -54,103 +54,105 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email already registered")
         return value
     
-    def validate_company_name(self, value):
-        if not value.strip():
-            raise serializers.ValidationError("Company name cannot be empty")
-        return value.strip()
-    
     def create(self, validated_data):
         password = validated_data.pop('password')
+        
+        # Create company using the manager method
         company = Company.objects.create_user(
+            email=validated_data['email'],
             password=password,
-            **validated_data
+            company_name=validated_data['company_name'],
+            description=validated_data.get('description', ''),
+            company_address=validated_data.get('company_address', ''),
+            phone_number=validated_data.get('phone_number', ''),
+            city=validated_data.get('city', 'Cairo'),
+            country=validated_data.get('country', 'Egypt')
         )
+        
         return company
-
-class CompanyProfileUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for updating company profile"""
-    
-    class Meta:
-        model = Company
-        fields = [
-            'company_name', 'description', 'company_address', 
-            'phone_number', 'city', 'country'
-        ]
-    
-    def validate_company_name(self, value):
-        if not value.strip():
-            raise serializers.ValidationError("Company name cannot be empty")
-        return value.strip()
-    
-    def validate_description(self, value):
-        if value and len(value.strip()) < 10:
-            raise serializers.ValidationError("Description must be at least 10 characters long")
-        return value.strip() if value else ""
-    
-    def validate_phone_number(self, value):
-        if value and not value.replace('+', '').replace('-', '').replace(' ', '').isdigit():
-            raise serializers.ValidationError("Please enter a valid phone number")
-        return value.strip() if value else ""
-    
-    def update(self, instance, validated_data):
-        """Update company profile fields"""
-        for field, value in validated_data.items():
-            setattr(instance, field, value)
-        instance.save()
-        return instance
 
 class CompanyLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
         
         if email and password:
-            # Use email to find the company, then authenticate with username
             try:
-                company = Company.objects.get(email=email)
+                company = Company.objects.get(email__iexact=email)
+                # Use username for authentication
                 user = authenticate(username=company.username, password=password)
-                if user:
-                    if not user.is_active:
-                        raise serializers.ValidationError('Account is disabled')
-                    data['user'] = user
-                else:
+                if not user:
                     raise serializers.ValidationError('Invalid credentials')
+                if not user.is_active:
+                    raise serializers.ValidationError('Account is disabled')
+                attrs['company'] = user
             except Company.DoesNotExist:
                 raise serializers.ValidationError('Invalid credentials')
         else:
-            raise serializers.ValidationError('Email and password are required')
+            raise serializers.ValidationError('Email and password required')
         
-        return data
+        return attrs
+
+# Fixed ReviewSerializer to match actual database schema
+class ReviewSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.service_name', read_only=True)
+    company_name = serializers.CharField(source='service.company.company_name', read_only=True)
+    
+    class Meta:
+        model = Review
+        fields = [
+            'review_id', 'rating', 'title', 'content', 'project_type',
+            'project_duration', 'would_recommend', 'is_verified',
+            'created_at', 'service_name', 'company_name'
+        ]
 
 class CompanyListSerializer(serializers.ModelSerializer):
     services_count = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
+    primary_department = serializers.SerializerMethodField()
+    departments = serializers.SerializerMethodField()
     
     class Meta:
         model = Company
         fields = [
             'company_id', 'company_name', 'description', 'city', 'country',
-            'is_verified', 'logo', 'services_count', 'reviews_count', 'rating',
-            'created_at'
+            'is_verified', 'services_count', 'reviews_count', 'rating',
+            'primary_department', 'departments', 'created_at'
         ]
     
     def get_services_count(self, obj):
         return obj.services.count()
     
     def get_reviews_count(self, obj):
-        # Use the correct relationship name from your models
+        # Get reviews through services - using correct field names
         return Review.objects.filter(service__company=obj).count()
     
     def get_rating(self, obj):
-        # Get reviews through services
+        # Get reviews through services - using correct field names
         reviews = Review.objects.filter(service__company=obj)
         if reviews.exists():
             return round(reviews.aggregate(avg=Avg('rating'))['avg'], 1)
         return 4.5  # Default rating for demo
+    
+    def get_primary_department(self, obj):
+        # Get the most common service category as primary department
+        services = obj.services.all()
+        if services.exists():
+            # Get the first service's category as primary
+            return services.first().category
+        return None
+    
+    def get_departments(self, obj):
+        # Get all unique service categories for this company
+        services = obj.services.all()
+        if services.exists():
+            categories = list(set([service.category for service in services if service.category]))
+            return [{'name': cat, 'is_primary': i == 0} for i, cat in enumerate(categories)]
+        return []
 
 class CompanyDetailSerializer(CompanyListSerializer):
     services = ServiceSerializer(many=True, read_only=True)
@@ -159,25 +161,17 @@ class CompanyDetailSerializer(CompanyListSerializer):
     class Meta(CompanyListSerializer.Meta):
         fields = CompanyListSerializer.Meta.fields + [
             'email', 'company_address', 'phone_number', 
-            'certification', 'services', 'recent_reviews'
+            'services', 'recent_reviews'
         ]
     
     def get_recent_reviews(self, obj):
-        # Get reviews through services
-        recent_reviews = Review.objects.filter(service__company=obj)[:3]
-        return ReviewSerializer(recent_reviews, many=True).data
-
-class ReviewSerializer(serializers.ModelSerializer):
-    company_name = serializers.CharField(source='company.company_name', read_only=True)
-    service_name = serializers.CharField(source='service.service_name', read_only=True)
-    
-    class Meta:
-        model = Review
-        fields = [
-            'review_id', 'rating', 'title', 'content', 'project_type',
-            'project_duration', 'would_recommend', 'is_verified',
-            'created_at', 'company_name', 'service_name'
-        ]
+        # Get recent reviews through services - limit to 3 most recent
+        try:
+            recent_reviews = Review.objects.filter(service__company=obj).order_by('-created_at')[:3]
+            return ReviewSerializer(recent_reviews, many=True).data
+        except Exception as e:
+            # Return empty list if there's any error
+            return []
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
     

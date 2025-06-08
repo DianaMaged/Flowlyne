@@ -55,7 +55,6 @@ class CompanyAdmin(UserAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    # Removed 'is_active' from list_display and list_filter
     list_display = ['service_id', 'service_name', 'company', 'price', 'category', 'created_at']
     list_filter = ['category', 'created_at', 'company']
     search_fields = ['service_name', 'service_description', 'company__company_name']
@@ -77,7 +76,6 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    # Removed 'is_active' from list_display and list_filter
     list_display = ['category_id', 'category_name', 'service', 'created_at']
     list_filter = ['created_at', 'service']
     search_fields = ['category_name', 'category_description']
@@ -99,21 +97,25 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['review_id', 'service', 'reviewer_name', 'rating', 'created_at']
-    list_filter = ['rating', 'created_at']
-    search_fields = ['reviewer_name', 'reviewer_email', 'review_text', 'service__service_name']
+    # Fixed to use actual database field names
+    list_display = ['review_id', 'service', 'title', 'rating', 'is_verified', 'created_at']
+    list_filter = ['rating', 'is_verified', 'would_recommend', 'created_at']
+    search_fields = ['title', 'content', 'service__service_name', 'service__company__company_name']
     ordering = ['-created_at']
-    readonly_fields = ['review_id', 'created_at']
+    readonly_fields = ['review_id', 'created_at', 'updated_at']
     
     fieldsets = (
         ('Review Information', {
-            'fields': ('reviewer_name', 'reviewer_email', 'rating', 'review_text')
+            'fields': ('title', 'content', 'rating', 'project_type', 'project_duration')
+        }),
+        ('Status', {
+            'fields': ('would_recommend', 'is_verified')
         }),
         ('Relations', {
             'fields': ('service',)
         }),
         ('Timestamps', {
-            'fields': ('review_id', 'created_at'),
+            'fields': ('review_id', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
@@ -141,7 +143,6 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
-    # Removed 'is_active' from list_display and list_filter
     list_display = ['plan_id', 'plan_name', 'price_egp', 'created_at']
     list_filter = ['created_at']
     search_fields = ['plan_name', 'search_ranking', 'support_level']
@@ -184,7 +185,6 @@ class CompanySubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Advertising)
 class AdvertisingAdmin(admin.ModelAdmin):
-    # Removed 'is_active' from list_display and list_filter
     list_display = ['adv_id', 'company', 'title', 'budget', 'start_date', 'end_date']
     list_filter = ['start_date', 'end_date']
     search_fields = ['title', 'description', 'company__company_name']

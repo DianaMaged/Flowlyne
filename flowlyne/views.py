@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Avg, Count
+from django.utils import timezone  # <-- Add this import
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -14,9 +16,9 @@ from django.contrib.auth.hashers import check_password
 from .serializers import (
     ServiceSerializer, ServiceCreateSerializer, CompanyRegistrationSerializer,
     CompanyLoginSerializer, CompanyListSerializer, CompanyDetailSerializer,
-    CompanyProfileUpdateSerializer, ReviewSerializer, SubscriptionPlanSerializer, 
-    PaymentSerializer, CompanySubscriptionSerializer, AdvertisingSerializer, 
-    StatsSerializer, CategorySerializer
+    ReviewSerializer, SubscriptionPlanSerializer, PaymentSerializer,
+    CompanySubscriptionSerializer, AdvertisingSerializer, StatsSerializer,
+    CategorySerializer
 )
 import json
 import logging
@@ -24,6 +26,7 @@ import logging
 from .models import Company, Service, Category, Admin, SubscriptionPlan, Review, Payment
 
 logger = logging.getLogger(__name__)
+
 
 # ================================
 # FRONTEND VIEWS - SIMPLE AUTHENTICATION
@@ -34,305 +37,311 @@ def index(request):
     logger.info(f"Index page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'index.html')
 
+
 def services(request):
     """Services page"""
     logger.info(f"Services page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'services.html')
 
-def plans(request):
-    """Plans page"""
-    logger.info(f"Plans page accessed. User authenticated: {request.user.is_authenticated}")
-    return render(request, 'plans.html')
-
-def payment(request):
-    """Payment page"""
-    logger.info(f"Payment page accessed. User authenticated: {request.user.is_authenticated}")
-    return render(request, 'payment.html')
-
-def offering_view(request):
-    """Offering management page - authentication handled on frontend"""
-    logger.info(f"Offering page accessed. User authenticated: {request.user.is_authenticated}")
-    return render(request, 'offering.html')
 
 def register_view(request):
-    """Handle company registration"""
-    if request.method == 'POST':
-        try:
-            # Get form data
-            data = {
-                'company_name': request.POST.get('company_name'),
-                'email': request.POST.get('email'),
-                'password': request.POST.get('password'),
-                'description': request.POST.get('description'),
-                'company_address': request.POST.get('company_address'),
-                'phone_number': request.POST.get('phone_number'),
-                'city': request.POST.get('city', 'Cairo'),
-                'country': request.POST.get('country', 'Egypt')
-            }
-            
-            # Validate required fields
-            if not all([data['company_name'], data['email'], data['password']]):
-                return render(request, 'register.html', {
-                    'error': 'Please fill in all required fields.',
-                    'form_data': request.POST
-                })
-            
-            # Use serializer for validation and creation
-            serializer = CompanyRegistrationSerializer(data=data)
-            if serializer.is_valid():
-                company = serializer.save()
-                logger.info(f"Company registered successfully: {company.company_name}")
-                
-                # Login the user immediately after registration
-                user = authenticate(username=company.username, password=data['password'])
-                if user:
-                    login(request, user)
-                    logger.info(f"User logged in after registration: {user.company_name}")
-                    return redirect('flowlyne:dashboard')
-                
-                return redirect('flowlyne:login')
-            else:
-                errors = serializer.errors
-                error_message = next(iter(errors.values()))[0] if errors else 'Registration failed.'
-                return render(request, 'register.html', {
-                    'error': error_message,
-                    'form_data': request.POST
-                })
-                
-        except Exception as e:
-            logger.error(f"Registration error: {str(e)}")
-            return render(request, 'register.html', {
-                'error': 'An error occurred during registration. Please try again.',
-                'form_data': request.POST
-            })
-    
-    # GET request - show the form
+    """Register page"""
+    logger.info(f"Register page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'register.html')
 
+
 def login_view(request):
-    """Handle company login"""
-    if request.method == 'POST':
-        try:
-            email = request.POST.get('email')
-            password = request.POST.get('password')
-            
-            logger.info(f"Login attempt for email: {email}")
-            
-            if not email or not password:
-                return render(request, 'login.html', {
-                    'error': 'Please provide both email and password.',
-                    'form_data': request.POST
-                })
-            
-            # Use serializer for validation
-            serializer = CompanyLoginSerializer(data={'email': email, 'password': password})
-            if serializer.is_valid():
-                user = serializer.validated_data['user']
-                login(request, user)
-                logger.info(f"User logged in successfully: {user.company_name}")
-                return redirect('flowlyne:dashboard')
-            else:
-                errors = serializer.errors
-                error_message = next(iter(errors.values()))[0] if errors else 'Invalid credentials.'
-                return render(request, 'login.html', {
-                    'error': error_message,
-                    'form_data': request.POST
-                })
-                
-        except Exception as e:
-            logger.error(f"Login error: {str(e)}")
-            return render(request, 'login.html', {
-                'error': 'An error occurred during login. Please try again.',
-                'form_data': request.POST
-            })
-            
-    # GET request - show the form
+    """Login page"""
+    if request.user.is_authenticated:
+        return redirect('flowlyne:dashboard')
+
+    logger.info(f"Login page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'login.html')
 
 def logout_view(request):
-    """Handle logout"""
+    """Logout and redirect to home"""
     if request.user.is_authenticated:
-        logger.info(f"Logging out user: {request.user.company_name}")
-    logout(request)
-    logger.info("User logged out successfully")
+        logger.info(f"User logout: {request.user.company_name}")
+        logout(request)
     return redirect('flowlyne:index')
 
+
+@login_required
 def dashboard(request):
-    """Dashboard - authentication handled on frontend"""
-    logger.info(f"Dashboard accessed. User authenticated: {request.user.is_authenticated}")
+    """Dashboard page - requires authentication"""
+    logger.info(f"Dashboard accessed by: {request.user.company_name}")
     return render(request, 'dashboard.html')
+
 
 def about(request):
     """About page"""
     logger.info(f"About page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'about.html')
 
+
 def plans(request):
     """Plans page"""
     logger.info(f"Plans page accessed. User authenticated: {request.user.is_authenticated}")
     return render(request, 'plans.html')
 
+
+@login_required
+def payment(request):
+    """Payment page - requires authentication"""
+    logger.info(f"Payment page accessed by: {request.user.company_name}")
+    return render(request, 'payment.html')
+
+
+@login_required
+def offering_view(request):
+    """Offering services page - requires authentication"""
+    logger.info(f"Offering page accessed by: {request.user.company_name}")
+    return render(request, 'offering.html')
+
+
+def company_profile(request, company_id):
+    """Company profile page"""
+    logger.info(f"Company profile page accessed for company ID: {company_id}")
+    return render(request, 'company_profile.html', {'company_id': company_id})
+
+
 # ================================
-# API ENDPOINTS - FOR FRONTEND AJAX CALLS
+# API VIEWS 
 # ================================
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def api_register(request):
-    """API endpoint for company registration"""
-    try:
-        serializer = CompanyRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            company = serializer.save()
-            return Response({
-                'success': True,
-                'message': 'Company registered successfully',
-                'company': {
-                    'company_id': company.company_id,
-                    'company_name': company.company_name,
-                    'email': company.email
-                }
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response({
-                'success': False,
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"API Registration error: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Internal server error'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@csrf_exempt
 def api_login(request):
-    """API endpoint for company login"""
+    """API Login endpoint - for JavaScript/AJAX requests"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+
     try:
-        serializer = CompanyLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            token, created = Token.objects.get_or_create(user=user)
-            
-            return Response({
-                'success': True,
-                'token': token.key,
-                'company': {
-                    'company_id': user.company_id,
-                    'company_name': user.company_name,
-                    'email': user.email,
-                    'city': user.city,
-                    'country': user.country,
-                    'description': user.description,
-                    'phone_number': user.phone_number,
-                    'website': '',  # Add if you have this field
-                    'is_verified': user.is_verified,
-                    'current_plan': user.current_plan,
-                    'created_at': user.created_at.isoformat()
-                }
-            })
+        # Parse request data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
         else:
-            return Response({
-                'success': False,
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+            data = request.POST
+
+        email = data.get('email', '').strip()
+        password = data.get('password', '')
+
+        logger.info(f"API Login attempt for email: {email}")
+
+        if not email or not password:
+            return JsonResponse({'error': 'Email and password are required'}, status=400)
+
+        try:
+            # Find company by email to get username
+            company = Company.objects.get(email__iexact=email)
+            logger.info(f"Found company: {company.company_name}, username: {company.username}")
+
+            # Check if account is active
+            if not company.is_active:
+                logger.warning(f"Inactive account login attempt: {email}")
+                return JsonResponse({'error': 'Account is disabled'}, status=400)
+
+            # Authenticate using username
+            user = authenticate(request, username=company.username, password=password)
+
+            if user is not None:
+                # Log them into Django session
+                login(request, user)
+                logger.info(f"API Login session created for: {user.company_name}")
+
+                # Get or create auth token for API usage
+                token, created = Token.objects.get_or_create(user=company)
+
+                # Prepare company data for response
+                company_data = {
+                    'id': company.company_id,
+                    'company_name': company.company_name,
+                    'email': company.email,
+                    'description': company.description or '',
+                    'company_address': company.company_address or '',
+                    'phone_number': company.phone_number or '',
+                    'city': company.city,
+                    'country': company.country,
+                    'is_verified': company.is_verified,
+                    'current_plan': company.current_plan,
+                    'created_at': company.created_at.isoformat()
+                }
+
+                logger.info(f"API Login successful for: {company.company_name}")
+
+                return JsonResponse({
+                    'message': 'Login successful',
+                    'company': company_data,
+                    'token': token.key
+                })
+            else:
+                logger.warning(f"Invalid password for: {email}")
+                return JsonResponse({'error': 'Invalid email or password'}, status=400)
+
+        except Company.DoesNotExist:
+            logger.warning(f"API Login attempt for non-existent email: {email}")
+            return JsonResponse({'error': 'Invalid email or password'}, status=400)
+
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in request body")
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         logger.error(f"API Login error: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Internal server error'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def api_company_profile(request):
-    """API endpoint to get current company profile"""
-    try:
-        company = request.user
-        serializer = CompanyDetailSerializer(company)
-        return Response({
-            'success': True,
-            'company': serializer.data
-        })
-    except Exception as e:
-        logger.error(f"Error fetching company profile: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Error fetching profile'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(['PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
-def api_update_company_profile(request):
-    """API endpoint to update company profile"""
+@csrf_exempt
+def api_register(request):
+    """Register a new company"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+
     try:
-        company = request.user
-        serializer = CompanyProfileUpdateSerializer(company, data=request.data, partial=True)
-        
-        if serializer.is_valid():
-            updated_company = serializer.save()
-            logger.info(f"Company profile updated: {updated_company.company_name}")
-            
-            # Return updated profile data
-            return Response({
-                'success': True,
-                'message': 'Profile updated successfully',
-                'company': {
-                    'company_id': updated_company.company_id,
-                    'company_name': updated_company.company_name,
-                    'email': updated_company.email,
-                    'description': updated_company.description,
-                    'company_address': updated_company.company_address,
-                    'phone_number': updated_company.phone_number,
-                    'city': updated_company.city,
-                    'country': updated_company.country,
-                    'is_verified': updated_company.is_verified,
-                    'current_plan': updated_company.current_plan,
-                    'created_at': updated_company.created_at.isoformat(),
-                    'updated_at': updated_company.updated_at.isoformat()
-                }
-            })
+        # Parse request data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
         else:
-            return Response({
-                'success': False,
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-            
+            data = request.POST
+
+        company_name = data.get('company_name', '').strip()
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+        description = data.get('description', '').strip()
+
+        logger.info(f"API Registration attempt for: {company_name} ({email})")
+
+        # Validation
+        if not all([company_name, email, password]):
+            return JsonResponse({'error': 'Company name, email and password are required'}, status=400)
+
+        # Check if email already exists
+        if Company.objects.filter(email__iexact=email).exists():
+            logger.warning(f"API Registration attempt with existing email: {email}")
+            return JsonResponse({'error': 'A company with this email already exists'}, status=400)
+
+        # Create the company
+        company = Company.objects.create_user(
+            email=email,
+            password=password,
+            company_name=company_name,
+            description=description,
+            city='Cairo',  # Default for now
+            country='Egypt'  # Default for now
+        )
+
+        # Log them into Django session using username
+        user = authenticate(request, username=company.username, password=password)
+        if user is not None:
+            login(request, user)
+            logger.info(f"API Registration session created for: {user.company_name}")
+
+        # Create auth token
+        token, created = Token.objects.get_or_create(user=company)
+
+        # Prepare response data
+        company_data = {
+            'id': company.company_id,
+            'company_name': company.company_name,
+            'email': company.email,
+            'description': company.description or '',
+            'company_address': company.company_address or '',
+            'phone_number': company.phone_number or '',
+            'city': company.city,
+            'country': company.country,
+            'is_verified': company.is_verified,
+            'current_plan': company.current_plan,
+            'created_at': company.created_at.isoformat()
+        }
+
+        logger.info(f"API Registration successful for: {company.company_name}")
+
+        return JsonResponse({
+            'message': 'Registration successful',
+            'company': company_data,
+            'token': token.key
+        }, status=201)
+
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON in request body")
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
-        logger.error(f"Error updating company profile: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Error updating profile'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(f"API Registration error: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
-# ===== EXISTING API ENDPOINTS =====
 
-# API view to get all companies (for services page)
+# ================================
+# API VIEWS - UPDATED TO REMOVE is_active FILTERS AND ADD SEARCH
+# ================================
+
+# API view to get all companies (for services page) with search and category filtering
 def api_companies(request):
     try:
-        # Remove is_active filter since the field doesn't exist
-        companies = Company.objects.filter(is_active=True)  # Keep this one - it exists in Company
+        # Get search and filter parameters
+        search_query = request.GET.get('search', '').strip()
+        category_filter = request.GET.get('category', '').strip()
+
+        # Start with active companies
+        companies = Company.objects.filter(is_active=True)
+
+        # Apply category filter if provided
+        if category_filter:
+            companies = companies.filter(services__category__icontains=category_filter).distinct()
+            logger.info(f"Category filter applied: {category_filter}, found {companies.count()} companies")
+
+        # Apply search filter if provided
+        if search_query:
+            companies = companies.filter(
+                Q(company_name__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(city__icontains=search_query) |
+                Q(country__icontains=search_query) |
+                Q(services__category__icontains=search_query) |
+                Q(services__service_name__icontains=search_query)
+            ).distinct()
+            logger.info(f"Search performed for: {search_query}, found {companies.count()} companies")
+
+        # Order by verification status and creation date
+        companies = companies.order_by('-is_verified', '-created_at')
+
         serializer = CompanyListSerializer(companies, many=True)
         return JsonResponse({'companies': serializer.data})
+
     except Exception as e:
         logger.error(f"Error fetching companies: {str(e)}")
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
+
 # API view to get company details
 def api_company_detail(request, company_id):
     try:
-        company = get_object_or_404(Company, company_id=company_id, is_active=True)
+        # First check if company exists
+        if not Company.objects.filter(company_id=company_id).exists():
+            logger.warning(f"Company with ID {company_id} does not exist")
+            return JsonResponse({'error': 'Company not found'}, status=404)
+
+        # Get the company (removed is_active filter to be safe)
+        company = get_object_or_404(Company, company_id=company_id)
+
+        # Check if company is active
+        if not company.is_active:
+            logger.warning(f"Inactive company requested: {company.company_name} (ID: {company_id})")
+            return JsonResponse({'error': 'Company not found'}, status=404)
+
+        # Serialize the company data
         serializer = CompanyDetailSerializer(company)
+
+        # Log successful profile view
+        logger.info(f"Company profile viewed: {company.company_name} (ID: {company_id})")
+
         return JsonResponse({'company': serializer.data})
+
     except Exception as e:
-        logger.error(f"Error fetching company details: {str(e)}")
-        return JsonResponse({'error': 'Company not found'}, status=404)
+        logger.error(f"Error fetching company details for ID {company_id}: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
 
 # API view to get categories
 def api_categories(request):
     try:
-        # Remove is_active filter
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return JsonResponse({'categories': serializer.data})
@@ -340,16 +349,17 @@ def api_categories(request):
         logger.error(f"Error fetching categories: {str(e)}")
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
+
 # API view to get dashboard stats
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def api_stats(request):
     try:
         company = request.user
-        
-        # Get company's services - remove is_active filter
+
+        # Get company's services
         services = Service.objects.filter(company=company)
-        
+
         # Calculate stats
         stats = {
             'total_services': services.count(),
@@ -361,65 +371,78 @@ def api_stats(request):
             'current_plan': company.current_plan,
             'is_verified': company.is_verified
         }
-        
+
         return Response({'stats': stats})
     except Exception as e:
         logger.error(f"Error fetching stats: {str(e)}")
         return Response({'error': 'Internal server error'}, status=500)
 
-# Global stats for platform
-def api_platform_stats(request):
+
+# API view to send messages (contact form)
+@csrf_exempt
+def api_send_message(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+
     try:
-        stats = {
-            'total_companies': Company.objects.filter(is_active=True).count(),
-            'verified_companies': Company.objects.filter(is_verified=True, is_active=True).count(),
-            'total_departments': Category.objects.count(),  # Keep as total_departments for frontend compatibility
-            'total_services': Service.objects.count()
-        }
-        return JsonResponse(stats)
+        data = json.loads(request.body)
+        # Here you would typically save the message to database
+        # or send an email
+        logger.info(f"Message received from {data.get('email')}")
+        return JsonResponse({'message': 'Message sent successfully'})
     except Exception as e:
-        logger.error(f"Error fetching platform stats: {str(e)}")
+        logger.error(f"Error sending message: {str(e)}")
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
-# Message sending (placeholder)
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def api_send_message(request):
-    # This is a placeholder for future messaging functionality
-    return Response({
-        'message': 'Message functionality will be implemented in future updates',
-        'success': True
-    })
 
-# Subscription management endpoints
-@api_view(['GET'])
-@permission_classes([AllowAny])
+# API view to get subscription plans
 def api_subscription_plans(request):
     try:
-        # Remove is_active filter
         plans = SubscriptionPlan.objects.all()
         serializer = SubscriptionPlanSerializer(plans, many=True)
-        return Response({'plans': serializer.data})
+        return JsonResponse({'plans': serializer.data})
     except Exception as e:
         logger.error(f"Error fetching subscription plans: {str(e)}")
-        return Response({'error': 'Internal server error'}, status=500)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
+
+# API view to upgrade subscription
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def api_upgrade_subscription(request):
-    # This is a placeholder for future subscription upgrade functionality
-    return Response({
-        'message': 'Subscription upgrade functionality will be implemented in future updates',
-        'success': True
-    })
+    try:
+        plan_id = request.data.get('plan_id')
+        if not plan_id:
+            return Response({'error': 'Plan ID is required'}, status=400)
 
-# Company services management
+        plan = get_object_or_404(SubscriptionPlan, plan_id=plan_id)
+        company = request.user
+
+        # Update company's current plan
+        company.current_plan = plan.plan_name
+        company.save()
+
+        # Create payment record
+        Payment.objects.create(
+            company=company,
+            plan=plan,
+            amount=plan.price,
+            payment_method='credit_card',  # Default for now
+            status='completed'
+        )
+
+        return Response({'message': 'Subscription upgraded successfully'})
+    except Exception as e:
+        logger.error(f"Error upgrading subscription: {str(e)}")
+        return Response({'error': 'Internal server error'}, status=500)
+
+
+# API view to get company's services
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def api_company_services(request):
     try:
         company = request.user
-        # Remove is_active filter
         services = Service.objects.filter(company=company)
         serializer = ServiceSerializer(services, many=True)
         return Response({'services': serializer.data})
@@ -427,120 +450,87 @@ def api_company_services(request):
         logger.error(f"Error fetching company services: {str(e)}")
         return Response({'error': 'Internal server error'}, status=500)
 
+
+# API view to create a new service
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def api_create_service(request):
     try:
-        # Add company to the data
+        company = request.user
         data = request.data.copy()
-        data['company'] = request.user.company_id
-        
+        data['company'] = company.company_id
+
         serializer = ServiceCreateSerializer(data=data)
         if serializer.is_valid():
-            service = serializer.save()
-            response_serializer = ServiceSerializer(service)
-            return Response({
-                'success': True,
-                'service': response_serializer.data,
-                'message': 'Service created successfully'
-            }, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response({'message': 'Service created successfully', 'service': serializer.data}, status=201)
         else:
-            return Response({
-                'success': False,
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': serializer.errors}, status=400)
     except Exception as e:
         logger.error(f"Error creating service: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Internal server error'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': 'Internal server error'}, status=500)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
+
+# API view to get service details
 def api_service_detail(request, service_id):
     try:
-        service = get_object_or_404(Service, service_id=service_id, company=request.user)
-        
-        if request.method == 'GET':
-            serializer = ServiceSerializer(service)
-            return Response(serializer.data)
-        
-        elif request.method == 'PUT':
-            serializer = ServiceCreateSerializer(service, data=request.data, partial=True)
-            if serializer.is_valid():
-                service = serializer.save()
-                response_serializer = ServiceSerializer(service)
-                return Response({
-                    'success': True,
-                    'service': response_serializer.data,
-                    'message': 'Service updated successfully'
-                })
-            else:
-                return Response({
-                    'success': False,
-                    'errors': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
-        
-        elif request.method == 'DELETE':
-            service.delete()
-            return Response({
-                'success': True,
-                'message': 'Service deleted successfully'
-            })
-            
+        service = get_object_or_404(Service, service_id=service_id)
+        serializer = ServiceSerializer(service)
+        return JsonResponse({'service': serializer.data})
     except Exception as e:
-        logger.error(f"Error in service detail: {str(e)}")
-        return Response({
-            'success': False,
-            'message': 'Service not found or access denied'
-        }, status=status.HTTP_404_NOT_FOUND)
+        logger.error(f"Error fetching service details: {str(e)}")
+        return JsonResponse({'error': 'Service not found'}, status=404)
 
-# All services endpoint (for services page)
-@api_view(['GET'])
-@permission_classes([AllowAny])
+
+# API view to get all services (for public listing)
 def api_all_services(request):
     try:
-        # Get search parameters
-        search = request.GET.get('search', '')
-        category = request.GET.get('category', '')
-        city = request.GET.get('city', '')
-        
-        # Base queryset - remove is_active filter from Service
-        services = Service.objects.select_related('company')
-        
-        # Apply filters
-        if search:
-            services = services.filter(
-                Q(service_name__icontains=search) |
-                Q(service_description__icontains=search) |
-                Q(company__company_name__icontains=search)
-            )
-        
-        if category:
-            services = services.filter(category__icontains=category)
-        
-        if city:
-            services = services.filter(company__city__icontains=city)
-        
-        # Only show services from active companies
-        services = services.filter(company__is_active=True)
-        
+        services = Service.objects.all().select_related('company')
+
+        # Filter by company if specified
+        company_name = request.GET.get('company_name')
+        if company_name:
+            services = services.filter(company__company_name=company_name)
+
         serializer = ServiceSerializer(services, many=True)
-        return Response({'services': serializer.data})
+        return JsonResponse({'services': serializer.data})
     except Exception as e:
         logger.error(f"Error fetching all services: {str(e)}")
-        return Response({'error': 'Internal server error'}, status=500)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
-# Service categories endpoint
-@api_view(['GET'])
-@permission_classes([AllowAny])
+
+# API view to get service categories
 def api_service_categories(request):
     try:
-        # Get unique categories from services
-        categories = Service.objects.values_list('category', flat=True).distinct()
-        categories = [cat for cat in categories if cat]  # Remove empty categories
-        return Response({'categories': categories})
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return JsonResponse({'categories': serializer.data})
     except Exception as e:
         logger.error(f"Error fetching service categories: {str(e)}")
-        return Response({'error': 'Internal server error'}, status=500)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
+
+
+def api_platform_stats(request):
+    try:
+        # Get platform-wide statistics
+        stats = {
+            'total_companies': Company.objects.filter(is_active=True).count(),
+            'verified_companies': Company.objects.filter(is_active=True, is_verified=True).count(),
+            'total_services': Service.objects.count(),
+            'total_reviews': Review.objects.count(),
+            'average_platform_rating': Review.objects.aggregate(
+                avg_rating=Avg('rating')
+            )['avg_rating'] or 4.5,
+            'new_companies_this_month': Company.objects.filter(
+                is_active=True,
+                created_at__month=timezone.now().month,
+                created_at__year=timezone.now().year
+            ).count(),
+        }
+
+        logger.info(f"Platform stats requested: {stats}")
+        return JsonResponse({'stats': stats})
+
+    except Exception as e:
+        logger.error(f"Error fetching platform stats: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)

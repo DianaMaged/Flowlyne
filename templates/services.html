@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -994,7 +995,7 @@
 
         async function loadCompanies() {            
             try {
-                console.log('Loading companies...');
+                console.log('Loading companies from database...');
                 const response = await fetch('/api/companies/', {
                     credentials: 'include' // Include session cookies
                 });
@@ -1003,69 +1004,29 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const companies = await response.json();
-                console.log('Companies loaded:', companies);
+                const data = await response.json();
+                console.log('Companies loaded from database:', data);
                 
-                allCompanies = companies;
-                filteredCompanies = companies;
+                allCompanies = data.companies || [];
+                filteredCompanies = allCompanies;
                 
-                displayCompanies(companies);
-                updateResultsCount(companies.length);
+                displayCompanies(allCompanies);
+                updateResultsCount(allCompanies.length);
                 
             } catch (error) {
                 console.error('Error loading companies:', error);
                 
-                // Show demo companies as fallback
-                const demoCompanies = [
-                    {
-                        id: '1',
-                        company_name: 'TechSolutions Egypt',
-                        description: 'Leading web development company in Egypt specializing in modern, scalable web applications.',
-                        city: 'Cairo',
-                        country: 'Egypt',
-                        website: 'https://techsolutions.eg',
-                        is_verified: true,
-                        primary_department: 'Web Development',
-                        rating: 4.8,
-                        review_count: 15,
-                        departments: [
-                            { name: 'Web Development', icon: '💻', is_primary: true }
-                        ]
-                    },
-                    {
-                        id: '2',
-                        company_name: 'Creative Studio Alexandria',
-                        description: 'Award-winning design agency providing comprehensive branding and visual identity solutions.',
-                        city: 'Alexandria',
-                        country: 'Egypt',
-                        is_verified: true,
-                        primary_department: 'Graphic Design',
-                        rating: 4.9,
-                        review_count: 22,
-                        departments: [
-                            { name: 'Graphic Design', icon: '🎨', is_primary: true }
-                        ]
-                    },
-                    {
-                        id: '3',
-                        company_name: 'Digital Marketing Agency Cairo',
-                        description: 'Full-service digital marketing agency helping Egyptian businesses grow online.',
-                        city: 'Cairo',
-                        country: 'Egypt',
-                        is_verified: true,
-                        primary_department: 'Digital Marketing',
-                        rating: 4.7,
-                        review_count: 18,
-                        departments: [
-                            { name: 'Digital Marketing', icon: '📈', is_primary: true }
-                        ]
-                    }
-                ];
-                
-                allCompanies = demoCompanies;
-                filteredCompanies = demoCompanies;
-                displayCompanies(demoCompanies);
-                updateResultsCount(demoCompanies.length);
+                // Show error message with retry option
+                const container = document.getElementById('companies-container');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <h3 class="empty-title">Unable to load companies</h3>
+                        <p class="empty-text">Please check your connection and try again. Make sure your server is running and you have companies in your database.</p>
+                        <button class="empty-btn" onclick="loadCompanies()">Try Again</button>
+                    </div>
+                `;
+                updateResultsCount(0);
             }
         }
 
@@ -1125,10 +1086,10 @@
                             ${company.description || 'Professional service provider ready to help your business grow with innovative solutions and expert guidance.'}
                         </p>
                         <div class="company-list-actions">
-                            <button class="contact-btn" onclick="contactCompany('${company.id}', '${company.company_name}')">
+                            <button class="contact-btn" onclick="contactCompany('${company.company_id}', '${company.company_name}')">
                                 💬 Contact Company
                             </button>
-                            <button class="view-btn-card" onclick="viewCompanyProfile('${company.id}')">
+                            <button class="view-btn-card" onclick="viewCompanyProfile('${company.company_id}')">
                                 👁️ View Profile
                             </button>
                         </div>
@@ -1172,10 +1133,10 @@
                         </div>
 
                         <div class="company-actions">
-                            <button class="contact-btn" onclick="contactCompany('${company.id}', '${company.company_name}')">
+                            <button class="contact-btn" onclick="contactCompany('${company.company_id}', '${company.company_name}')">
                                 💬 Contact Company
                             </button>
-                            <button class="view-btn-card" onclick="viewCompanyProfile('${company.id}')">
+                            <button class="view-btn-card" onclick="viewCompanyProfile('${company.company_id}')">
                                 👁️ View Profile
                             </button>
                         </div>
@@ -1236,10 +1197,10 @@
                 });
                 
                 if (response.ok) {
-                    const companies = await response.json();
-                    filteredCompanies = companies;
-                    displayCompanies(companies);
-                    updateResultsCount(companies.length);
+                    const data = await response.json();
+                    filteredCompanies = data.companies || [];
+                    displayCompanies(filteredCompanies);
+                    updateResultsCount(filteredCompanies.length);
                 } else {
                     throw new Error('Search failed');
                 }
@@ -1248,16 +1209,16 @@
                 console.error('Search error:', error);
                 
                 // Fallback to client-side search
-                const searchResults = allCompanies.filter(company => 
-                    company.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    company.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    company.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    (company.primary_department && company.primary_department.toLowerCase().includes(searchTerm.toLowerCase()))
-                );
+                filteredCompanies = allCompanies.filter(company => {
+                    const searchLower = searchTerm.toLowerCase();
+                    return company.company_name.toLowerCase().includes(searchLower) ||
+                           (company.description && company.description.toLowerCase().includes(searchLower)) ||
+                           (company.city && company.city.toLowerCase().includes(searchLower)) ||
+                           (company.primary_department && company.primary_department.toLowerCase().includes(searchLower));
+                });
                 
-                filteredCompanies = searchResults;
-                displayCompanies(searchResults);
-                updateResultsCount(searchResults.length);
+                displayCompanies(filteredCompanies);
+                updateResultsCount(filteredCompanies.length);
             }
         }
 
@@ -1279,7 +1240,34 @@
                 </div>
             `;
             
-            setTimeout(() => {
+            // Use backend filtering for better performance
+            filterCompaniesBackend(category);
+        }
+
+        async function filterCompaniesBackend(category) {
+            try {
+                const url = category ? 
+                    `/api/companies/?category=${encodeURIComponent(category)}` : 
+                    `/api/companies/`;
+                
+                const response = await fetch(url, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    filteredCompanies = data.companies || [];
+                    displayCompanies(filteredCompanies);
+                    updateResultsCount(filteredCompanies.length);
+                } else {
+                    throw new Error('Filter failed');
+                }
+                
+            } catch (error) {
+                console.error('Filter error:', error);
+                console.log('Falling back to client-side filtering...');
+                
+                // Fallback to client-side filtering
                 if (!category) {
                     filteredCompanies = allCompanies;
                 } else {
@@ -1291,7 +1279,7 @@
                 
                 displayCompanies(filteredCompanies);
                 updateResultsCount(filteredCompanies.length);
-            }, 500);
+            }
         }
 
         function clearFilters() {
@@ -1303,9 +1291,8 @@
             });
             document.querySelector('.filter-pill').classList.add('active');
             
-            filteredCompanies = allCompanies;
-            displayCompanies(filteredCompanies);
-            updateResultsCount(filteredCompanies.length);
+            // Reload all companies from backend
+            loadCompanies();
         }
 
         function contactCompany(companyId, companyName) {
@@ -1319,8 +1306,9 @@
         }
 
         function viewCompanyProfile(companyId) {
-            // In a real app, this would show detailed company profile
-            alert(`👁️ Company Profile\n\nIn a full application, this would show:\n• Complete company information\n• Portfolio of past projects\n• Client testimonials and reviews\n• Services offered in detail\n• Team members and expertise\n• Contact information\n\nFor now, this is a demo!`);
+            console.log('Redirecting to profile for company ID:', companyId);
+            // Redirect to dedicated company profile page
+            window.location.href = `/profile/${companyId}/`;
         }
 
         // User menu for authenticated users

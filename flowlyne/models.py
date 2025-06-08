@@ -136,18 +136,21 @@ class SubscriptionPlan(models.Model):
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews', db_column='service_id')
-    reviewer_name = models.CharField(max_length=255)
-    reviewer_email = models.EmailField()
     rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
-    review_text = models.TextField()
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    project_type = models.CharField(max_length=100, blank=True)
+    project_duration = models.DurationField(default=timedelta(days=30))
+    would_recommend = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'review'
 
     def __str__(self):
-        return f"Review for {self.service.service_name} by {self.reviewer_name}"
-
+        return f"Review for {self.service.service_name} - {self.title}"
 
 class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
