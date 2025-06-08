@@ -158,7 +158,6 @@
             box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
 
-
         /* Main Content */
         .main-content {
             flex: 1;
@@ -1053,26 +1052,18 @@
             setupDragAndDrop();
         });
 
-        // Load available departments
-        async function loadDepartments() {
-            try {
-                const response = await fetch('/api/departments/');
-                const data = await response.json();
-                availableDepartments = data;
-                renderDepartments();
-            } catch (error) {
-                console.error('Error loading departments:', error);
-                // Fallback departments
-                availableDepartments = [
-                    {id: 1, name: 'Web Development', icon: '💻'},
-                    {id: 2, name: 'Mobile App Development', icon: '📱'},
-                    {id: 3, name: 'Digital Marketing', icon: '📈'},
-                    {id: 4, name: 'Graphic Design', icon: '🎨'},
-                    {id: 5, name: 'Business Consulting', icon: '🎯'},
-                    {id: 6, name: 'Accounting & Finance', icon: '💰'},
-                ];
-                renderDepartments();
-            }
+        // Load available departments - FIXED: No API call, just use predefined departments
+        function loadDepartments() {
+            // Use predefined departments directly instead of making API call
+            availableDepartments = [
+                {id: 1, name: 'Web Development', icon: '💻'},
+                {id: 2, name: 'Mobile App Development', icon: '📱'},
+                {id: 3, name: 'Digital Marketing', icon: '📈'},
+                {id: 4, name: 'Graphic Design', icon: '🎨'},
+                {id: 5, name: 'Business Consulting', icon: '🎯'},
+                {id: 6, name: 'Accounting & Finance', icon: '💰'},
+            ];
+            renderDepartments();
         }
 
         // Render departments grid
@@ -1334,18 +1325,20 @@
                 console.log('Response data:', data);
                 
                 if (response.ok) {
+                    console.log('✅ Registration successful!');
+                    
                     // Show success message
                     let successMessage = '🎉 Account created successfully!';
                     if (Object.keys(uploadedFiles).length > 0) {
                         successMessage += ' Your files have been uploaded and will be processed shortly.';
                     }
-                    successMessage += ' Redirecting to explore companies...';
+                    successMessage += ' Redirecting to dashboard...';
                     
                     showMessage(successMessage, 'success');
                     
-                    // Redirect after short delay
+                    // Redirect to dashboard (Django session is already active)
                     setTimeout(() => {
-                        window.location.href = '{% url "flowlyne:services" %}';
+                        window.location.href = '/dashboard/';
                     }, 2000);
                 } else {
                     throw new Error(data.error || `Registration failed with status ${response.status}`);

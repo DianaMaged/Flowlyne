@@ -97,64 +97,66 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    # Fixed to use actual database field names
-    list_display = ['review_id', 'service', 'title', 'rating', 'is_verified', 'created_at']
-    list_filter = ['rating', 'is_verified', 'would_recommend', 'created_at']
-    search_fields = ['title', 'content', 'service__service_name', 'service__company__company_name']
+    # Fixed to use actual database field names from your Review model
+    list_display = ['review_id', 'service', 'client_name', 'rating', 'created_at']
+    list_filter = ['rating', 'created_at']
+    search_fields = ['client_name', 'client_email', 'review_text', 'service__service_name']
     ordering = ['-created_at']
-    readonly_fields = ['review_id', 'created_at', 'updated_at']
+    readonly_fields = ['review_id', 'created_at']
     
     fieldsets = (
         ('Review Information', {
-            'fields': ('title', 'content', 'rating', 'project_type', 'project_duration')
-        }),
-        ('Status', {
-            'fields': ('would_recommend', 'is_verified')
+            'fields': ('client_name', 'client_email', 'review_text', 'rating')
         }),
         ('Relations', {
             'fields': ('service',)
         }),
         ('Timestamps', {
-            'fields': ('review_id', 'created_at', 'updated_at'),
+            'fields': ('review_id', 'created_at'),
             'classes': ('collapse',)
         }),
     )
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['payment_id', 'company', 'plan', 'amount', 'status', 'payment_method', 'created_at']
-    list_filter = ['status', 'payment_method', 'created_at']
-    search_fields = ['company__company_name', 'plan__plan_name', 'transaction_id']
+    # Fixed to use actual fields from your Payment model
+    list_display = ['payment_id', 'payment_method', 'is_active', 'start_date', 'end_date', 'created_at']
+    list_filter = ['is_active', 'payment_method', 'created_at']
+    search_fields = ['payment_method']
     ordering = ['-created_at']
-    readonly_fields = ['payment_id', 'created_at']
+    readonly_fields = ['payment_id', 'created_at', 'updated_at']
     
     fieldsets = (
         ('Payment Information', {
-            'fields': ('amount', 'payment_method', 'status', 'transaction_id')
+            'fields': ('payment_method', 'is_active')
+        }),
+        ('Schedule', {
+            'fields': ('start_date', 'end_date', 'last_payment_date', 'next_payment_date')
         }),
         ('Relations', {
-            'fields': ('company', 'plan')
+            'fields': ('adv',)
         }),
         ('Timestamps', {
-            'fields': ('payment_id', 'created_at'),
+            'fields': ('payment_id', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
-    list_display = ['plan_id', 'plan_name', 'price_egp', 'created_at']
+    # Fixed to use actual fields from your SubscriptionPlan model
+    list_display = ['plan_id', 'plan_name', 'price', 'duration_days', 'created_at']
     list_filter = ['created_at']
-    search_fields = ['plan_name', 'search_ranking', 'support_level']
-    ordering = ['price_egp']
+    search_fields = ['plan_name', 'description']
+    ordering = ['price']
     readonly_fields = ['plan_id', 'created_at']
     
     fieldsets = (
         ('Plan Information', {
-            'fields': ('plan_name', 'price_egp', 'plan_duration')
+            'fields': ('plan_name', 'description', 'price', 'duration_days')
         }),
         ('Features', {
-            'fields': ('search_ranking', 'support_level')
+            'fields': ('features',)
         }),
         ('Timestamps', {
             'fields': ('plan_id', 'created_at'),
@@ -172,7 +174,7 @@ class CompanySubscriptionAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Subscription Information', {
-            'fields': ('company', 'plan', 'is_active')
+            'fields': ('company', 'plan', 'payment', 'is_active')
         }),
         ('Schedule', {
             'fields': ('start_date', 'end_date')
@@ -185,24 +187,25 @@ class CompanySubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Advertising)
 class AdvertisingAdmin(admin.ModelAdmin):
-    list_display = ['adv_id', 'company', 'title', 'budget', 'start_date', 'end_date']
-    list_filter = ['start_date', 'end_date']
-    search_fields = ['title', 'description', 'company__company_name']
+    # Fixed to use actual fields from your Advertising model
+    list_display = ['adv_id', 'admin', 'price', 'start_date', 'end_date']
+    list_filter = ['start_date', 'end_date', 'admin']
+    search_fields = ['admin__email']
     ordering = ['-start_date']
-    readonly_fields = ['adv_id', 'created_at']
+    readonly_fields = ['adv_id']
     
     fieldsets = (
         ('Advertisement Information', {
-            'fields': ('title', 'description', 'image', 'target_audience', 'budget')
+            'fields': ('image', 'price')
         }),
         ('Schedule', {
             'fields': ('start_date', 'end_date')
         }),
         ('Relations', {
-            'fields': ('company',)
+            'fields': ('admin',)
         }),
         ('Timestamps', {
-            'fields': ('adv_id', 'created_at'),
+            'fields': ('adv_id',),
             'classes': ('collapse',)
         }),
     )

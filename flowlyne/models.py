@@ -22,10 +22,13 @@ class CompanyManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        # Use email as username for simplicity
+        
+        # Handle username - use provided username or default to email
+        username = extra_fields.pop('username', email)
+        
         user = self.model(
             email=email, 
-            username=email,  # Set username to email
+            username=username,
             company_name=company_name, 
             **extra_fields
         )
@@ -100,26 +103,39 @@ class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=255)
     category_description = models.TextField(blank=True)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='categories', null=True, blank=True, db_column='service_id')
-    # Removed is_active field - not in your database
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='categories', db_column='service_id')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'category'
-        verbose_name_plural = "Categories"
 
     def __str__(self):
-        return self.category_name
+        return f"{self.category_name} - {self.service.service_name}"
+
+
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews', db_column='service_id')
+    client_name = models.CharField(max_length=255)
+    client_email = models.EmailField()
+    review_text = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'review'
+
+    def __str__(self):
+        return f"Review by {self.client_name} for {self.service.service_name}"
 
 
 class SubscriptionPlan(models.Model):
     plan_id = models.AutoField(primary_key=True)
-    plan_name = models.CharField(max_length=100)
-    price_egp = models.DecimalField(max_digits=10, decimal_places=2)
-    search_ranking = models.CharField(max_length=200)
-    plan_duration = models.DurationField(default=timedelta(days=30))
-    support_level = models.CharField(max_length=100)
-    # Removed is_active field - not in your database
+    plan_name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    duration_days = models.IntegerField()
+    features = models.TextField()  # JSON string of features
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -128,54 +144,34 @@ class SubscriptionPlan(models.Model):
     def __str__(self):
         return self.plan_name
 
-    @property
-    def price(self):
-        return self.price_egp
-
-
-class Review(models.Model):
-    review_id = models.AutoField(primary_key=True)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews', db_column='service_id')
-    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    project_type = models.CharField(max_length=100, blank=True)
-    project_duration = models.DurationField(default=timedelta(days=30))
-    would_recommend = models.BooleanField(default=True)
-    is_verified = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'review'
-
-    def __str__(self):
-        return f"Review for {self.service.service_name} - {self.title}"
 
 class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='payments', db_column='company_id')
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name='payments', db_column='plan_id')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=50)
-    status = models.CharField(max_length=20, default='pending')
-    transaction_id = models.CharField(max_length=255, blank=True, null=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    last_payment_date = models.DateTimeField(null=True, blank=True)
+    next_payment_date = models.DateTimeField(null=True, blank=True)
+    payment_method = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    adv = models.ForeignKey('Advertising', on_delete=models.SET_NULL, null=True, blank=True, db_column='adv_id')
 
     class Meta:
         db_table = 'payment'
 
     def __str__(self):
-        return f"Payment {self.payment_id} - {self.company.company_name}"
+        return f"Payment {self.payment_id}"
 
 
 class CompanySubscription(models.Model):
     subscription_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='subscriptions', db_column='company_id')
-    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name='subscriptions', db_column='plan_id')
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, db_column='plan_id')
+    payment = models.OneToOneField(Payment, on_delete=models.CASCADE, db_column='payment_id')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    is_active = models.BooleanField(default=True)  # Keep this if it exists in your DB
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -187,19 +183,14 @@ class CompanySubscription(models.Model):
 
 class Advertising(models.Model):
     adv_id = models.AutoField(primary_key=True)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='advertisements', db_column='company_id')
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    image = models.CharField(max_length=500, blank=True, null=True)
-    target_audience = models.CharField(max_length=255)
-    budget = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    # Removed is_active field - not in your database
-    created_at = models.DateTimeField(auto_now_add=True)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='advertisements', db_column='admin_id')
 
     class Meta:
         db_table = 'advertising'
 
     def __str__(self):
-        return f"{self.title} - {self.company.company_name}"
+        return f"Advertisement {self.adv_id}"
