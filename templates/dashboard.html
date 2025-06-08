@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Flowlyne</title>
-    <link rel="icon" type="image/x-icon" href="/static/images/logo.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo.png">
-    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
-    <link rel="apple-touch-icon" href="/static/images/logo.png">
-    <link rel="shortcut icon" href="/static/images/logo.ico">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+    
     <style>
+        /* Modern Flowlyne Design System - Apple Inspired */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         :root {
+            /* Logo-inspired color palette */
             --primary-teal: #4ECDC4;
             --primary-blue: #45B7D1;
             --accent-purple: #6C5CE7;
@@ -19,40 +20,79 @@
             --light-grey: #DDD6FE;
             --white: #FFFFFF;
             --off-white: #FAFBFC;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
             --success: #00D4AA;
             --warning: #FFB800;
             --error: #FF6B6B;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.16);
+            
+            /* Gradients */
             --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
             --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
             --gradient-dark: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Reset and base styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--off-white);
-            color: var(--dark-grey);
             line-height: 1.6;
+            color: var(--dark-grey);
+            background: var(--off-white);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Navigation */
-        .navbar {
+        .nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
             padding: 1rem 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-container {
@@ -64,58 +104,21 @@
             align-items: center;
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-brand:hover {
-            transform: translateY(-1px);
-        }
-
-        .nav-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .nav-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        .nav-brand:hover .nav-logo {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-        }
-
-        .nav-brand h1 {
-            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin: 0;
+            text-decoration: none;
         }
 
         .nav-tagline {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--medium-grey);
-            font-weight: 500;
             font-style: italic;
-            opacity: 0.8;
+            margin-top: -0.25rem;
         }
 
         .nav-links {
@@ -125,42 +128,33 @@
         }
 
         .nav-links a {
-            color: var(--dark-grey);
             text-decoration: none;
+            color: var(--dark-grey);
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             position: relative;
         }
 
         .nav-links a:hover {
-            background: var(--glass-bg);
-            transform: translateY(-1px);
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--primary-teal);
         }
 
-        .nav-cta {
-            background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue)) !important;
-            color: white !important;
-            padding: 0.75rem 1.5rem !important;
-            border-radius: 25px;
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
             font-weight: 600;
-            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
-        }
-
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
         }
 
         .user-menu {
-            position: relative;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(78, 205, 196, 0.1);
             padding: 0.5rem 1rem;
-            border-radius: 25px;
+            border-radius: 16px;
+            background: rgba(78, 205, 196, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -179,109 +173,111 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
-
-        /* Dashboard Content */
-        .dashboard {
-            padding-top: 6rem;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
+            font-size: 0.9rem;
         }
 
+        /* Main Content */
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 120px 2rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
         }
 
+        /* Welcome Section */
         .welcome-section {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .welcome-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
-            transform: translate(50px, -50px);
-        }
-
-        .welcome-content {
-            position: relative;
-            z-index: 10;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(78, 205, 196, 0.2);
+            text-align: center;
         }
 
         .welcome-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            background: var(--gradient-dark);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
         }
 
         .welcome-subtitle {
-            color: var(--medium-grey);
-            font-size: 1.1rem;
+            font-size: 1.125rem;
+            opacity: 0.9;
             margin-bottom: 2rem;
         }
 
         .quick-actions {
             display: flex;
             gap: 1rem;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
         .quick-btn {
-            background: var(--gradient-primary);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 0.75rem 1.5rem;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 12px;
             text-decoration: none;
-            display: inline-flex;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
+            cursor: pointer;
         }
 
         .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
         }
 
         .quick-btn.secondary {
-            background: rgba(255, 255, 255, 0.8);
-            color: var(--dark-grey);
-            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .quick-btn.secondary:hover {
-            background: var(--white);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        /* Profile section button overrides */
+        .profile-overview .quick-btn.secondary {
+            background: rgba(78, 205, 196, 0.1);
+            color: var(--primary-teal);
+            border: 2px solid rgba(78, 205, 196, 0.2);
         }
 
-        /* Stats Grid */
+        .profile-overview .quick-btn.secondary:hover {
+            background: rgba(78, 205, 196, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.2);
+        }
+
+        .profile-overview .quick-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+        }
+
+        .profile-overview .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Stats Section */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
@@ -291,42 +287,49 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-
-        .stat-card.purple::before {
+        .stat-card.purple {
             background: var(--gradient-accent);
-        }
-
-        .stat-card.success::before {
-            background: linear-gradient(135deg, var(--success), #00B894);
-        }
-
-        .stat-card.warning::before {
-            background: linear-gradient(135deg, var(--warning), #E17055);
+            color: white;
         }
 
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success);
+        }
+
+        .stat-change.positive {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success);
         }
 
         .stat-icon {
@@ -337,58 +340,19 @@
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            color: white;
+            background: rgba(78, 205, 196, 0.1);
         }
 
         .stat-icon.teal {
-            background: var(--gradient-primary);
+            background: rgba(78, 205, 196, 0.1);
         }
 
         .stat-icon.purple {
-            background: var(--gradient-accent);
+            background: rgba(108, 92, 231, 0.1);
         }
 
-        .stat-icon.success {
-            background: linear-gradient(135deg, var(--success), #00B894);
-        }
-
-        .stat-icon.warning {
-            background: linear-gradient(135deg, var(--warning), #E17055);
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--dark-grey);
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: var(--medium-grey);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .stat-change {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .stat-change.positive {
-            color: var(--success);
-        }
-
-        .stat-change.negative {
-            color: var(--error);
-        }
-
-        /* Main Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
+        .stat-icon.blue {
+            background: rgba(69, 183, 209, 0.1);
         }
 
         /* Subscription Section */
@@ -398,26 +362,25 @@
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
         }
 
         .subscription-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .subscription-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--dark-grey);
         }
 
         .plan-badge {
             padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-size: 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -434,11 +397,11 @@
         }
 
         .plan-premium {
-            background: rgba(108, 92, 231, 0.1);
-            color: var(--accent-purple);
+            background: var(--gradient-accent);
+            color: white;
         }
 
-        .benefits-comparison {
+        .benefits-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
@@ -446,32 +409,23 @@
         }
 
         .benefits-column {
-            padding: 1.5rem;
+            background: rgba(78, 205, 196, 0.03);
+            border: 1px solid rgba(78, 205, 196, 0.1);
             border-radius: 16px;
-        }
-
-        .current-benefits {
-            background: rgba(0, 212, 170, 0.05);
-            border: 1px solid rgba(0, 212, 170, 0.2);
-        }
-
-        .upgrade-benefits {
-            background: rgba(78, 205, 196, 0.05);
-            border: 1px solid rgba(78, 205, 196, 0.2);
+            padding: 1.5rem;
         }
 
         .benefits-title {
-            font-weight: 600;
-            color: var(--dark-grey);
-            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+            margin-bottom: 1rem;
         }
 
         .benefits-list {
             list-style: none;
-            padding: 0;
         }
 
         .benefits-list li {
@@ -479,49 +433,33 @@
             align-items: center;
             gap: 0.5rem;
             margin-bottom: 0.75rem;
-            color: var(--medium-grey);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            color: var(--dark-grey);
+        }
+
+        .upgrade-benefits {
+            background: rgba(108, 92, 231, 0.03);
+            border-color: rgba(108, 92, 231, 0.1);
         }
 
         .upgrade-cta {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 2rem;
-            border-radius: 16px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upgrade-cta::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-10px, -10px) rotate(2deg); }
+            padding: 2rem;
+            background: rgba(78, 205, 196, 0.05);
+            border-radius: 16px;
+            border: 2px dashed rgba(78, 205, 196, 0.2);
         }
 
         .upgrade-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 700;
+            color: var(--dark-grey);
             margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 10;
         }
 
         .upgrade-text {
+            color: var(--medium-grey);
             margin-bottom: 1.5rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 10;
         }
 
         .upgrade-buttons {
@@ -529,29 +467,33 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 10;
         }
 
         .upgrade-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: var(--gradient-primary);
             color: white;
-            padding: 0.75rem 1.5rem;
+            border: none;
+            padding: 1rem 1.5rem;
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            font-size: 0.875rem;
         }
 
         .upgrade-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(78, 205, 196, 0.3);
         }
 
-        /* Activity Feed */
+        /* Right Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Activity Section */
         .activity-card {
             background: var(--white);
             border-radius: 20px;
@@ -665,6 +607,193 @@
             font-size: 1rem;
         }
 
+        /* Edit Profile Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-grey);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--medium-grey);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--dark-grey);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: rgba(149, 165, 166, 0.1);
+            color: var(--medium-grey);
+            border: 2px solid rgba(149, 165, 166, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(149, 165, 166, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .nav-container {
@@ -680,273 +809,321 @@
             }
 
             .dashboard-container {
-                padding: 1rem;
+                padding: 140px 1rem 1rem;
             }
 
-            .welcome-section {
-                padding: 2rem;
-            }
-
-            .welcome-title {
-                font-size: 2rem;
+            .dashboard-grid {
+                grid-template-columns: 1fr;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
-            .content-grid {
+            .benefits-container {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
-            .benefits-comparison {
+            .form-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
 
             .upgrade-buttons {
                 flex-direction: column;
             }
 
-            .profile-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-section {
+                text-align: left;
+                padding: 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 1.5rem;
             }
 
             .quick-actions {
-                flex-direction: column;
+                justify-content: flex-start;
             }
-        }
 
-        /* Loading states */
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        .skeleton-loading {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="nav">
         <div class="nav-container">
-            <a href="/" class="nav-brand">
-                <div class="nav-logo">
-                    <img src="/static/images/logo.png" alt="Flowlyne Logo" />
-                </div>
-                <div>
-                    <h1>Flowlyne</h1>
-                </div>
-                <span class="nav-tagline">Smooth and Fine</span>
-            </a>
+            <div>
+                <a href="/" class="logo">Flowlyne</a>
+                <div class="nav-tagline">connecting businesses, creating success</div>
+            </div>
             <div class="nav-links" id="nav-links">
                 <!-- Navigation will be populated by JavaScript -->
             </div>
         </div>
     </nav>
 
-    <!-- Dashboard Content -->
-    <main class="dashboard">
-        <div class="dashboard-container">
-            <!-- Welcome Section -->
-            <section class="welcome-section">
-                <div class="welcome-content">
-                    <h1 class="welcome-title" id="welcome-title">Welcome Back! 👋</h1>
-                    <p class="welcome-subtitle">Here's what's happening with your business network today.</p>
-                    
-                    <div class="quick-actions">
-                        <a href="/services/" class="quick-btn">
-                            <span>🔍</span>
-                            <span>Find Partners</span>
-                        </a>
-                        <button class="quick-btn secondary" onclick="showDemo('messages')">
-                            <span>💬</span>
-                            <span>Messages</span>
-                        </button>
-                        <button class="quick-btn secondary" onclick="showDemo('analytics')">
-                            <span>📊</span>
-                            <span>Analytics</span>
-                        </button>
-                        <a href="/plans/" class="quick-btn secondary">
-                            <span>⚡</span>
-                            <span>Upgrade Plan</span>
-                        </a>
-                        <a href="/offering/" class="quick-btn">
-                            <span>🎯</span>
-                            <span>Manage Services</span>
-                        </a>
-                    </div>
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 class="welcome-title" id="welcome-title">Welcome back! 👋</h1>
+                <p class="welcome-subtitle">Here's what's happening with your business network today.</p>
+                
+                <div class="quick-actions">
+                    <a href="/services/" class="quick-btn">
+                        <span>🔍</span>
+                        <span>Find Partners</span>
+                    </a>
+                    <button class="quick-btn secondary" onclick="showDemo('messages')">
+                        <span>💬</span>
+                        <span>Messages</span>
+                    </button>
+                    <button class="quick-btn secondary" onclick="showDemo('analytics')">
+                        <span>📊</span>
+                        <span>Analytics</span>
+                    </button>
+                    <a href="/plans/" class="quick-btn secondary">
+                        <span>⚡</span>
+                        <span>Upgrade Plan</span>
+                    </a>
+                    <a href="/offering/" class="quick-btn">
+                        <span>🎯</span>
+                        <span>Manage Services</span>
+                    </a>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Stats Grid -->
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="total-companies">0</div>
-                            <div class="stat-label">Platform Companies</div>
-                            <div class="stat-change positive">+12% this month</div>
-                        </div>
-                        <div class="stat-icon teal">🏢</div>
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="total-companies">0</div>
+                        <div class="stat-label">Platform Companies</div>
+                        <div class="stat-change positive">+12% this month</div>
                     </div>
+                    <div class="stat-icon teal">🏢</div>
                 </div>
-
-                <div class="stat-card purple">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="verified-companies">0</div>
-                            <div class="stat-label">Verified Partners</div>
-                            <div class="stat-change positive">+8% this month</div>
-                        </div>
-                        <div class="stat-icon purple">✅</div>
-                    </div>
-                </div>
-
-                <div class="stat-card success">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="total-departments">0</div>
-                            <div class="stat-label">Service Categories</div>
-                            <div class="stat-change positive">+2 new categories</div>
-                        </div>
-                        <div class="stat-icon success">🎯</div>
-                    </div>
-                </div>
-
-                <div class="stat-card warning">
-                    <div class="stat-header">
-                        <div>
-                            <div class="stat-value" id="member-since">0</div>
-                            <div class="stat-label">Days as Member</div>
-                            <div class="stat-change positive">Growing strong!</div>
-                        </div>
-                        <div class="stat-icon warning">📅</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Main Content Grid -->
-            <div class="content-grid">
-                <!-- Subscription Section -->
-                <section class="subscription-card">
-                    <div class="subscription-header">
-                        <h2 class="subscription-title">Your Subscription</h2>
-                        <span id="current-plan-badge" class="plan-badge plan-basic">Basic Plan</span>
-                    </div>
-
-                    <div class="benefits-comparison">
-                        <div class="benefits-column current-benefits">
-                            <div class="benefits-title">
-                                <span>✅</span>
-                                <span>Current Benefits</span>
-                            </div>
-                            <ul class="benefits-list" id="current-benefits-list">
-                                <li><span>✓</span> Standard listing in search</li>
-                                <li><span>✓</span> Basic company profile</li>
-                                <li><span>✓</span> Email support</li>
-                                <li><span>✓</span> 5 project uploads</li>
-                            </ul>
-                        </div>
-
-                        <div class="benefits-column upgrade-benefits">
-                            <div class="benefits-title">
-                                <span>🚀</span>
-                                <span>Upgrade to Get</span>
-                            </div>
-                            <ul class="benefits-list">
-                                <li><span>⭐</span> Higher search ranking</li>
-                                <li><span>📁</span> Portfolio showcase</li>
-                                <li><span>📊</span> Advanced analytics</li>
-                                <li><span>⚡</span> Priority support</li>
-                                <li><span>💰</span> Reduced commissions</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="upgrade-cta" id="upgrade-cta">
-                        <h3 class="upgrade-title">🎯 Ready to Grow Your Business?</h3>
-                        <p class="upgrade-text">Upgrade to Standard plan and get higher visibility, portfolio showcase, and reduced commissions.</p>
-                        <div class="upgrade-buttons">
-                            <button class="upgrade-btn" onclick="quickUpgrade('standard')">
-                                Upgrade to Standard - EGP 200/mo
-                            </button>
-                            <button class="upgrade-btn" onclick="quickUpgrade('premium')">
-                                Go Premium - EGP 500/mo
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Activity Feed -->
-                <section class="activity-card">
-                    <div class="activity-header">
-                        <h3 class="activity-title">Recent Activity</h3>
-                        <button class="quick-btn secondary" onclick="showDemo('activity')">View All</button>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon">👋</div>
-                        <div class="activity-content">
-                            <div class="activity-text">Welcome to Flowlyne!</div>
-                            <div class="activity-time">Just now</div>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon">🏢</div>
-                        <div class="activity-content">
-                            <div class="activity-text">Your company profile was created</div>
-                            <div class="activity-time">Today</div>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon">✅</div>
-                        <div class="activity-content">
-                            <div class="activity-text">Account verification pending</div>
-                            <div class="activity-time">Today</div>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon">🚀</div>
-                        <div class="activity-content">
-                            <div class="activity-text">Ready to connect with partners</div>
-                            <div class="activity-time">Now</div>
-                        </div>
-                    </div>
-                </section>
             </div>
 
-            <!-- Profile Overview -->
-            <section class="profile-overview">
-                <div class="profile-header">
-                    <h2 class="profile-title">Company Profile</h2>
+            <div class="stat-card purple">
+                <div class="stat-header">
                     <div>
-                        <button class="quick-btn secondary" onclick="showDemo('edit')">Edit Profile</button>
-                        <button class="quick-btn" onclick="showDemo('verify')">Get Verified</button>
+                        <div class="stat-value" id="verified-companies">0</div>
+                        <div class="stat-label">Verified Partners</div>
+                        <div class="stat-change positive">+8% this month</div>
+                    </div>
+                    <div class="stat-icon">✅</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="total-departments">0</div>
+                        <div class="stat-label">Service Categories</div>
+                        <div class="stat-change positive">Growing network</div>
+                    </div>
+                    <div class="stat-icon blue">🎯</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="member-since">0</div>
+                        <div class="stat-label">Days as Member</div>
+                        <div class="stat-change positive">Your journey</div>
+                    </div>
+                    <div class="stat-icon purple">📅</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Subscription Section -->
+            <div class="subscription-card">
+                <div class="subscription-header">
+                    <h3 class="subscription-title">Your Subscription</h3>
+                    <span class="plan-badge" id="current-plan-badge">Basic Plan (Free)</span>
+                </div>
+
+                <div class="benefits-container">
+                    <div class="benefits-column current-benefits">
+                        <div class="benefits-title">
+                            <span>✅</span>
+                            <span>Current Benefits</span>
+                        </div>
+                        <ul class="benefits-list" id="current-benefits-list">
+                            <li><span>✓</span> Standard listing in search</li>
+                            <li><span>✓</span> Basic company profile</li>
+                            <li><span>✓</span> Email support</li>
+                            <li><span>✓</span> 5 project uploads</li>
+                        </ul>
+                    </div>
+
+                    <div class="benefits-column upgrade-benefits">
+                        <div class="benefits-title">
+                            <span>🚀</span>
+                            <span>Upgrade to Get</span>
+                        </div>
+                        <ul class="benefits-list">
+                            <li><span>⭐</span> Higher search ranking</li>
+                            <li><span>📁</span> Portfolio showcase</li>
+                            <li><span>📊</span> Advanced analytics</li>
+                            <li><span>⚡</span> Priority support</li>
+                            <li><span>💰</span> Reduced commissions</li>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="profile-grid" id="profile-grid">
-                    <!-- Profile information will be populated by JavaScript -->
+                <div class="upgrade-cta" id="upgrade-cta">
+                    <h3 class="upgrade-title">🎯 Ready to Grow Your Business?</h3>
+                    <p class="upgrade-text">Upgrade to Standard plan and get higher visibility, portfolio showcase, and reduced commissions.</p>
+                    <div class="upgrade-buttons">
+                        <button class="upgrade-btn" onclick="quickUpgrade('standard')">
+                            Upgrade to Standard - EGP 200/mo
+                        </button>
+                        <button class="upgrade-btn" onclick="quickUpgrade('premium')">
+                            Go Premium - EGP 500/mo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <section class="activity-card">
+                <div class="activity-header">
+                    <h3 class="activity-title">Recent Activity</h3>
+                    <button class="quick-btn secondary" onclick="showDemo('activity')">View All</button>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">👋</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Welcome to Flowlyne!</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">🏢</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Your company profile was created</div>
+                        <div class="activity-time">Today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Account verification pending</div>
+                        <div class="activity-time">Today</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon">🚀</div>
+                    <div class="activity-content">
+                        <div class="activity-text">Ready to connect with partners</div>
+                        <div class="activity-time">Now</div>
+                    </div>
                 </div>
             </section>
         </div>
-    </main>
+
+        <!-- Profile Overview -->
+        <section class="profile-overview">
+            <div class="profile-header">
+                <h2 class="profile-title">Company Profile</h2>
+                <div>
+                    <button class="quick-btn secondary" onclick="openEditProfileModal()">Edit Profile</button>
+                    <button class="quick-btn" onclick="showDemo('verify')">Get Verified</button>
+                </div>
+            </div>
+
+            <div class="profile-grid" id="profile-grid">
+                <!-- Profile information will be populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Company Profile</h2>
+                <button class="modal-close" onclick="closeEditProfileModal()">&times;</button>
+            </div>
+
+            <form id="edit-profile-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="edit-company-name">Company Name *</label>
+                        <input type="text" id="edit-company-name" name="company_name" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="edit-phone">Phone Number</label>
+                        <input type="tel" id="edit-phone" name="phone_number" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="edit-city">City</label>
+                        <input type="text" id="edit-city" name="city" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="edit-country">Country</label>
+                        <input type="text" id="edit-country" name="country" class="form-input">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="edit-address">Company Address</label>
+                        <textarea id="edit-address" name="company_address" class="form-input form-textarea" 
+                                  placeholder="Full company address including street, city, and country"></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="edit-description">Company Description</label>
+                        <textarea id="edit-description" name="description" class="form-input form-textarea" 
+                                  placeholder="Describe your company, services, and what makes you unique..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditProfileModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="save-profile-btn">
+                        <span id="save-btn-text">Save Changes</span>
+                        <div class="spinner" id="save-spinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         // Global variables
@@ -959,7 +1136,9 @@
 
         // Initialize dashboard
         function initializeDashboard() {
-            checkAuthentication();
+            if (!checkAuthentication()) {
+                return; // Exit early if not authenticated
+            }
             loadDashboard();
             setupNavigation();
         }
@@ -970,10 +1149,16 @@
             currentUser = JSON.parse(localStorage.getItem('flowlyne_current_company') || 'null');
             
             if (!token || !currentUser) {
-                alert('Please login to access your dashboard');
-                window.location.href = '/login/';
-                return;
+                console.log('No authentication found, redirecting to login');
+                showMessage('Please login to access your dashboard', 'error');
+                // Delay redirect slightly to show the message
+                setTimeout(() => {
+                    window.location.href = '/login/';
+                }, 1500);
+                return false;
             }
+            console.log('User authenticated:', currentUser.company_name);
+            return true;
         }
 
         // Setup navigation
@@ -1003,8 +1188,16 @@
                 document.getElementById('welcome-title').textContent = `Welcome back, ${currentUser.company_name}! 👋`;
 
                 // Load platform statistics
-                const response = await fetch('/api/stats/');
+                const response = await fetch('/api/platform-stats/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const stats = await response.json();
+                
+                // Check if we got an error response
+                if (stats.error) {
+                    throw new Error(stats.error);
+                }
                 
                 // Update stats
                 document.getElementById('total-companies').textContent = stats.total_companies;
@@ -1028,7 +1221,17 @@
                 
             } catch (error) {
                 console.error('Dashboard error:', error);
-                showMessage('Error loading dashboard data', 'error');
+                if (error.message.includes('HTTP error')) {
+                    showMessage('Error connecting to server. Please check your connection.', 'error');
+                } else {
+                    showMessage('Error loading dashboard data: ' + error.message, 'error');
+                }
+                
+                // Set default values if API fails
+                document.getElementById('total-companies').textContent = '--';
+                document.getElementById('verified-companies').textContent = '--';
+                document.getElementById('total-departments').textContent = '--';
+                document.getElementById('member-since').textContent = '--';
             }
         }
 
@@ -1129,6 +1332,128 @@
             `).join('');
         }
 
+        // Edit Profile Modal Functions
+        function openEditProfileModal() {
+            const modal = document.getElementById('edit-profile-modal');
+            
+            // Populate form with current data
+            document.getElementById('edit-company-name').value = currentUser.company_name || '';
+            document.getElementById('edit-phone').value = currentUser.phone_number || '';
+            document.getElementById('edit-city').value = currentUser.city || '';
+            document.getElementById('edit-country').value = currentUser.country || '';
+            document.getElementById('edit-address').value = currentUser.company_address || '';
+            document.getElementById('edit-description').value = currentUser.description || '';
+            
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditProfileModal() {
+            const modal = document.getElementById('edit-profile-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Reset form
+            document.getElementById('edit-profile-form').reset();
+        }
+
+        // Handle edit profile form submission
+        document.getElementById('edit-profile-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('save-profile-btn');
+            const saveText = document.getElementById('save-btn-text');
+            const spinner = document.getElementById('save-spinner');
+            
+            // Show loading state
+            saveBtn.disabled = true;
+            saveText.textContent = 'Saving...';
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+                
+                const token = localStorage.getItem('flowlyne_token');
+                const response = await fetch('/api/profile/update/', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update currentUser with new data
+                    currentUser = { ...currentUser, ...result.company };
+                    
+                    // Update localStorage
+                    localStorage.setItem('flowlyne_current_company', JSON.stringify(currentUser));
+                    
+                    // Refresh profile display
+                    populateProfileGrid();
+                    
+                    // Close modal
+                    closeEditProfileModal();
+                    
+                    // Show success message
+                    showMessage('Profile updated successfully!', 'success');
+                } else {
+                    // Show validation errors
+                    const errorMessages = Object.values(result.errors).flat();
+                    showMessage(errorMessages.join(', '), 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showMessage('Error updating profile. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                saveBtn.disabled = false;
+                saveText.textContent = 'Save Changes';
+                spinner.style.display = 'none';
+            }
+        });
+
+        // Utility function to show messages
+        function showMessage(message, type) {
+            // Create a simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                color: white;
+                font-weight: 600;
+                z-index: 3000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                ${type === 'success' ? 'background: var(--success);' : 'background: var(--error);'}
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
         // Quick upgrade functionality
         function quickUpgrade(planType) {
             const planNames = {
@@ -1146,7 +1471,6 @@
             const messages = {
                 'messages': '💬 Messaging System\n\nIn a full application, this would show:\n• Direct messages with other companies\n• Inquiry threads and responses\n• Message history and notifications',
                 'analytics': '📊 Analytics Dashboard\n\nIn a full application, this would show:\n• Profile views and engagement\n• Search ranking performance\n• Lead generation metrics\n• Conversion tracking',
-                'edit': '✏️ Edit Profile\n\nIn a full application, this would allow:\n• Update company information\n• Upload new logo and portfolio\n• Manage service categories\n• Update contact details',
                 'verify': '✅ Get Verified\n\nIn a full application, this would:\n• Guide through verification process\n• Upload business documents\n• Schedule verification call\n• Track verification status',
                 'activity': '📋 Full Activity Feed\n\nIn a full application, this would show:\n• Complete activity history\n• Partner interactions\n• Profile updates\n• System notifications'
             };
@@ -1171,54 +1495,31 @@
 
         // Add entrance animations
         function animateElements() {
-            const elements = document.querySelectorAll('.welcome-section, .stat-card, .subscription-card, .activity-card, .profile-overview');
-            
-            elements.forEach((element, index) => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(20px)';
-                element.style.transition = 'all 0.6s ease';
-                
+            const elements = document.querySelectorAll('.stat-card, .subscription-card, .activity-card, .profile-overview');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
                 setTimeout(() => {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
+                    el.style.transition = 'all 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
                 }, index * 100);
             });
         }
 
-        // Show message function
-        function showMessage(message, type = 'info') {
-            // Create a temporary notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: ${type === 'error' ? 'var(--error)' : 'var(--success)'};
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                z-index: 1001;
-                transition: all 0.3s ease;
-                transform: translateX(400px);
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(400px)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
+        // Close modal when clicking outside
+        document.getElementById('edit-profile-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditProfileModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditProfileModal();
+            }
+        });
     </script>
 </body>
 </html>

@@ -54,47 +54,76 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email already registered")
         return value
     
+    def validate_company_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Company name cannot be empty")
+        return value.strip()
+    
     def create(self, validated_data):
         password = validated_data.pop('password')
-        
-        # Create company using the manager method
         company = Company.objects.create_user(
-            email=validated_data['email'],
             password=password,
-            company_name=validated_data['company_name'],
-            description=validated_data.get('description', ''),
-            company_address=validated_data.get('company_address', ''),
-            phone_number=validated_data.get('phone_number', ''),
-            city=validated_data.get('city', 'Cairo'),
-            country=validated_data.get('country', 'Egypt')
+            **validated_data
         )
-        
         return company
+
+class CompanyProfileUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating company profile"""
+    
+    class Meta:
+        model = Company
+        fields = [
+            'company_name', 'description', 'company_address', 
+            'phone_number', 'city', 'country'
+        ]
+    
+    def validate_company_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Company name cannot be empty")
+        return value.strip()
+    
+    def validate_description(self, value):
+        if value and len(value.strip()) < 10:
+            raise serializers.ValidationError("Description must be at least 10 characters long")
+        return value.strip() if value else ""
+    
+    def validate_phone_number(self, value):
+        if value and not value.replace('+', '').replace('-', '').replace(' ', '').isdigit():
+            raise serializers.ValidationError("Please enter a valid phone number")
+        return value.strip() if value else ""
+    
+    def update(self, instance, validated_data):
+        """Update company profile fields"""
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
 
 class CompanyLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
         
         if email and password:
+            # Use email to find the company, then authenticate with username
             try:
-                company = Company.objects.get(email__iexact=email)
-                # Use username for authentication
+                company = Company.objects.get(email=email)
                 user = authenticate(username=company.username, password=password)
-                if not user:
+                if user:
+                    if not user.is_active:
+                        raise serializers.ValidationError('Account is disabled')
+                    data['user'] = user
+                else:
                     raise serializers.ValidationError('Invalid credentials')
-                if not user.is_active:
-                    raise serializers.ValidationError('Account is disabled')
-                attrs['company'] = user
             except Company.DoesNotExist:
                 raise serializers.ValidationError('Invalid credentials')
         else:
-            raise serializers.ValidationError('Email and password required')
+            raise serializers.ValidationError('Email and password are required')
         
-        return attrs
+        return data
 
 class CompanyListSerializer(serializers.ModelSerializer):
     services_count = serializers.SerializerMethodField()

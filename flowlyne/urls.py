@@ -16,16 +16,29 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('offering/', views.offering_view, name='offering'),
     
-    # API endpoints
+    # API endpoints - Authentication
     path('api/register/', views.api_register, name='api_register'),
     path('api/login/', views.api_login, name='api_login'),
+    
+    # API endpoints - Company Profile
+    path('api/profile/', views.api_company_profile, name='api_company_profile'),
+    path('api/profile/update/', views.api_update_company_profile, name='api_update_company_profile'),
+    
+    # API endpoints - Companies
     path('api/companies/', views.api_companies, name='api_companies'),
     path('api/companies/<int:company_id>/', views.api_company_detail, name='api_company_detail'),
+    
+    # API endpoints - General
     path('api/categories/', views.api_categories, name='api_categories'),
     path('api/stats/', views.api_stats, name='api_stats'),
+    path('api/platform-stats/', views.api_platform_stats, name='api_platform_stats'),
     path('api/messages/', views.api_send_message, name='api_send_message'),
+    
+    # API endpoints - Subscriptions
     path('api/subscription-plans/', views.api_subscription_plans, name='api_subscription_plans'),
     path('api/upgrade/', views.api_upgrade_subscription, name='api_upgrade_subscription'),
+    
+    # API endpoints - Services
     path('api/services/', views.api_company_services, name='api_company_services'),
     path('api/services/create/', views.api_create_service, name='api_create_service'),
     path('api/services/<int:service_id>/', views.api_service_detail, name='api_service_detail'),
