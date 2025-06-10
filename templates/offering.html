@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offering Services - Flowlyne</title>
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="icon" type="image/x-icon" href="/static/images/logo.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo.png">
-    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
-    <link rel="apple-touch-icon" href="/static/images/logo.png">
-    <link rel="shortcut icon" href="/static/images/logo.ico">
+    <title>My Services - Flowlyne</title>
+    {% csrf_token %}
+    
     <style>
+        /* ===== CSS VARIABLES ===== */
         :root {
             --primary-teal: #4ECDC4;
-            --primary-blue: #45B7D1;
             --accent-purple: #6C5CE7;
             --dark-grey: #2D3436;
             --medium-grey: #636E72;
-            --light-grey: #DDD6FE;
+            --light-grey: #DDD;
             --white: #FFFFFF;
-            --off-white: #FAFBFC;
-            --success: #00D4AA;
-            --warning: #FFB800;
+            --success: #00B894;
             --error: #FF6B6B;
-            --gradient-primary: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
-            --gradient-accent: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
-            --gradient-dark: linear-gradient(135deg, var(--dark-grey), var(--medium-grey));
+            --warning: #FDCB6E;
+            --gradient-primary: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            --gradient-accent: linear-gradient(135deg, #6C5CE7 0%, #A29BFE 100%);
+            --border-radius: 16px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
         }
 
+        /* ===== GLOBAL STYLES ===== */
         * {
             margin: 0;
             padding: 0;
@@ -35,35 +33,36 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--off-white) 0%, #F3F4F6 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             color: var(--dark-grey);
             line-height: 1.6;
             min-height: 100vh;
         }
 
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1rem 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-container {
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .nav-brand {
@@ -71,100 +70,45 @@
             align-items: center;
             gap: 0.75rem;
             text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-brand:hover {
-            transform: translateY(-1px);
-        }
-
-        .nav-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
-            transition: all 0.3s ease;
+            color: var(--dark-grey);
         }
 
         .nav-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
         }
 
-        .nav-brand:hover .nav-logo {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-        }
-
         .nav-brand h1 {
-            background: linear-gradient(135deg, var(--primary-teal), var(--accent-purple));
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
             margin: 0;
         }
 
         .nav-tagline {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--medium-grey);
-            font-weight: 500;
-            font-style: italic;
-            opacity: 0.8;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--dark-grey);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            background: rgba(78, 205, 196, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .nav-links a.active {
-            background: var(--gradient-primary);
-            color: white;
+            margin-top: -2px;
         }
 
         .user-menu {
-            position: relative;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(78, 205, 196, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            gap: 1rem;
         }
 
-        .user-menu:hover {
-            background: rgba(78, 205, 196, 0.2);
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-grey);
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--gradient-primary);
             display: flex;
@@ -172,92 +116,69 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        /* Main Content */
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        /* ===== MAIN CONTENT ===== */
         .main-content {
-            padding-top: 6rem;
-            min-height: 100vh;
+            padding: 3rem 0;
+            min-height: calc(100vh - 80px);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Hero Section */
-        .hero-section {
+        .page-header {
             text-align: center;
-            margin-bottom: 4rem;
-            position: relative;
-            overflow: hidden;
-            background: var(--white);
-            border-radius: 24px;
-            padding: 4rem 2rem;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
         }
 
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(78, 205, 196, 0.08) 0%, transparent 70%);
-            animation: float 25s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-20px, -15px) rotate(2deg); }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-        }
-
-        .hero-title {
-            font-size: clamp(2rem, 5vw, 3rem);
+        .page-title {
+            font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            background: var(--gradient-dark);
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
-        .hero-subtitle {
+        .page-subtitle {
             font-size: 1.25rem;
             color: var(--medium-grey);
             margin-bottom: 2rem;
         }
 
-        .hero-tagline {
-            font-size: 1rem;
-            color: var(--primary-teal);
+        /* ===== ADD SERVICE BUTTON ===== */
+        .add-service-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
             font-weight: 600;
-            font-style: italic;
-            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .hero-image {
-            max-width: 300px;
-            height: auto;
-            margin: 0 auto;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+        .add-service-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
         }
 
-        /* Services Section */
+        /* ===== SERVICES SECTION ===== */
         .services-section {
-            margin-bottom: 4rem;
+            margin-top: 3rem;
         }
 
-        .section-header {
+        .services-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -266,59 +187,26 @@
             gap: 1rem;
         }
 
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark-grey);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
         .services-count {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 1.25rem;
             font-weight: 600;
+            color: var(--dark-grey);
         }
 
-        .add-service-btn {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
-        }
-
-        .add-service-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
-        }
-
-        /* Services Grid */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
 
         .service-card {
             background: var(--white);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--box-shadow);
             border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.4s ease;
+            transition: var(--transition);
             position: relative;
             overflow: hidden;
         }
@@ -336,8 +224,8 @@
         }
 
         .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         }
 
         .service-card:hover::before {
@@ -351,7 +239,7 @@
             margin-bottom: 1rem;
         }
 
-        .service-title {
+        .service-info h3 {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--dark-grey);
@@ -403,7 +291,7 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .edit-btn:hover {
@@ -419,7 +307,7 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .delete-btn:hover {
@@ -427,12 +315,12 @@
             color: white;
         }
 
-        /* Add Service Form */
+        /* ===== ADD SERVICE FORM ===== */
         .add-service-form {
             background: var(--white);
             border-radius: 24px;
             padding: 3rem;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--box-shadow);
             border: 1px solid rgba(0, 0, 0, 0.05);
             margin-bottom: 2rem;
             display: none;
@@ -460,7 +348,7 @@
         }
 
         .form-title {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--dark-grey);
             margin-bottom: 0.5rem;
@@ -468,76 +356,72 @@
 
         .form-subtitle {
             color: var(--medium-grey);
-            font-size: 1rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
         }
 
         .form-group {
             margin-bottom: 1.5rem;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
         .form-label {
             display: block;
-            margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--dark-grey);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
         }
 
-        .form-input {
+        .form-input,
+        .form-select,
+        .form-textarea {
             width: 100%;
             padding: 1rem;
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            font-family: inherit;
+            border: 2px solid var(--light-grey);
+            border-radius: var(--border-radius);
             font-size: 1rem;
-            transition: all 0.3s ease;
-            background: var(--white);
+            transition: var(--transition);
+            background: white;
         }
 
-        .form-input:focus {
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
             border-color: var(--primary-teal);
-            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.1);
-            transform: translateY(-1px);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
         }
 
         .form-textarea {
-            min-height: 120px;
             resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
         .form-actions {
             display: flex;
             gap: 1rem;
             justify-content: flex-end;
+            margin-top: 2rem;
         }
 
         .cancel-btn {
-            background: rgba(149, 165, 166, 0.1);
+            background: rgba(99, 110, 114, 0.1);
             color: var(--medium-grey);
-            border: 2px solid rgba(149, 165, 166, 0.2);
+            border: 2px solid rgba(99, 110, 114, 0.2);
             padding: 1rem 2rem;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .cancel-btn:hover {
-            background: rgba(149, 165, 166, 0.2);
+            background: var(--medium-grey);
+            color: white;
         }
 
         .submit-btn {
@@ -545,64 +429,72 @@
             color: white;
             border: none;
             padding: 1rem 2rem;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.3);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.4);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3);
         }
 
         .submit-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
 
-        /* Empty State */
+        /* ===== LOADING STATES ===== */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--medium-grey);
         }
 
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-title {
+        .empty-state h3 {
             font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             color: var(--dark-grey);
         }
 
-        .empty-text {
-            color: var(--medium-grey);
+        .empty-state p {
+            font-size: 1.1rem;
             margin-bottom: 2rem;
         }
 
-        /* Notifications */
+        /* ===== NOTIFICATIONS ===== */
         .notification {
             position: fixed;
-            top: 100px;
-            right: 20px;
+            top: 2rem;
+            right: 2rem;
             background: var(--success);
             color: white;
             padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
-            z-index: 1001;
-            transform: translateX(400px);
-            transition: all 0.3s ease;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 400px;
         }
 
         .notification.show {
@@ -611,75 +503,42 @@
 
         .notification.error {
             background: var(--error);
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
         }
 
-        /* Mobile Responsive */
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 768px) {
-            .nav-container {
-                padding: 0 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
             .container {
+                padding: 0 1rem;
+            }
+
+            .nav-container {
                 padding: 1rem;
             }
 
-            .hero-section {
-                padding: 2rem 1rem;
+            .page-title {
+                font-size: 2rem;
             }
 
             .services-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
             }
 
-            .service-card {
-                padding: 1.5rem;
+            .services-header {
+                flex-direction: column;
+                align-items: stretch;
             }
 
-            .add-service-form {
-                padding: 2rem;
-            }
-
-            .form-grid {
+            .form-row {
                 grid-template-columns: 1fr;
             }
 
             .form-actions {
                 flex-direction: column;
             }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .service-actions {
-                flex-direction: column;
-            }
-        }
-
-        /* Loading animation */
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-            margin-right: 0.5rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -696,22 +555,13 @@
                     <div class="nav-tagline">Smooth and Fine</div>
                 </div>
             </a>
-            <div class="nav-links">
-                <a href="{% url 'flowlyne:index' %}">Home</a>
-                <a href="{% url 'flowlyne:services' %}">Services</a>
-                <a href="{% url 'flowlyne:offering' %}" class="active">My Services</a>
-                <a href="{% url 'flowlyne:dashboard' %}">Dashboard</a>
-                <a href="{% url 'flowlyne:plans' %}">Plans</a>
-            </div>
+            
             {% if user.is_authenticated %}
-            <div class="user-menu" onclick="showUserMenu()">
-                <div class="user-avatar" id="user-avatar">{{ user.company_name|first|upper }}</div>
-                <span id="user-name">{{ user.company_name }}</span>
-            </div>
-            {% else %}
-            <div class="nav-links">
-                <a href="{% url 'flowlyne:login' %}">Login</a>
-                <a href="{% url 'flowlyne:register' %}">Register</a>
+            <div class="user-menu">
+                <span class="user-name">{{ user.company_name }}</span>
+                <div class="user-avatar" onclick="showUserMenu()">
+                    {{ user.company_name|first|upper }}
+                </div>
             </div>
             {% endif %}
         </div>
@@ -720,101 +570,59 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
-            <!-- Hero Section -->
-            <section class="hero-section">
-                <div class="hero-content">
-                    <h1 class="hero-title">The Services that Power Your Growth</h1>
-                    <p class="hero-subtitle">We handle the heavy lifting - so you can focus on your vision.</p>
-                    <p class="hero-tagline">"Smooth and Fine, That's Flowlyne"</p>
-                    
-                    <!-- Hero Image Placeholder -->
-                    <div style="display: flex; justify-content: center; margin: 2rem 0;">
-                        <div style="width: 300px; height: 200px; background: var(--gradient-primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
-                            🚀
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Services Section -->
-            <section class="services-section">
-                <div class="section-header">
-                    <div>
-                        <h2 class="section-title">
-                            🎯 My Offered Services
-                            <span class="services-count" id="services-count">0 Services</span>
-                        </h2>
-                    </div>
-                    <button class="add-service-btn" onclick="toggleAddServiceForm()">
-                        <span>➕</span>
-                        <span>Add New Service</span>
-                    </button>
-                </div>
-
-                <!-- Services Grid -->
-                <div class="services-grid" id="services-grid">
-                    <!-- Services will be loaded here -->
-                </div>
-
-                <!-- Empty State -->
-                <div class="empty-state" id="empty-state" style="display: none;">
-                    <div class="empty-icon">📦</div>
-                    <h3 class="empty-title">No Services Yet</h3>
-                    <p class="empty-text">Start building your service portfolio by adding your first service offering.</p>
-                    <button class="add-service-btn" onclick="toggleAddServiceForm()">
-                        <span>➕</span>
-                        <span>Add Your First Service</span>
-                    </button>
-                </div>
+            <!-- Page Header -->
+            <section class="page-header">
+                <h1 class="page-title">My Services</h1>
+                <p class="page-subtitle">Manage and showcase your professional services</p>
+                <button class="add-service-btn" onclick="toggleAddServiceForm()">
+                    ➕ Add New Service
+                </button>
             </section>
 
             <!-- Add Service Form -->
             <section class="add-service-form" id="add-service-form">
                 <div class="form-header">
-                    <h3 class="form-title">Add a New Service</h3>
+                    <h2 class="form-title">Add a New Service</h2>
                     <p class="form-subtitle">Expand your offerings and reach more clients</p>
                 </div>
 
-                <form onsubmit="handleAddService(event)" id="service-form">
-                    {% csrf_token %}
-                    <div class="form-grid">
+                <form id="service-form" onsubmit="handleAddService(event)">
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="service-title">Service Title *</label>
-                            <input type="text" id="service-title" name="title" class="form-input" required 
-                                   placeholder="Enter service name">
+                            <input type="text" id="service-title" name="title" class="form-input" 
+                                   placeholder="e.g., Logo Design, Website Development" required>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label" for="service-price">Price (EGP) *</label>
-                            <input type="number" id="service-price" name="price" class="form-input" required 
-                                   placeholder="0.00" min="0" step="0.01">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="service-category">Category</label>
-                            <select id="service-category" name="category" class="form-input">
-                                <option value="Web Development">Web Development</option>
-                                <option value="Mobile App Development">Mobile App Development</option>
-                                <option value="Digital Marketing">Digital Marketing</option>
-                                <option value="Graphic Design">Graphic Design</option>
-                                <option value="Business Consulting">Business Consulting</option>
-                                <option value="Accounting & Finance">Accounting & Finance</option>
-                                <option value="Content Creation">Content Creation</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="service-duration">Estimated Duration</label>
-                            <input type="text" id="service-duration" name="duration" class="form-input" 
-                                   placeholder="e.g., 2-3 weeks">
+                            <input type="number" id="service-price" name="price" class="form-input" 
+                                   placeholder="5000" min="1" step="0.01" required>
                         </div>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label class="form-label" for="service-description">Service Description *</label>
-                        <textarea id="service-description" name="description" class="form-input form-textarea" required
-                                  placeholder="Describe your service in detail. What do you offer? What are the benefits? What's included?"></textarea>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="service-category">Category</label>
+                            <select id="service-category" name="category" class="form-select">
+                                <option value="Design">Design</option>
+                                <option value="Development">Development</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Consulting">Consulting</option>
+                                <option value="Writing">Writing</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="service-duration">Duration</label>
+                            <input type="text" id="service-duration" name="duration" class="form-input" 
+                                   placeholder="e.g., 2-3 weeks, 1 month">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="service-description">Description *</label>
+                        <textarea id="service-description" name="description" class="form-textarea" 
+                                  placeholder="Describe your service in detail. What do you offer? What are the benefits? What's included?" required></textarea>
                     </div>
 
                     <div class="form-actions">
@@ -826,6 +634,25 @@
                         </button>
                     </div>
                 </form>
+            </section>
+
+            <!-- Services Section -->
+            <section class="services-section">
+                <div class="services-header">
+                    <h2 class="services-count" id="services-count">0 Services</h2>
+                </div>
+                
+                <div class="services-grid" id="services-grid">
+                    <!-- Services will be populated by JavaScript -->
+                </div>
+
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <h3>No services yet</h3>
+                    <p>Start by adding your first service to showcase your offerings</p>
+                    <button class="add-service-btn" onclick="toggleAddServiceForm()">
+                        ➕ Add Your First Service
+                    </button>
+                </div>
             </section>
         </div>
     </main>
@@ -863,88 +690,60 @@
                 throw new Error(errorData.error || errorData.detail || `HTTP error! status: ${response.status}`);
             }
 
-            return await response.json();
+            return response;
         }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing...');
-            checkAuthentication();
             loadServices();
         });
 
-        // Check if user is logged in
-        function checkAuthentication() {
-            {% if not user.is_authenticated %}
-            alert('Please login to access your services');
-            window.location.href = '{% url "flowlyne:login" %}';
-            return;
-            {% endif %}
-
-            // User info is already available from Django template
-            console.log('User authenticated');
-        }
-
-        // Load existing services from Django - FIXED URLS
+        // Load services - FIXED URLS
         async function loadServices() {
             try {
-                console.log('Loading services from backend...');
-                // Use correct Django URL pattern name
-                const response = await fetch('{% url "flowlyne:api_company_services" %}', {
-                    method: 'GET',
-                    headers: {
-                        'X-CSRFToken': getCSRFToken(),
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
+                const response = await apiRequest('{% url "flowlyne:api_company_services" %}', {
+                    method: 'GET'
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
 
                 const data = await response.json();
                 services = data.services || [];
-                console.log('Loaded services:', services);
-                displayServices();
+                
+                renderServices();
                 updateServicesCount();
+                
             } catch (error) {
                 console.error('Error loading services:', error);
                 showNotification('Error loading services: ' + error.message, 'error');
-                // Show empty state even if there's an error
-                services = [];
-                displayServices();
-                updateServicesCount();
             }
         }
 
-        // Display services in grid
-        function displayServices() {
-            const grid = document.getElementById('services-grid');
+        // Render services
+        function renderServices() {
+            const servicesGrid = document.getElementById('services-grid');
             const emptyState = document.getElementById('empty-state');
 
             if (services.length === 0) {
-                grid.style.display = 'none';
+                servicesGrid.style.display = 'none';
                 emptyState.style.display = 'block';
                 return;
             }
 
-            grid.style.display = 'grid';
+            servicesGrid.style.display = 'grid';
             emptyState.style.display = 'none';
 
-            grid.innerHTML = services.map(service => {
-                const serviceId = service.id || service.service_id;
-                const serviceName = service.service_name || service.title || '';
-                const serviceDescription = service.service_description || service.description || '';
-                const servicePrice = service.price || '0';
+            servicesGrid.innerHTML = services.map(service => {
+                const serviceId = service.service_id || service.id;
+                const serviceName = service.service_name || service.title || 'Untitled Service';
+                const serviceDescription = service.service_description || service.description || 'No description available';
+                const servicePrice = service.price || 0;
                 const serviceCategory = service.category || '';
                 const serviceDuration = service.duration || '';
 
                 return `
-                    <div class="service-card" data-id="${serviceId}">
+                    <div class="service-card">
                         <div class="service-header">
-                            <div>
-                                <h4 class="service-title">${serviceName}</h4>
+                            <div class="service-info">
+                                <h3>${serviceName}</h3>
                                 <div class="service-meta">
                                     ${serviceCategory ? `<span class="meta-tag">${serviceCategory}</span>` : ''}
                                     ${serviceDuration ? `<span class="meta-tag">⏱️ ${serviceDuration}</span>` : ''}
@@ -1101,7 +900,8 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const service = await response.json();
+                const data = await response.json();
+                const service = data.service;
                 
                 editingServiceId = serviceId;
                 
@@ -1136,7 +936,7 @@
 
         // Delete service - FIXED URLS
         async function deleteService(serviceId) {
-            const service = services.find(s => (s.id || s.service_id) == serviceId);
+            const service = services.find(s => (s.service_id || s.id) == serviceId);
             const serviceName = service ? (service.service_name || service.title || 'this service') : 'this service';
 
             if (confirm(`Are you sure you want to delete "${serviceName}"?\n\nThis action cannot be undone.`)) {
@@ -1188,50 +988,9 @@
         // User menu
         function showUserMenu() {
             if (confirm('Sign out of your account?')) {
-                logout();
+                window.location.href = '{% url "flowlyne:logout" %}';
             }
         }
-
-        // Logout
-        function logout() {
-            window.location.href = '{% url "flowlyne:logout" %}';
-        }
-
-        // Add smooth focus animations to form inputs
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.form-input').forEach(input => {
-                input.addEventListener('focus', (e) => {
-                    e.target.style.transform = 'translateY(-1px)';
-                });
-                
-                input.addEventListener('blur', (e) => {
-                    e.target.style.transform = 'translateY(0)';
-                });
-            });
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 100) {
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-            } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.8)';
-                navbar.style.boxShadow = 'none';
-            }
-        });
-
-        // Auto-resize textareas
-        document.addEventListener('DOMContentLoaded', function() {
-            const textareas = document.querySelectorAll('.form-textarea');
-            textareas.forEach(textarea => {
-                textarea.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-            });
-        });
     </script>
 </body>
 </html>

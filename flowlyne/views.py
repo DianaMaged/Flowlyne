@@ -153,20 +153,12 @@ def api_login(request):
 
                 # Prepare company data for response
                 company_data = {
-                    'id': company.company_id,
+                    'company_id': company.company_id,
                     'company_name': company.company_name,
                     'email': company.email,
-                    'description': company.description or '',
-                    'company_address': company.company_address or '',
-                    'phone_number': company.phone_number or '',
-                    'city': company.city,
-                    'country': company.country,
-                    'is_verified': company.is_verified,
                     'current_plan': company.current_plan,
-                    'created_at': company.created_at.isoformat()
+                    'is_verified': company.is_verified
                 }
-
-                logger.info(f"API Login successful for: {company.company_name}")
 
                 return JsonResponse({
                     'message': 'Login successful',
@@ -174,108 +166,67 @@ def api_login(request):
                     'token': token.key
                 })
             else:
-                logger.warning(f"Invalid password for: {email}")
+                logger.warning(f"Authentication failed for: {email}")
                 return JsonResponse({'error': 'Invalid email or password'}, status=400)
 
         except Company.DoesNotExist:
-            logger.warning(f"API Login attempt for non-existent email: {email}")
+            logger.warning(f"Login attempt for non-existent email: {email}")
             return JsonResponse({'error': 'Invalid email or password'}, status=400)
 
     except json.JSONDecodeError:
-        logger.error("Invalid JSON in request body")
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     except Exception as e:
-        logger.error(f"API Login error: {str(e)}")
+        logger.error(f"Login error: {str(e)}")
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
 
 @csrf_exempt
 def api_register(request):
-    """Register a new company"""
+    """API Register endpoint - for JavaScript/AJAX requests"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST method allowed'}, status=405)
 
     try:
-        # Parse request data
         if request.content_type == 'application/json':
             data = json.loads(request.body)
         else:
             data = request.POST
 
-        company_name = data.get('company_name', '').strip()
-        email = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-        description = data.get('description', '').strip()
+        logger.info(f"Registration attempt for: {data.get('email')}")
 
-        logger.info(f"API Registration attempt for: {company_name} ({email})")
+        serializer = CompanyRegistrationSerializer(data=data)
+        if serializer.is_valid():
+            company = serializer.save()
+            logger.info(f"Company registered successfully: {company.company_name}")
 
-        # Validation
-        if not all([company_name, email, password]):
-            return JsonResponse({'error': 'Company name, email and password are required'}, status=400)
+            # Prepare response data
+            company_data = {
+                'company_id': company.company_id,
+                'company_name': company.company_name,
+                'email': company.email,
+                'current_plan': company.current_plan,
+                'is_verified': company.is_verified
+            }
 
-        # Check if email already exists
-        if Company.objects.filter(email__iexact=email).exists():
-            logger.warning(f"API Registration attempt with existing email: {email}")
-            return JsonResponse({'error': 'A company with this email already exists'}, status=400)
-
-        # Create the company
-        company = Company.objects.create_user(
-            email=email,
-            password=password,
-            company_name=company_name,
-            description=description,
-            city='Cairo',  # Default for now
-            country='Egypt'  # Default for now
-        )
-
-        # Log them into Django session using username
-        user = authenticate(request, username=company.username, password=password)
-        if user is not None:
-            login(request, user)
-            logger.info(f"API Registration session created for: {user.company_name}")
-
-        # Create auth token
-        token, created = Token.objects.get_or_create(user=company)
-
-        # Prepare response data
-        company_data = {
-            'id': company.company_id,
-            'company_name': company.company_name,
-            'email': company.email,
-            'description': company.description or '',
-            'company_address': company.company_address or '',
-            'phone_number': company.phone_number or '',
-            'city': company.city,
-            'country': company.country,
-            'is_verified': company.is_verified,
-            'current_plan': company.current_plan,
-            'created_at': company.created_at.isoformat()
-        }
-
-        logger.info(f"API Registration successful for: {company.company_name}")
-
-        return JsonResponse({
-            'message': 'Registration successful',
-            'company': company_data,
-            'token': token.key
-        }, status=201)
+            return JsonResponse({
+                'message': 'Registration successful',
+                'company': company_data
+            }, status=201)
+        else:
+            logger.warning(f"Registration validation failed: {serializer.errors}")
+            return JsonResponse({'error': serializer.errors}, status=400)
 
     except json.JSONDecodeError:
-        logger.error("Invalid JSON in request body")
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     except Exception as e:
-        logger.error(f"API Registration error: {str(e)}")
+        logger.error(f"Registration error: {str(e)}")
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
 
-# ================================
-# API VIEWS - UPDATED TO REMOVE is_active FILTERS AND ADD SEARCH
-# ================================
-
-# API view to get all companies (for services page) with search and category filtering
+# API view to get companies
 def api_companies(request):
     try:
-        # Get search and filter parameters
+        # Get query parameters
         search_query = request.GET.get('search', '').strip()
         category_filter = request.GET.get('category', '').strip()
 
@@ -471,15 +422,72 @@ def api_create_service(request):
         return Response({'error': 'Internal server error'}, status=500)
 
 
-# API view to get service details
+# FIXED: API view to handle service details with GET, PUT, DELETE
+@csrf_exempt
 def api_service_detail(request, service_id):
+    """Handle service detail operations: GET, PUT, DELETE"""
     try:
+        # Get the service and check ownership if user is authenticated
         service = get_object_or_404(Service, service_id=service_id)
-        serializer = ServiceSerializer(service)
-        return JsonResponse({'service': serializer.data})
-    except Exception as e:
-        logger.error(f"Error fetching service details: {str(e)}")
+        
+        # For PUT and DELETE, require authentication and ownership
+        if request.method in ['PUT', 'DELETE']:
+            if not request.user.is_authenticated:
+                return JsonResponse({'error': 'Authentication required'}, status=401)
+            
+            if service.company != request.user:
+                return JsonResponse({'error': 'Permission denied'}, status=403)
+        
+        if request.method == 'GET':
+            # Get service details
+            serializer = ServiceSerializer(service)
+            return JsonResponse({'service': serializer.data})
+            
+        elif request.method == 'PUT':
+            # Update service
+            try:
+                data = json.loads(request.body)
+                logger.info(f"Updating service {service_id} with data: {data}")
+                
+                # Update service fields
+                if 'service_name' in data:
+                    service.service_name = data['service_name']
+                if 'service_description' in data:
+                    service.service_description = data['service_description']
+                if 'price' in data:
+                    service.price = float(data['price'])
+                if 'category' in data:
+                    service.category = data['category']
+                if 'duration' in data:
+                    service.duration = data['duration']
+                
+                service.save()
+                logger.info(f"Service {service_id} updated successfully")
+                
+                serializer = ServiceSerializer(service)
+                return JsonResponse({
+                    'message': 'Service updated successfully', 
+                    'service': serializer.data
+                })
+                
+            except json.JSONDecodeError:
+                return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+            except ValueError as e:
+                return JsonResponse({'error': f'Invalid data format: {str(e)}'}, status=400)
+                
+        elif request.method == 'DELETE':
+            # Delete service
+            service_name = service.service_name
+            service.delete()
+            logger.info(f"Service '{service_name}' (ID: {service_id}) deleted successfully")
+            return JsonResponse({'message': 'Service deleted successfully'})
+            
+    except Service.DoesNotExist:
+        logger.warning(f"Service with ID {service_id} does not exist")
         return JsonResponse({'error': 'Service not found'}, status=404)
+    except Exception as e:
+        logger.error(f"Error handling service detail request: {str(e)}")
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
 
 # API view to get all services (for public listing)
